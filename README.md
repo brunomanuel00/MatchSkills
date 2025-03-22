@@ -16,24 +16,25 @@ Un sistema que conecta personas con habilidades complementarias para proyectos y
    ```sh
    git clone https://github.com/brunomanuel00/MatchSkills.git
    cd MatchSkills
+   rm -rf .git
 
 2. Instalar dependencias
-cd frontend && pnpm install
-cd ../backend && npm install
+   cd frontend && pnpm install
+   cd ../backend && npm install
 3. Configurar env
-backend/.env
-MONGODB_URI=mongodb+srv://TUCUENTAMONGODB@cluster0.54z7f.mongodb.net/NombreRegistro?retryWrites=true&w=majority&appName=Cluster0
-PORT=3001
+   backend/.env
+   MONGODB_URI=mongodb+srv://TUCUENTAMONGODB@cluster0.54z7f.mongodb.net/NombreRegistro?retryWrites=true&w=majority&appName=Cluster0
+   PORT=3001
 
-TEST_MONGODB_URI=mongodb+srv://TUCUENTAMONGODB@cluster0.54z7f.mongodb.net/TestNombreRegistro?retryWrites=true&w=majority
+   TEST_MONGODB_URI=mongodb+srv://TUCUENTAMONGODB@cluster0.54z7f.mongodb.net/TestNombreRegistro?retryWrites=true&w=majority
 
 SECRET = para el jwt;
 
 4. Inicia el servidor
-cd backend && npm dev
+   cd backend && npm dev
 
 5. Inicia el frontend
-cd ../frontend && pnpm dev
+   cd ../frontend && pnpm dev
 
 ## Estructura del Proyecto
 /frontend
