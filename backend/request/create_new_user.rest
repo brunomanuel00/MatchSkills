@@ -1,0 +1,11 @@
+POST   http://localhost:3001/api/register/
+Content-Type: application/json
+
+ {
+    "name": "Rolando",
+    "email": "rolo@gmail.com",
+    "password": "welcomeToHymalalla",
+    "skills":["reactjs","node js"],
+    "lookingFor":["express", "nest"],
+    "role":"user"
+}

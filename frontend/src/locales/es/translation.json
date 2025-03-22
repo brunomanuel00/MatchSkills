@@ -1,0 +1,37 @@
+{
+    "welcome": {
+        "title": "Bienvenido a Match de habilidades",
+        "subtitle": "Conéctate con personas que complementan tus habilidades",
+        "description": "Elige una opción para continuar",
+        "login": "Iniciar Sesión",
+        "register": "Registrarse"
+    },
+    "login": {
+        "title": "Bienvenido de nuevo",
+        "subtitle": "Ingresa tus credenciales para iniciar sesión",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "button": "Iniciar Sesión",
+        "noAccount": "¿No tienes una cuenta?",
+        "signUp": "Regístrate"
+    },
+    "register": {
+        "title": "Crear una cuenta",
+        "subtitle": "Ingresa tu información para comenzar",
+        "name": "Nombre completo",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "button": "Crear Cuenta",
+        "haveAccount": "¿Ya tienes una cuenta?",
+        "signIn": "Inicia sesión"
+    },
+    "validation": {
+        "passwordMatch": "Las contraseñas no coinciden"
+    },
+    "language": "Idioma",
+    "theme": {
+        "toggle": "Cambiar tema"
+    }
+}

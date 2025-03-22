@@ -1,0 +1,37 @@
+{
+    "welcome": {
+        "title": "Welcome to Match Skills",
+        "subtitle": "Connect with people who complement your skills",
+        "description": "Choose an option to continue",
+        "login": "Login",
+        "register": "Register"
+    },
+    "login": {
+        "title": "Welcome back",
+        "subtitle": "Enter your credentials to sign in",
+        "email": "Email",
+        "password": "Password",
+        "forgotPassword": "Forgot password?",
+        "button": "Sign In",
+        "noAccount": "Don't have an account?",
+        "signUp": "Sign up"
+    },
+    "register": {
+        "title": "Create an account",
+        "subtitle": "Enter your information to get started",
+        "name": "Full Name",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "button": "Create Account",
+        "haveAccount": "Already have an account?",
+        "signIn": "Sign in"
+    },
+    "validation": {
+        "passwordMatch": "Passwords do not match"
+    },
+    "language": "Language",
+    "theme": {
+        "toggle": "Toggle theme"
+    }
+}
