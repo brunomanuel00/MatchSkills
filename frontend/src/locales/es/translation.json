@@ -33,5 +33,8 @@
     "language": "Idioma",
     "theme": {
         "toggle": "Cambiar tema"
+    },
+    "session": {
+        "close": "Cerrar Sesión"
     }
 }

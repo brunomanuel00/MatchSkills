@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { LogIn, UserPlus } from "lucide-react"
 import logo from '../assets/Match de habilidades.jpg'
@@ -7,11 +7,25 @@ import logo from '../assets/Match de habilidades.jpg'
 import { Button } from "../components/ui/button"
 import { ThemeToggle } from "../components/theme-toggle"
 import { LanguageToggle } from "../components/language-toggle"
+import { useAuth } from "../components/AuthContext"
+import { useEffect } from "react"
 // import { useState } from "react"
 
 export function WelcomePage() {
     const { t } = useTranslation()
-    // const [user, setUser] = useState<>
+    const navigate = useNavigate()
+    const { user } = useAuth()
+
+    useEffect(() => {
+        const logged = async () => {
+            if (user) {
+                navigate('/home')
+            }
+        }
+
+        logged();
+
+    }, [])
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -53,7 +67,7 @@ export function WelcomePage() {
                 variants={containerVariants}
             >
                 <div className="top-4 right-4 flex justify-evenly space-x-2 ">
-                    <div className="absolute top-4 left-5"><Link to='/'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
+                    <div className="absolute top-4 left-5"><Link to='/home'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
                     <div className=" absolute  top-4 right-4">
                         <LanguageToggle />
                         <ThemeToggle />

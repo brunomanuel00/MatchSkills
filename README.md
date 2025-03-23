@@ -8,7 +8,7 @@ Un sistema que conecta personas con habilidades complementarias para proyectos y
 ![Registro](./screenshots/register.png)
 
 ## Tecnologías Utilizadas
-- **Frontend:** React, Vite, Axios, React Router, Tailwind CSS, Shadcn/ui,i18next,Framer Motion, Lucide
+- **Frontend:** React, Vite,TypeScript, Axios, React Router, Tailwind CSS, Shadcn/ui,i18next,Framer Motion, Lucide
 - **Backend:** Express, MongoDB, Mongoose, JWT, Bcrypt , Cors, Dotenv, Morgan. Lodash, express-async-errors, Nodemon, Supertest
 
 ## Instalación
@@ -19,10 +19,14 @@ Un sistema que conecta personas con habilidades complementarias para proyectos y
    rm -rf .git
 
 2. Instalar dependencias
+   ```sh
    cd frontend && pnpm install
    cd ../backend && npm install
+
 3. Configurar env
+
    backend/.env
+   ```sh
    MONGODB_URI=mongodb+srv://TUCUENTAMONGODB@cluster0.54z7f.mongodb.net/NombreRegistro?retryWrites=true&w=majority&appName=Cluster0
    PORT=3001
 
@@ -31,52 +35,54 @@ Un sistema que conecta personas con habilidades complementarias para proyectos y
 SECRET = para el jwt;
 
 4. Inicia el servidor
+  ```sh
    cd backend && npm dev
 
 5. Inicia el frontend
+  ```sh
    cd ../frontend && pnpm dev
 
 ## Estructura del Proyecto
-/frontend
-  ├── public/
-  ├── src/
-  │   ├── assets/
-  │   ├── components/
-  │       ├── ui/
-  │   ├── lib/
-  │   ├── locales/
-  │       ├── en/
-  │       ├── es/
-  │   ├── pages/
-  │       ├── auth/
-  │   ├── routes/
-  │   ├── services/
-  │   ├── styles/
-  │   ├── types/
-  ├── components.json
-  ├── eslint.config.js
-  ├── index.html
-  ├── package.json
-  ├── pnpm-lock.yaml
-  ├── postcss.config.js
-  ├── tailwind.config.js
-  ├── tsconfig.app.json
-  ├── tsconfig.json
-  ├── tsconfig.node.json
-  ├── vite.config.ts
-/backend
-  ├── src/
-  │   ├── controllers/
-  │   ├── models/
-  │   ├── request/
-  │   ├── utils/
-  ├── .env
-  ├── .eslintrc.js
-  ├── app.js
-  ├── .eslint.config.mjs
-  ├── index.js
-  ├── package-lock.json
-  ├── package.json
+  /frontend
+    ├── public/
+    ├── src/
+    │   ├── assets/
+    │   ├── components/
+    │       ├── ui/
+    │   ├── lib/
+    │   ├── locales/
+    │       ├── en/
+    │       ├── es/
+    │   ├── pages/
+    │       ├── auth/
+    │   ├── routes/
+    │   ├── services/
+    │   ├── styles/
+    │   ├── types/
+    ├── components.json
+    ├── eslint.config.js
+    ├── index.html
+    ├── package.json
+    ├── pnpm-lock.yaml
+    ├── postcss.config.js
+    ├── tailwind.config.js
+    ├── tsconfig.app.json
+    ├── tsconfig.json
+    ├── tsconfig.node.json
+    ├── vite.config.ts
+  /backend
+    ├── src/
+    │   ├── controllers/
+    │   ├── models/
+    │   ├── request/
+    │   ├── utils/
+    ├── .env
+    ├── .eslintrc.js
+    ├── app.js
+    ├── .eslint.config.mjs
+    ├── index.js
+    ├── package-lock.json
+    ├── package.json
 
 ## Funcionalidades
 ✅ Registro y autenticación con JWT  

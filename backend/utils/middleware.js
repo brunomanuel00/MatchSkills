@@ -25,22 +25,23 @@ const tokenExtractor = (request, _response, next) => {
 }
 
 const userExtractor = async (request, response, next) => {
-    if (!request.token) {
-        return response.status(401).json({ error: 'token missing' })
+    const token = request.cookies.token;
+    if (!token) {
+        return response.status(401).json({ error: 'no token provided' });
     }
 
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    const decodedToken = jwt.verify(token, process.env.SECRET);
     if (!decodedToken.id) {
-        return response.status(400).json({ error: 'token invalid' })
+        return response.status(401).json({ error: 'token invalid' });
     }
 
-    const user = await User.findById(decodedToken.id)
+    const user = await User.findById(decodedToken.id);
     if (!user) {
-        return response.status(401).json({ error: 'user not found' })
+        return response.status(401).json({ error: 'user not found' });
     }
 
     request.user = user;
-    next()
+    next();
 }
 
 const errorHandler = (error, _request, response, next) => {
@@ -62,6 +63,12 @@ const errorHandler = (error, _request, response, next) => {
     }
     if (error.name === 'UnauthorizedError') {
         return response.status(403).json({ error: error.message });
+    }
+    if (error.name === 'TokenExpiredError') {
+        return response.status(401).json({ error: 'token expired' });
+    }
+    if (error.name === 'JsonWebTokenError') {
+        return response.status(401).json({ error: 'invalid token' });
     }
 
     next(error);

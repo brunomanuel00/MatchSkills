@@ -66,7 +66,7 @@ export function Register() {
             variants={containerVariants}
         >
             <div className="top-4 right-4 flex justify-evenly space-x-2 ">
-                <div className="absolute top-4 left-5"><Link to='/'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
+                <div className="absolute top-4 left-5"><Link to='/home'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
                 <div className=" absolute  top-4 right-4">
                     <LanguageToggle />
                     <ThemeToggle />

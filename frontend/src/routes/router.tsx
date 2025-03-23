@@ -3,16 +3,19 @@ import { Login } from "../pages/Auth/Login";
 import { WelcomePage } from "../pages/Welcome-page";
 import { Register } from "../pages/Auth/Register";
 import HomePage from "../pages/HomePage";
+import ProtectedRoute from "../components/ProtectedRoute";
+import Layout from "../pages/Layout";
+import { AuthProvider } from "../components/AuthContext";
 
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <WelcomePage />,
+        element: <AuthProvider><WelcomePage /></AuthProvider>,
     },
     {
         path: "/login",
-        element: <Login />,
+        element: <AuthProvider><Login /></AuthProvider>,
     },
     {
         path: "/register",
@@ -20,7 +23,14 @@ const router = createBrowserRouter([
     },
     {
         path: "/home",
-        element: <HomePage />
+        element: <AuthProvider><Layout /></AuthProvider>,
+        children: [
+            {
+                path: '',
+                element: <ProtectedRoute><HomePage /></ProtectedRoute>
+            }
+
+        ]
     }
 ])
 export default router;

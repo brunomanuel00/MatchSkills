@@ -4,12 +4,13 @@ require('express-async-errors')
 const cors = require('cors')
 const authRoutes = require('./controllers/auth')
 const userRoutes = require('./controllers/user')
+const cookieParser = require('cookie-parser');
 const middleware = require('./utils/middleware')
 const config = require('./utils/config')
 const mongoose = require('mongoose')
 const logger = require('./utils/logger')
 
-mongoose.set('strictQuery', true)
+mongoose.set('strictQuery', false)
 
 const url = config.MONGODB_URI
 
@@ -27,6 +28,7 @@ app.use(cors())
 app.use(express.json())
 app.use(middleware.morganMiddleware)
 app.use(middleware.tokenExtractor)
+app.use(cookieParser());
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 

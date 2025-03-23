@@ -1,6 +1,6 @@
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
@@ -13,6 +13,8 @@ import { ThemeToggle } from "../../components/theme-toggle"
 import { LanguageToggle } from "../../components/language-toggle"
 import logo from '../../assets/Match de habilidades.jpg'
 import loginService from '../../services/auth'
+import { useAuth } from '../../components/AuthContext';
+import { AuthCredentials } from "../../types/authTypes"
 
 export function Login() {
     const { t } = useTranslation()
@@ -20,23 +22,30 @@ export function Login() {
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
+    const { login, user } = useAuth()
+
+    useEffect(() => {
+        const logged = async () => {
+            if (user) {
+                navigate('/home')
+            }
+        }
+
+        logged();
+
+    }, [])
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         console.log({ email, password })
         try {
-            const user = await loginService.login({
-                email, password
-            })
-            window.localStorage.setItem(
-                'loggedMatchapp', JSON.stringify(user)
-            )
+            const credentials: AuthCredentials = { email, password };
+            const userData = await loginService.login(credentials);
+            login(userData.user);
             navigate('/home')
-
-            console.log("Esto es lo que devuelve luego de logguear: ", user)
         } catch (error) {
-            console.error(error)
+            console.error('Error al iniciar sesión:', error);
 
         }
     }
@@ -70,7 +79,7 @@ export function Login() {
             variants={containerVariants}
         >
             <div className="top-4 right-4 flex justify-evenly space-x-2 ">
-                <div className="absolute top-4 left-5"><Link to='/'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
+                <div className="absolute top-4 left-5"><Link to='/home'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
                 <div className=" absolute  top-4 right-4">
                     <LanguageToggle />
                     <ThemeToggle />

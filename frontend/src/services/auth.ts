@@ -1,15 +1,27 @@
 import axios from "axios";
-import { AuthCredentials, RegisterCredentials, AuthResponse } from "../types/authTypes";
+import { AuthCredentials, RegisterCredentials, User } from "../types/authTypes";
 
 const baseUrl = "/api/auth";
 
 const login = async (credentials: AuthCredentials) => {
-    const response = await axios.post<AuthResponse>(`${baseUrl}/login`, credentials)
+    const response = await axios.post<{ user: User }>(`${baseUrl}/login`, credentials, { withCredentials: true })
     return response.data
 }
 
-const register = (credentials: RegisterCredentials) => {
-    axios.post<AuthResponse>(`${baseUrl}/register`, credentials).then((res) => res.data);
+const logout = async () => {
+    const response = await axios.post(`${baseUrl}/logout`, {}, { withCredentials: true })
+    return response.data
 }
 
-export default { login, register };
+const verifyAuth = async () => {
+    const response = await axios.get(`${baseUrl}/verify-auth`, { withCredentials: true });
+    return response.data;
+
+}
+
+const register = async (credentials: RegisterCredentials) => {
+    const response = await axios.post(`${baseUrl}/register`, credentials)
+    return response.data
+}
+
+export default { login, register, logout, verifyAuth };
