@@ -19,3 +19,7 @@ export interface RegisterCredentials extends AuthCredentials {
     rol: "user" | "admin";
 }
 
+export interface LoginResponse {
+    user: User;
+    message: string;
+}

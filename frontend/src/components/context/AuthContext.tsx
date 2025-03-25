@@ -1,13 +1,12 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { User } from '../types/authTypes';
-import authService from "../services/auth"
-import { Spinner } from './ui/spinner';
+import { User, AuthCredentials } from '../../types/authTypes';
+import authService from "../../services/auth"
+import { Spinner } from '../ui/spinner';
 
 type AuthContextType = {
     user: User | null;
-    login: (userData: User) => void;
+    login: (credentials: AuthCredentials) => Object;
     logout: () => void;
-    loading: boolean
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,24 +23,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Verifica la autenticación al cargar la aplicación
     useEffect(() => {
         const verifyAuth = async () => {
             try {
                 const userData = await authService.verifyAuth();
-                setUser(userData); // Actualiza el estado del usuario
+                setUser(userData);
             } catch (error) {
                 setUser(null);
             } finally {
-                setLoading(false); // Indica que la verificación ha terminado
+                setLoading(false);
             }
         };
 
         verifyAuth();
     }, []);
 
-    const login = (userData: User) => {
-        setUser(userData);
+    const login = async (credentials: AuthCredentials) => {
+        try {
+            const userData = await authService.login(credentials);
+
+            if (!userData?.user?.rol) {
+                throw new Error('Role not found in user data');
+            }
+
+            setUser(userData.user);
+            return userData.user.rol;
+
+        } catch (error) {
+            throw error;
+        }
     };
 
     const logout = async () => {
@@ -50,13 +60,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     };
 
-    // Evita renderizar la aplicación hasta que se complete la verificación inicial
     if (loading) {
-        return <Spinner></Spinner>; // Puedes mostrar un spinner o un mensaje de carga
+        return <Spinner />;
     }
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

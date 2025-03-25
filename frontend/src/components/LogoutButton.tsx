@@ -1,16 +1,19 @@
 import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./context/AuthContext";
 import { useTranslation } from "react-i18next"
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function LogoutButton() {
     const { logout } = useAuth();
     const { t } = useTranslation()
+    const navigate = useNavigate()
 
     const handleLogout = async () => {
         try {
             await logout();
+            navigate('/')
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
         }

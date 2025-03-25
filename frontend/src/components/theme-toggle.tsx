@@ -1,36 +1,22 @@
-import { useEffect, useState } from "react"
-import { Moon, Sun } from "lucide-react"
-import { motion } from "framer-motion"
-
-import { Button } from "../components/ui/button"
-import { useTranslation } from "react-i18next"
+import { useTheme } from "./context/theme-context";
+import { Button } from "../components/ui/button";
+import { Moon, Sun } from "lucide-react";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export function ThemeToggle() {
-    const [theme, setTheme] = useState<"light" | "dark">("light")
-    const { t } = useTranslation()
-
-    useEffect(() => {
-        const storedTheme = localStorage.getItem("theme") as "light" | "dark" | null
-        if (storedTheme) {
-            setTheme(storedTheme)
-            document.documentElement.classList.toggle("dark", storedTheme === "dark")
-        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            setTheme("dark")
-            document.documentElement.classList.add("dark")
-        }
-    }, [])
-
-    const toggleTheme = () => {
-        const newTheme = theme === "light" ? "dark" : "light"
-        setTheme(newTheme)
-        document.documentElement.classList.toggle("dark", newTheme === "dark")
-        localStorage.setItem("theme", newTheme)
-    }
+    const { t } = useTranslation();
+    const { theme, toggleTheme } = useTheme();
 
     return (
-        <Button title={t('theme.toggle')} variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full ">
+        <Button
+            title={t('theme.toggle')}
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="rounded-full"
+        >
             <motion.div
-
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
@@ -45,6 +31,5 @@ export function ThemeToggle() {
             </motion.div>
             <span className="sr-only">Toggle theme</span>
         </Button>
-    )
+    );
 }
-

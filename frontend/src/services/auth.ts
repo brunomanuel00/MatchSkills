@@ -1,10 +1,10 @@
 import axios from "axios";
-import { AuthCredentials, RegisterCredentials, User } from "../types/authTypes";
+import { AuthCredentials, LoginResponse, RegisterCredentials, User } from "../types/authTypes";
 
 const baseUrl = "/api/auth";
 
 const login = async (credentials: AuthCredentials) => {
-    const response = await axios.post<{ user: User }>(`${baseUrl}/login`, credentials, { withCredentials: true })
+    const response = await axios.post<LoginResponse>(`${baseUrl}/login`, credentials, { withCredentials: true })
     return response.data
 }
 
@@ -20,7 +20,7 @@ const verifyAuth = async () => {
 }
 
 const register = async (credentials: RegisterCredentials) => {
-    const response = await axios.post(`${baseUrl}/register`, credentials)
+    const response = await axios.post<User>(`${baseUrl}/register`, credentials)
     return response.data
 }
 

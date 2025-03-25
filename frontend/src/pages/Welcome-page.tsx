@@ -7,7 +7,7 @@ import logo from '../assets/Match de habilidades.jpg'
 import { Button } from "../components/ui/button"
 import { ThemeToggle } from "../components/theme-toggle"
 import { LanguageToggle } from "../components/language-toggle"
-import { useAuth } from "../components/AuthContext"
+import { useAuth } from "../components/context/AuthContext"
 import { useEffect } from "react"
 // import { useState } from "react"
 
@@ -48,18 +48,9 @@ export function WelcomePage() {
         },
     }
 
-    // useEffect(() => {
-    //     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    //     if (loggedUserJSON) {
-    //         const user = JSON.parse(loggedUserJSON)
-    //         setUser(user)
-    //         blogService.setToken(user.token)
-    //     }
-    // }, [])
 
     return (
         <>
-
             <motion.div
                 className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-tea_green-500 to-light_green-300 dark:from-lapis_lazuli-500 dark:to-verdigris-700"
                 initial="hidden"

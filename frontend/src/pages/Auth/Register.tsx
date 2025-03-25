@@ -1,19 +1,22 @@
-"use client"
+import type React from "react";
 
-import type React from "react"
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, UserPlus, AlertCircle } from "lucide-react";
+import axios from "axios";
 
-import { useState } from "react"
-import { useTranslation } from "react-i18next"
-import { Link } from "react-router-dom"
-import { motion } from "framer-motion"
-import { Eye, EyeOff, UserPlus } from "lucide-react"
 
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import { ThemeToggle } from "../../components/theme-toggle"
-import { LanguageToggle } from "../../components/language-toggle"
-import logo from '../../assets/Match de habilidades.jpg'
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { ThemeToggle } from "../../components/theme-toggle";
+import { LanguageToggle } from "../../components/language-toggle";
+import logo from '../../assets/Match de habilidades.jpg';
+import authService from '../../services/auth';
+import { RegisterCredentials } from "../../types/authTypes";
+import { useAuth } from '../../components/context/AuthContext';
 
 export function Register() {
     const { t } = useTranslation()
@@ -24,17 +27,42 @@ export function Register() {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [passwordError, setPasswordError] = useState("")
+    const [error, setError] = useState<string | null>(null);
+    const rol = "user";
+    const { login, user } = useAuth()
+    const navigate = useNavigate()
 
-    const handleSubmit = (e: React.FormEvent) => {
+    useEffect(() => {
+        const logged = async () => {
+            if (user) {
+                navigate('/home')
+            }
+        }
+        logged();
+
+    }, [])
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         if (password !== confirmPassword) {
             setPasswordError(t("validation.passwordMatch"))
             return
         }
+        try {
+            const user: RegisterCredentials = { name, email, password, skills: [], lookingFor: [], rol }
+            const dataUser = await authService.register(user)
+            const credentials = { email: dataUser.email, password }
+            login(credentials)
+            navigate('/home')
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.data?.error === 'invalidEmail') {
+                setError(err.response.data.error);
+            } else {
+                setError('genericError');
+            }
+        }
 
-        // Handle registration logic here
-        console.log({ name, email, password })
     }
 
     const containerVariants = {
@@ -42,7 +70,7 @@ export function Register() {
         visible: {
             opacity: 1,
             transition: {
-                duration: 0.5,
+                duration: 0.2,
                 when: "beforeChildren",
                 staggerChildren: 0.1,
             },
@@ -66,7 +94,7 @@ export function Register() {
             variants={containerVariants}
         >
             <div className="top-4 right-4 flex justify-evenly space-x-2 ">
-                <div className="absolute top-4 left-5"><Link to='/home'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
+                <div className="absolute top-4 left-5"><Link to='/'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
                 <div className=" absolute  top-4 right-4">
                     <LanguageToggle />
                     <ThemeToggle />
@@ -110,6 +138,16 @@ export function Register() {
 
                             <motion.div className="space-y-2" variants={itemVariants}>
                                 <Label htmlFor="register-email">{t("register.email")}</Label>
+                                {error &&
+                                    <motion.div
+                                        className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-md"
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0 }}
+                                    >
+                                        <AlertCircle className="h-4 w-4" />
+                                        <span>{t(`register.errors.${error}`)}</span>
+                                    </motion.div>}
                                 <Input
                                     id="register-email"
                                     type="email"
@@ -129,6 +167,7 @@ export function Register() {
                                         type={showPassword ? "text" : "password"}
                                         placeholder="••••••••"
                                         value={password}
+                                        minLength={8}
                                         onChange={(e) => {
                                             setPassword(e.target.value)
                                             if (confirmPassword && e.target.value !== confirmPassword) {
@@ -158,6 +197,7 @@ export function Register() {
                                         type={showConfirmPassword ? "text" : "password"}
                                         placeholder="••••••••"
                                         value={confirmPassword}
+                                        minLength={8}
                                         onChange={(e) => {
                                             setConfirmPassword(e.target.value)
                                             if (password && e.target.value !== password) {
@@ -178,9 +218,12 @@ export function Register() {
                                         {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     </button>
                                 </div>
-                                {passwordError && <p className="text-xs text-destructive">{passwordError}</p>}
+                                {passwordError &&
+                                    <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 dark:bg-white dark:text-red-600 rounded-md">
+                                        <AlertCircle className="h-4 w-4" />
+                                        <p className="text-xs text-destructive"> {passwordError}</p>
+                                    </div>}
                             </motion.div>
-
                             <motion.div variants={itemVariants}>
                                 <Button
                                     type="submit"

@@ -5,7 +5,7 @@ const express = require('express')
 const app = express()
 const cookieParser = require('cookie-parser');
 const authRouter = express.Router()
-const middleware = require('../utils/middleware')
+
 
 app.use(cookieParser());
 
@@ -13,11 +13,17 @@ authRouter.post('/register', async (request, response) => {
     const { name, email, password, skills, lookingFor, rol } = request.body;
 
     if (password.length < 8) {
-        return response.status(400).json({ error: "The password is too short" });
+        return response.status(400).json({ error: "password" });
     }
 
     if (!name || !email) {
-        return response.status(400).json({ error: "Invalid fields" });
+        return response.status(400).json({ error: "fields" });
+    }
+
+    const existEmail = await User.findOne({ email })
+
+    if (existEmail) {
+        return response.status(400).json({ error: "invalidEmail" });
     }
 
     let userRol = rol || "user";

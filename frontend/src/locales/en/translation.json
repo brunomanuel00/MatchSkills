@@ -14,7 +14,11 @@
         "forgotPassword": "Forgot password?",
         "button": "Sign In",
         "noAccount": "Don't have an account?",
-        "signUp": "Sign up"
+        "signUp": "Sign up",
+        "errors": {
+            "invalidCredentials": "Invalid email or password",
+            "genericError": "An error occurred. Please try again."
+        }
     },
     "register": {
         "title": "Create an account",
@@ -25,7 +29,11 @@
         "confirmPassword": "Confirm Password",
         "button": "Create Account",
         "haveAccount": "Already have an account?",
-        "signIn": "Sign in"
+        "signIn": "Sign in",
+        "errors": {
+            "invalidEmail": "This email already exist",
+            "genericError": "An error occurred. Please try again."
+        }
     },
     "validation": {
         "passwordMatch": "Passwords do not match"
@@ -36,5 +44,24 @@
     },
     "session": {
         "close": "Log Out"
+    },
+    "logged": {
+        "home": "Home",
+        "matches": "Matches",
+        "profile": "Profile",
+        "dashboard": "Dashboard",
+        "title": "Match Skills"
+    },
+    "footer": {
+        "title": "Match Skills",
+        "description": "Connecting talents and opportunities to create incredible projects together.",
+        "quickLinks": "Quick Links",
+        "connect": "Connect with us",
+        "home": "Home",
+        "matches": "Matches",
+        "profile": "Profile",
+        "dashboard": "Dashboard",
+        "copyright": "Match Skills. All rights reserved.",
+        "loggedInAs": "Logged in as"
     }
 }

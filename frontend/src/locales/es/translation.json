@@ -1,6 +1,6 @@
 {
     "welcome": {
-        "title": "Bienvenido a Match de habilidades",
+        "title": "Bienvenido a Match de Habilidades",
         "subtitle": "Conéctate con personas que complementan tus habilidades",
         "description": "Elige una opción para continuar",
         "login": "Iniciar Sesión",
@@ -14,7 +14,11 @@
         "forgotPassword": "¿Olvidaste tu contraseña?",
         "button": "Iniciar Sesión",
         "noAccount": "¿No tienes una cuenta?",
-        "signUp": "Regístrate"
+        "signUp": "Regístrate",
+        "errors": {
+            "invalidCredentials": "Correo electrónico o contraseña incorrectos",
+            "genericError": "Ocurrió un error. Por favor, inténtalo de nuevo."
+        }
     },
     "register": {
         "title": "Crear una cuenta",
@@ -25,7 +29,11 @@
         "confirmPassword": "Confirmar contraseña",
         "button": "Crear Cuenta",
         "haveAccount": "¿Ya tienes una cuenta?",
-        "signIn": "Inicia sesión"
+        "signIn": "Inicia sesión",
+        "errors": {
+            "invalidEmail": "Este correo electrónico ya existe",
+            "genericError": "Ocurrió un error. Por favor, inténtalo de nuevo."
+        }
     },
     "validation": {
         "passwordMatch": "Las contraseñas no coinciden"
@@ -36,5 +44,24 @@
     },
     "session": {
         "close": "Cerrar Sesión"
+    },
+    "logged": {
+        "home": "Inicio",
+        "matches": "Matches",
+        "profile": "Perfil",
+        "dashboard": "Panel",
+        "title": "Match de Habilidades"
+    },
+    "footer": {
+        "title": "Match de Habilidades",
+        "description": "Conectando talentos y oportunidades para crear proyectos increíbles juntos.",
+        "quickLinks": "Enlaces Rápidos",
+        "connect": "Conéctate con nosotros",
+        "home": "Inicio",
+        "matches": "Match",
+        "profile": "Perfil",
+        "dashboard": "Panel",
+        "copyright": "Match de Habilidades. Todos los derechos reservados.",
+        "loggedInAs": "Iniciado sesión como"
     }
 }

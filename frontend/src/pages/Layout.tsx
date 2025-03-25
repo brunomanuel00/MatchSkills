@@ -1,15 +1,19 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import LogoutButton from "../components/LogoutButton";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import { Navbar } from "../components/NavBar";
+import { Footer } from "./Footer";
+import { ThemeProvider } from "../components/context/theme-context";
 
 export default function Layout() {
 
     return (
         <>
-            <main>
-                <Outlet />
-            </main>
+            <ThemeProvider>
+                <Navbar />
+                <main>
+                    <Outlet />
+                </main>
+                <Footer />
+            </ThemeProvider >
         </>
 
     );

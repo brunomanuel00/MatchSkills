@@ -5,30 +5,44 @@ import { Register } from "../pages/Auth/Register";
 import HomePage from "../pages/HomePage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Layout from "../pages/Layout";
-import { AuthProvider } from "../components/AuthContext";
+import MatchesPage from "../pages/MatchesPage";
+import ProfilePage from "../pages/ProfilePage";
+import DashboardPage from "../pages/DashboardPage";
 
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <AuthProvider><WelcomePage /></AuthProvider>,
+        element: <WelcomePage />,
     },
     {
         path: "/login",
-        element: <AuthProvider><Login /></AuthProvider>,
+        element: <Login />,
     },
     {
         path: "/register",
         element: <Register />,
     },
     {
-        path: "/home",
-        element: <AuthProvider><Layout /></AuthProvider>,
+        path: "",
+        element: <ProtectedRoute><Layout /></ProtectedRoute>,
         children: [
             {
-                path: '',
-                element: <ProtectedRoute><HomePage /></ProtectedRoute>
-            }
+                path: '/home',
+                element: <HomePage />
+            },
+            {
+                path: '/matches',
+                element: <MatchesPage />
+            },
+            {
+                path: '/profile',
+                element: <ProfilePage />
+            },
+            {
+                path: '/admin-dashboard',
+                element: <DashboardPage />
+            },
 
         ]
     }

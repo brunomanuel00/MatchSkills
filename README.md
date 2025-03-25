@@ -32,14 +32,14 @@ Un sistema que conecta personas con habilidades complementarias para proyectos y
 
    TEST_MONGODB_URI=mongodb+srv://TUCUENTAMONGODB@cluster0.54z7f.mongodb.net/TestNombreRegistro?retryWrites=true&w=majority
 
-SECRET = para el jwt;
+   SECRET = para el jwt;
 
 4. Inicia el servidor
-  ```sh
+   ```sh
    cd backend && npm dev
 
 5. Inicia el frontend
-  ```sh
+   ```sh
    cd ../frontend && pnpm dev
 
 ## Estructura del Proyecto

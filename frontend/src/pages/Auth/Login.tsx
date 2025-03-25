@@ -1,10 +1,12 @@
 import type React from "react"
+import axios from "axios"
+
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
-import { Eye, EyeOff, LogIn } from "lucide-react"
+import { Eye, EyeOff, LogIn, AlertCircle } from "lucide-react"
 
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -12,8 +14,7 @@ import { Label } from "../../components/ui/label"
 import { ThemeToggle } from "../../components/theme-toggle"
 import { LanguageToggle } from "../../components/language-toggle"
 import logo from '../../assets/Match de habilidades.jpg'
-import loginService from '../../services/auth'
-import { useAuth } from '../../components/AuthContext';
+import { useAuth } from '../../components/context/AuthContext';
 import { AuthCredentials } from "../../types/authTypes"
 
 export function Login() {
@@ -22,6 +23,7 @@ export function Login() {
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
+    const [errorType, setErrorType] = useState<string | null>(null);
     const { login, user } = useAuth()
 
     useEffect(() => {
@@ -30,25 +32,32 @@ export function Login() {
                 navigate('/home')
             }
         }
-
         logged();
 
     }, [])
 
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        console.log({ email, password })
+        e.preventDefault();
+        setErrorType(null);
         try {
             const credentials: AuthCredentials = { email, password };
-            const userData = await loginService.login(credentials);
-            login(userData.user);
-            navigate('/home')
-        } catch (error) {
-            console.error('Error al iniciar sesión:', error);
+            const rol = await login(credentials);
+            if (rol === 'user') {
+                navigate('/home')
+            } else if (rol === 'admin') {
+                navigate('/admin-dashboard')
+            } else {
+                throw new Error('Something gone wrong with permission')
+            }
 
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                setErrorType(err.response?.status === 401 ? 'invalidCredentials' : 'genericError');
+            }
         }
     }
+
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -79,7 +88,7 @@ export function Login() {
             variants={containerVariants}
         >
             <div className="top-4 right-4 flex justify-evenly space-x-2 ">
-                <div className="absolute top-4 left-5"><Link to='/home'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
+                <div className="absolute top-4 left-5"><Link to='/'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
                 <div className=" absolute  top-4 right-4">
                     <LanguageToggle />
                     <ThemeToggle />
@@ -109,6 +118,16 @@ export function Login() {
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            {errorType &&
+                                <motion.div
+                                    className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-md"
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                >
+                                    <AlertCircle className="h-4 w-4" />
+                                    <span>{t(`login.errors.${errorType}`)}</span>
+                                </motion.div>}
                             <motion.div className="space-y-2" variants={itemVariants}>
                                 <Label htmlFor="email">{t("login.email")}</Label>
                                 <Input
