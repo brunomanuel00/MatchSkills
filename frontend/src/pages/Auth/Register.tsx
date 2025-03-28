@@ -17,6 +17,8 @@ import logo from '../../assets/Match de habilidades.jpg';
 import authService from '../../services/auth';
 import { RegisterCredentials } from "../../types/authTypes";
 import { useAuth } from '../../components/context/AuthContext';
+// import { SkillsSelector } from "../../components/SkillsSelector";
+// import { SelectedSkills } from "../../types/skillTypes";
 
 export function Register() {
     const { t } = useTranslation()
@@ -31,6 +33,10 @@ export function Register() {
     const rol = "user";
     const { login, user } = useAuth()
     const navigate = useNavigate()
+    // const handleSkillsChange = (skills: SelectedSkills) => {
+    //     console.log('Skills updated:', skills);
+    // };
+
 
     useEffect(() => {
         const logged = async () => {
@@ -224,6 +230,7 @@ export function Register() {
                                         <p className="text-xs text-destructive"> {passwordError}</p>
                                     </div>}
                             </motion.div>
+                            {/* <SkillsSelector onSkillsChange={handleSkillsChange} /> */}
                             <motion.div variants={itemVariants}>
                                 <Button
                                     type="submit"

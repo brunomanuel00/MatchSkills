@@ -26,7 +26,7 @@ export function ThemeToggle() {
                 {theme === "light" ? (
                     <Sun className="h-5 w-5 text-lapis_lazuli" />
                 ) : (
-                    <Moon className="h-5 w-5 text-tea_green" />
+                    <Moon className="h-5 w-5 text-white" />
                 )}
             </motion.div>
             <span className="sr-only">Toggle theme</span>

@@ -24,7 +24,7 @@ export default function LogoutButton() {
             title={t('session.close')}
             variant="ghost"
             onClick={handleLogout}
-            className="flex items-center gap-2 hover:bg-red-100 dark:hover:bg-neutral-800"
+            className="flex items-center gap-2 hover:bg-white dark:hover:bg-neutral-800"
         >
             <motion.div
 
@@ -33,7 +33,7 @@ export default function LogoutButton() {
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{ duration: 0.3 }}
             >
-                <LogOut className="h-5 w-5 text-lapis_lazuli dark:text-tea_green" />
+                <LogOut className="h-5 w-5 text-lapis_lazuli dark:text-white" />
             </motion.div>
         </Button>
     );

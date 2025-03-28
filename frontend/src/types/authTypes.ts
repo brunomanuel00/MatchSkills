@@ -1,10 +1,15 @@
+import { Skill } from "./skillTypes";
 export interface User {
     id: string;
     name: string;
     email: string;
-    skills: string[];
-    lookingFor: string[];
+    skills: Skill[];
+    lookingFor: Skill[];
     rol: "user" | "admin";
+    avatar: {
+        public_id: String,
+        url: String
+    }
 }
 
 export interface AuthCredentials {

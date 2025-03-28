@@ -43,46 +43,47 @@ Un sistema que conecta personas con habilidades complementarias para proyectos y
    cd ../frontend && pnpm dev
 
 ## Estructura del Proyecto
-  /frontend
-    ├── public/
-    ├── src/
-    │   ├── assets/
-    │   ├── components/
-    │       ├── ui/
-    │   ├── lib/
-    │   ├── locales/
-    │       ├── en/
-    │       ├── es/
-    │   ├── pages/
-    │       ├── auth/
-    │   ├── routes/
-    │   ├── services/
-    │   ├── styles/
-    │   ├── types/
-    ├── components.json
-    ├── eslint.config.js
-    ├── index.html
-    ├── package.json
-    ├── pnpm-lock.yaml
-    ├── postcss.config.js
-    ├── tailwind.config.js
-    ├── tsconfig.app.json
-    ├── tsconfig.json
-    ├── tsconfig.node.json
-    ├── vite.config.ts
-  /backend
-    ├── src/
-    │   ├── controllers/
-    │   ├── models/
-    │   ├── request/
-    │   ├── utils/
-    ├── .env
-    ├── .eslintrc.js
-    ├── app.js
-    ├── .eslint.config.mjs
-    ├── index.js
-    ├── package-lock.json
-    ├── package.json
+   ```sh
+   /frontend
+     ├── public/
+     ├── src/
+     │   ├── assets/
+     │   ├── components/
+     │       ├── ui/
+     │   ├── lib/
+     │   ├── locales/
+     │       ├── en/
+     │       ├── es/
+     │   ├── pages/
+     │       ├── auth/
+     │   ├── routes/
+     │   ├── services/
+     │   ├── styles/
+     │   ├── types/
+     ├── components.json
+     ├── eslint.config.js
+     ├── index.html
+     ├── package.json
+     ├── pnpm-lock.yaml
+     ├── postcss.config.js
+     ├── tailwind.config.js
+     ├── tsconfig.app.json
+     ├── tsconfig.json
+     ├── tsconfig.node.json
+     ├── vite.config.ts
+   /backend
+     ├── src/
+     │   ├── controllers/
+     │   ├── models/
+     │   ├── request/
+     │   ├── utils/
+     ├── .env
+     ├── .eslintrc.js
+     ├── app.js
+     ├── .eslint.config.mjs
+     ├── index.js
+     ├── package-lock.json
+     ├── package.json
 
 ## Funcionalidades
 ✅ Registro y autenticación con JWT  

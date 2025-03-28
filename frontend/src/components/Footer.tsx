@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Home, Waypoints, User, Mail, Github, Linkedin, LayoutDashboard } from 'lucide-react';
-import { useAuth } from '../components/context/AuthContext';
-import { ThemeToggle } from '../components/theme-toggle';
-import { LanguageToggle } from '../components/language-toggle';
+import { Home, Waypoints, User, Github, Linkedin, LayoutDashboard } from 'lucide-react';
+import { useAuth } from './context/AuthContext';
+import { ThemeToggle } from './theme-toggle';
+import { LanguageToggle } from './language-toggle';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 
@@ -23,7 +23,7 @@ export const Footer = () => {
     };
 
     const footerItems = user?.rol === 'admin'
-        ? [...baseFooterItems, adminFooterItem]  // Admin: todos los ítems
+        ? [...baseFooterItems, adminFooterItem]
         : baseFooterItems;
 
 
@@ -47,7 +47,7 @@ export const Footer = () => {
     }, [i18n.language]);
 
     return (
-        <footer className="bg-white dark:bg-lapis_lazuli-400 border-t border-gray-200 dark:border-gray-700 mt-auto">
+        <footer className="bg-white dark:bg-lapis_lazuli-400 border-t border-gray-200 dark:border-white mt-auto">
             <div className="container mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     <div className="md:col-span-2">
@@ -64,7 +64,7 @@ export const Footer = () => {
                                 <li key={link.path}>
                                     <Link
                                         to={link.path}
-                                        className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-tea_green-500 dark:hover:text-verdigris-400 transition-colors"
+                                        className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-tea_green-400 dark:hover:text-verdigris-400 transition-colors"
                                     >
                                         {link.icon}
                                         {link.name}
@@ -84,7 +84,7 @@ export const Footer = () => {
                                         href={social.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-gray-600 dark:text-gray-300 hover:text-tea_green-500 dark:hover:text-verdigris-400 transition-colors"
+                                        className="text-gray-600 dark:text-gray-300 hover:text-tea_green-400 dark:hover:text-verdigris-400 transition-colors"
                                         aria-label={social.name}
                                     >
                                         {social.icon}

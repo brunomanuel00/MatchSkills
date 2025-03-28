@@ -28,6 +28,11 @@ userRouter.delete('/:id', middleware.userExtractor, async (request, response) =>
     response.status(204).end();
 })
 
+userRouter.put("/:id", middleware.userExtractor, async (request, response) => {
+    // const { }
+
+})
+
 
 
 module.exports = userRouter
