@@ -1,11 +1,37 @@
 POST   http://localhost:3001/api/auth/register/
 Content-Type: application/json
 
- {
-    "name": "Rolando",
-    "email": "rolo@gmail.com",
-    "password": "welcomeToHymalalla",
-    "skills":["reactjs","node js"],
-    "lookingFor":["express", "nest"],
-    "role":"user"
+{
+  "name": "Bruno",
+  "email": "bruno@gmail.com",
+  "password": "12345678",
+  "skills": [
+    { "id": "js", "category": "technology" },
+    { "id": "java", "category": "technology" },
+    { "id": "csharp", "category": "technology" },
+    { "id": "illustrator", "category": "design" },
+    { "id": "indesign", "category": "design" },
+    { "id": "ae", "category": "design" },
+    { "id": "premiere", "category": "design" },
+    { "id": "blender", "category": "design" },
+    { "id": "3dmax", "category": "design" },
+    { "id": "maya", "category": "design" },
+    { "id": "cinema4d", "category": "design" },
+    { "id": "content", "category": "business" },
+    { "id": "social", "category": "business" },
+    { "id": "email", "category": "business" },
+    { "id": "mentoring", "category": "others" },
+    { "id": "translation", "category": "others" }
+  ],
+  "lookingFor": [
+    { "id": "solidity", "category": "technology" },
+    { "id": "arduino", "category": "technology" },
+    { "id": "raspberry", "category": "technology" },
+    { "id": "iot", "category": "technology" }
+  ],
+  "rol": "admin",
+  "avatar": {
+    "public_id": "default_avatar",
+    "url": "https://example.com/default_avatar.png"
+  }
 }

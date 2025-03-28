@@ -24,7 +24,26 @@ mongoose.connect(url)
         logger.error('error connecting to MongoDB:', error)
     })
 
-app.use(cors())
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'http://localhost:3001'
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Origen no permitido por CORS'));
+        }
+    },
+    credentials: true, // Para cookies/auth
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json())
 app.use(middleware.morganMiddleware)
 app.use(middleware.tokenExtractor)

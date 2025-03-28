@@ -83,6 +83,7 @@ authRouter.post('/logout', (_req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
+        domain: process.env.COOKIE_DOMAIN || 'localhost'
     });
 
     res.status(200).json({ message: 'session closed' });
