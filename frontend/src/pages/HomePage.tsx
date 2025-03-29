@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { motion } from "framer-motion";
 import { Skill } from "../types/skillTypes";
 import { SquareArrowOutUpRight } from "lucide-react";
-
+import authService from '../services/auth'
 
 export default function HomePage() {
     const { user } = useAuth();
@@ -28,11 +28,44 @@ export default function HomePage() {
         }
     };
 
+    const handlePatch = async () => {
+        const change: object = {
+            name: "Bruno",
+            skills: [
+                { id: 'js', category: 'technology' },
+                { id: 'java', category: 'technology' },
+                { id: 'csharp', category: 'technology' },
+                { id: 'illustrator', category: 'design' },
+                { id: 'indesign', category: 'design' },
+                { id: 'ae', category: 'design' },
+                { id: 'premiere', category: 'design' },
+                { id: 'blender', category: 'design' },
+                { id: '3dmax', category: 'design' },
+                { id: 'maya', category: 'design' },
+                { id: 'cinema4d', category: 'design' },
+                { id: 'content', category: 'business' },
+                { id: 'email', category: 'business' },
+                { id: 'mentoring', category: 'others' },
+                { id: 'translation', category: 'others' },
+            ],
+            lookingFor: [
+                { id: 'solidity', category: 'technology' },
+                { id: 'arduino', category: 'technology' },
+                { id: 'raspberry', category: 'technology' },
+                { id: 'iot', category: 'technology' },
+            ]
+        }
+        const responseData = await authService.patchtest('67e6291c35a267617ca3d514', change)
+        console.log(responseData)
+
+    }
+
     return (
         <>
             <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-tea_green-500 to-light_green-300 dark:from-lapis_lazuli-500 dark:to-verdigris-700">
                 <div className=" md:px-40 ">
                     <h2 className=" font-bold text-center text-5xl sm:text-6xl">{t('home.title')}</h2>
+                    <button onClick={handlePatch}>hagamos cambio</button>
                 </div>
                 <div>
                     <h3 className="m-12 text-2xl">{t('home.subtitle')}</h3>

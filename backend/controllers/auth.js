@@ -2,12 +2,10 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 const express = require('express')
-const app = express()
-const cookieParser = require('cookie-parser');
 const authRouter = express.Router()
 
 
-app.use(cookieParser());
+
 
 authRouter.post('/register', async (request, response) => {
     const { name, email, password, skills, lookingFor, rol } = request.body;

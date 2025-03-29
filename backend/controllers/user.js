@@ -2,14 +2,15 @@ const userRouter = require('express').Router()
 const User = require('../models/User')
 const middleware = require('../utils/middleware')
 
+
 userRouter.get('/', async (_request, response) => {
     const users = await User.find({})
     response.json(users)
 })
 
-userRouter.get('/:id', async (req, res) => {
-    const user = await User.findById(req.params.id)
-    res.json(user)
+userRouter.get('/:id', middleware.userExtractor, middleware.tokenExtractor, async (request, response) => {
+    const user = await User.findById(request.params.id)
+    response.json(user)
 })
 
 userRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
@@ -28,8 +29,75 @@ userRouter.delete('/:id', middleware.userExtractor, async (request, response) =>
     response.status(204).end();
 })
 
-userRouter.put("/:id", middleware.userExtractor, async (request, response) => {
-    // const { }
+userRouter.patch("/:id", middleware.userExtractor, async (request, response) => {
+    try {
+        const userId = request.params.id;
+        const requestingUser = request.user;
+        const updateData = request.body;
+
+        // 1. Verificar permisos
+        if (requestingUser.id !== userId && requestingUser.rol !== 'admin') {
+            return response.status(403).json({
+                error: 'No autorizado: Solo puedes editar tu propio perfil o necesitas ser admin'
+            });
+        }
+
+        // 2. Buscar usuario a actualizar
+        const user = await User.findById(userId);
+        if (!user) {
+            return response.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // 3. Actualización segura
+        const allowedUpdates = {
+            name: updateData.name,
+            email: updateData.email,
+            skills: updateData.skills,
+            lookingFor: updateData.lookingFor,
+            avatar: updateData.avatar
+        };
+
+        // 4. Cambio de contraseña (si se proporciona)
+        if (updateData.password) {
+            if (updateData.password.length < 8) {
+                return response.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
+            }
+            allowedUpdates.passwordHash = await bcrypt.hash(updateData.password, 10);
+        }
+
+        // 5. Actualizar rol (solo admin)
+        if (updateData.rol && requestingUser.rol === 'admin') {
+            allowedUpdates.rol = updateData.rol;
+        }
+
+        // 6. Aplicar actualizaciones
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: allowedUpdates },
+            { new: true, runValidators: true }
+        );
+
+        // 7. Preparar respuesta (sin datos sensibles)
+        const userResponse = updatedUser.toObject();
+        delete userResponse.passwordHash;
+        delete userResponse.__v;
+
+        response.json(userResponse);
+
+    } catch (error) {
+        console.error('Error en updateUser:', error);
+
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return response.status(400).json({ error: errors.join(', ') });
+        }
+
+        if (error.code === 11000) {
+            return response.status(400).json({ error: 'El email ya está en uso' });
+        }
+
+        response.status(500).json({ error: 'Error interno del servidor' });
+    }
 
 })
 

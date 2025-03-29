@@ -16,7 +16,7 @@ const unknownEndpoint = (_request, response) => {
 
 const tokenExtractor = (request, _response, next) => {
     const authorization = request.get('Authorization');
-    if (authorization && authorization.startWith('Bearer ')) {
+    if (authorization && authorization.startsWith('Bearer ')) {
         request.token = authorization.replace('Bearer ', '')
     } else {
         request.token = null;
@@ -26,6 +26,7 @@ const tokenExtractor = (request, _response, next) => {
 
 const userExtractor = async (request, response, next) => {
     const token = request.cookies.token;
+
     if (!token) {
         return response.status(401).json({ error: 'no token provided' });
     }

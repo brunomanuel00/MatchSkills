@@ -1,0 +1,47 @@
+# ### 1. Login para obtener token
+# POST http://localhost:3001/api/auth/login
+# Content-Type: application/json
+
+# {
+#   "email": "bruno@gmail.com",
+#   "password": "12345678"
+# }
+
+
+# ### 2. Actualizar usuario básico (sin contraseña)
+PATCH http://localhost:3001/api/users/67e6291c35a267617ca3d514
+Content-Type: application/json
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJydW5vQGdtYWlsLmNvbSIsImlkIjoiNjdlNjI5MWMzNWEyNjc2MTdjYTNkNTE0IiwiaWF0IjoxNzQzMjAyNjQ5LCJleHAiOjE3NDMyODkwNDl9.CB7F-94s7NAK62Qr-RnsfjaAhhx37ShRgu89qMPsQNY
+
+{
+  "name": "Bruno Actualizado",
+  "skills": [
+    {"id": "python", "category": "technology"}
+  ],
+  "lookingFor": [
+    {"id": "blockchain", "category": "technology"}
+  ]
+}
+
+# ####
+
+# GET http://localhost:3001/api/users/67e6291c35a267617ca3d514
+
+
+# ### 3. Actualizar contraseña (requiere verificación previa)
+# PATCH http://localhost:3000/api/users/67e6291c35a267617ca3d514
+# Content-Type: application/json
+# Authorization: Bearer {{auth_token}}
+
+# {
+#   "password": "nuevaContraseñaSegura123"
+# }
+
+# ### 4. Actualizar rol (solo admin)
+# PATCH http://localhost:3000/api/users/{{userId}}
+# Content-Type: application/json
+# Authorization: Bearer {{auth_token}}
+
+# {
+#   "rol": "admin"
+# }

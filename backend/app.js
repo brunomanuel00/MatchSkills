@@ -39,15 +39,15 @@ app.use(cors({
             callback(new Error('Origen no permitido por CORS'));
         }
     },
-    credentials: true, // Para cookies/auth
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json())
+app.use(cookieParser());
 app.use(middleware.morganMiddleware)
 app.use(middleware.tokenExtractor)
-app.use(cookieParser());
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 

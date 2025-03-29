@@ -22,5 +22,10 @@ const register = async (credentials: RegisterCredentials) => {
     const response = await axios.post<User>(`${baseUrl}/register`, credentials)
     return response.data
 }
+const patchtest = async (id: string, credentials: object) => {
+    const response = await axios.patch(`http://localhost:3001/api/users/${id}`, credentials, { withCredentials: true })
+    return response.data
+}
 
-export default { login, register, logout, verifyAuth };
+
+export default { login, register, logout, verifyAuth, patchtest };
