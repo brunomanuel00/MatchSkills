@@ -53,7 +53,7 @@ const errorHandler = (error, _request, response, next) => {
     }
     if (error.name === 'MongooseError') {
         return response.status(500).send({
-            error: 'error al obtener información'
+            error: 'error to get the information'
         });
     }
     if (error.name === 'ValidationError') {
@@ -70,6 +70,9 @@ const errorHandler = (error, _request, response, next) => {
     }
     if (error.name === 'JsonWebTokenError') {
         return response.status(401).json({ error: 'invalid token' });
+    }
+    if (error.code === 11000) {
+        return response.status(400).json({ error: 'mail exist' });
     }
 
     next(error);
