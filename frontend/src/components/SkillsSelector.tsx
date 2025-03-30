@@ -32,6 +32,7 @@ export const SkillsSelector = ({
         ? searchSkills(categoryFilteredSkills, searchTerm, t)
         : categoryFilteredSkills;
 
+
     // Función para obtener el nombre traducido de una habilidad
     const getTranslatedSkillName = (skill: Skill) => {
         try {

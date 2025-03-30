@@ -1,5 +1,6 @@
 import { Skill, SkillCategory } from '../types/skillTypes';
 
+
 export const SKILL_CATEGORIES: SkillCategory[] = [
     'technology',
     'design',
@@ -188,13 +189,23 @@ export const getSkillsByCategory = (category: SkillCategory | 'all', skills: Ski
  * @returns Array de habilidades filtradas
  */
 export const searchSkills = (skills: Skill[], query: string, t: (key: string) => string) => {
-    if (!query) return skills;
+    if (!query.trim()) return skills;
 
-    const searchTerm = query.toLowerCase();
+    const searchTerm = query.toLowerCase().trim();
 
     return skills.filter(skill => {
-        const skillName = t(`${skill.category}.${skill.id}`).toLowerCase();
-        return skill.id.toLowerCase().includes(searchTerm) ||
-            skillName.includes(searchTerm);
+
+        // Buscar en el ID de la habilidad
+        const skillIdMatch = skill.id.toLowerCase().includes(searchTerm);
+
+        // Obtener el nombre traducido usando la estructura correcta
+        const translatedName = t(`skills.${skill.category}.${skill.id}`).toLowerCase();
+        const translatedNameMatch = translatedName.includes(searchTerm);
+
+        // También buscar en el nombre de la categoría por si acaso
+        const categoryName = t(`skills.categories.${skill.category}`).toLowerCase();
+        const categoryMatch = categoryName.includes(searchTerm);
+
+        return skillIdMatch || translatedNameMatch || categoryMatch;
     });
 };

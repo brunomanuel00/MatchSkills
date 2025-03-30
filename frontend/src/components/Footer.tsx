@@ -39,7 +39,7 @@ export const Footer = () => {
 
     const socialLinks = [
         { name: 'GitHub', url: 'https://github.com/brunomanuel00', icon: <Github className="h-6 w-6" /> },
-        { name: 'LinkedIn', url: 'https://linkedin.com/in/bruno-coello-b6591b223', icon: <Linkedin className="h-6 w-6" /> },
+        { name: 'LinkedIn', url: 'https://linkedin.com/in/bruno-coello', icon: <Linkedin className="h-6 w-6" /> },
     ];
 
     useEffect(() => {
