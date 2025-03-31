@@ -15,6 +15,7 @@ export const Navbar = () => {
     const location = useLocation();
     const { user } = useAuth()
 
+
     const baseNavItems = [
         { translationKey: 'logged.home', path: '/home', icon: <Home className="h-5 w-5" /> },
         { translationKey: 'logged.matches', path: '/matches', icon: <Waypoints className="h-5 w-5" /> },
@@ -97,7 +98,7 @@ export const Navbar = () => {
                 <motion.div
                     initial={{ opacity: 0, x: '100%' }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: '100%' }}
+                    exit={{ opacity: 0, x: "100%" }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     className="fixed inset-0 z-40 md:hidden bg-white dark:bg-lapis_lazuli-400 pt-20 px-4"
                 >
@@ -127,6 +128,7 @@ export const Navbar = () => {
                         </div>
                     </div>
                 </motion.div>
+
             )}
 
             {mobileMenuOpen && (

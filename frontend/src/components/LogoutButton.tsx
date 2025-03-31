@@ -34,6 +34,7 @@ export default function LogoutButton() {
                 transition={{ duration: 0.3 }}
             >
                 <LogOut className="h-5 w-5 text-lapis_lazuli dark:text-white" />
+                <span className="sr-only">{t('session.close')}</span>
             </motion.div>
         </Button>
     );

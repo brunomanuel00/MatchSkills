@@ -38,6 +38,10 @@
     "validation": {
         "passwordMatch": "Las contraseñas no coinciden"
     },
+    "edit-profile": {
+        "title": "Editar Perfil",
+        "subtitle": "Actualice su información personal y habilidades"
+    },
     "language": "Idioma",
     "theme": {
         "toggle": "Cambiar tema"

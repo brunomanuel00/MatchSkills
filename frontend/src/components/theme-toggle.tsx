@@ -29,7 +29,7 @@ export function ThemeToggle() {
                     <Moon className="h-5 w-5 text-white" />
                 )}
             </motion.div>
-            <span className="sr-only">Toggle theme</span>
+            <span className="sr-only">{t('theme.toggle')}</span>
         </Button>
     );
 }
