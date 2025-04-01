@@ -2,6 +2,7 @@ const logger = require('./logger')
 const morgan = require('morgan')
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
+const fs = require('fs')
 
 morgan.token('body', (req) => {
     return req.method === 'POST' ? JSON.stringify(req.body) : '';
@@ -49,7 +50,7 @@ const userExtractor = async (request, response, next) => {
     next();
 }
 
-const errorHandler = (error, _request, response, next) => {
+const errorHandler = (error, request, response, next) => {
     logger.error(error.message)
 
     if (error.name === 'CastError') {
@@ -77,6 +78,12 @@ const errorHandler = (error, _request, response, next) => {
     }
     if (error.code === 11000) {
         return response.status(400).json({ error: 'mail exist' });
+    }
+    if (req.file) {
+        fs.unlink(req.file.path).catch(err => console.error('Error eliminando archivo temporal:', err));
+        return response.status(500).json({
+            error: 'Error al actualizar el usuario'
+        });
     }
 
     next(error);

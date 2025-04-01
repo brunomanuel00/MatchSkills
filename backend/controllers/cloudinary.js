@@ -1,8 +1,6 @@
-const express = require('express');
-const router = express.Router();
 const multer = require('multer');
-const userController = require('../controllers/userController');
-const middleware = require('../utils/middleware');
+const fs = require('fs');
+const cloudinary = require('../utils/cloudinary')
 
 const upload = multer({
     dest: 'temp_uploads/',
@@ -18,7 +16,7 @@ const upload = multer({
     }
 });
 
-
+// Manejador de errores de Multer
 const handleMulterError = (err, _req, res, next) => {
     if (err instanceof multer.MulterError) {
         res.status(413).json({ error: err.message });
@@ -29,12 +27,21 @@ const handleMulterError = (err, _req, res, next) => {
     }
 };
 
-router.patch(
-    '/:id/avatar',
-    middleware.userExtractor,
-    upload.single('avatar'),
-    handleMulterError,
-    userController.uploadAvatar
-);
+const handleAvatarUpload = async (file, userId) => {
+    const result = await cloudinary.uploader.upload(file.path, {
+        folder: `user_avatars/${userId}`,
+        transformation: [
+            { width: 300, height: 300, crop: 'fill' },
+            { quality: 'auto:best' },
+            { format: 'webp' }
+        ]
+    });
 
-module.exports = router;
+    fs.unlinkSync(file.path); // Eliminar archivo temporal
+    return {
+        public_id: result.public_id,
+        url: result.secure_url
+    };
+};
+
+module.exports = { upload, handleMulterError, handleAvatarUpload }
