@@ -6,6 +6,7 @@ interface ProfileFooterProps {
     isSubmitting: boolean;
     onSubmit: (e: React.FormEvent) => void;
     onCancel: () => void;
+    isSaveDisabled?: boolean;
 }
 
 export const ProfileFooter = ({ isSubmitting, onSubmit, onCancel }: ProfileFooterProps) => {
