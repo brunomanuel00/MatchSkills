@@ -7,8 +7,8 @@ export interface User {
     lookingFor: Skill[];
     rol: "user" | "admin";
     avatar: {
-        public_id: String,
-        url: String
+        public_id: string,
+        url: string
     }
 }
 

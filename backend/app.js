@@ -47,7 +47,7 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser());
 app.use(middleware.morganMiddleware)
-app.use(middleware.tokenExtractor)
+// app.use(middleware.userExtractor)
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 

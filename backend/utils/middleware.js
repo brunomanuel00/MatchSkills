@@ -15,18 +15,16 @@ const unknownEndpoint = (_request, response) => {
     response.status(404).send({ error: 'unknown endpoint' });
 };
 
-const tokenExtractor = (request, _response, next) => {
-    const authorization = request.get('Authorization');
-    if (authorization && authorization.startsWith('Bearer ')) {
-        request.token = authorization.replace('Bearer ', '')
-    } else {
-        request.token = null;
-    }
-    next();
-}
 
 const userExtractor = async (request, response, next) => {
     const token = request.cookies.token;
+
+    if (!token) {
+        const authHeader = request.get('Authorization');
+        if (authHeader?.startsWith('Bearer ')) {
+            token = authHeader.replace('Bearer ', '');
+        }
+    }
 
     if (!token) {
         return response.status(401).json({ error: 'no token provided' });
@@ -79,8 +77,8 @@ const errorHandler = (error, request, response, next) => {
     if (error.code === 11000) {
         return response.status(400).json({ error: 'mail exist' });
     }
-    if (req.file) {
-        fs.unlink(req.file.path).catch(err => console.error('Error eliminando archivo temporal:', err));
+    if (request.file) {
+        fs.unlink(request.file.path).catch(err => console.error('Error eliminando archivo temporal:', err));
         return response.status(500).json({
             error: 'Error al actualizar el usuario'
         });
@@ -93,6 +91,5 @@ module.exports = {
     morganMiddleware,
     unknownEndpoint,
     errorHandler,
-    tokenExtractor,
     userExtractor
 }

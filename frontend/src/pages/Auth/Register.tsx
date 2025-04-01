@@ -14,7 +14,7 @@ import { Label } from "../../components/ui/label";
 import { ThemeToggle } from "../../components/theme-toggle";
 import { LanguageToggle } from "../../components/language-toggle";
 import logo from '../../assets/Match de habilidades.jpg';
-import authService from '../../services/auth';
+import authService from '../../services/authService';
 import { RegisterCredentials } from "../../types/authTypes";
 import { useAuth } from '../../components/context/AuthContext';
 
