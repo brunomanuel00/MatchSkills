@@ -9,21 +9,22 @@ interface ProfileFooterProps {
     isSaveDisabled?: boolean;
 }
 
-export const ProfileFooter = ({ isSubmitting, onSubmit, onCancel }: ProfileFooterProps) => {
+export const ProfileFooter = ({ isSubmitting, onSubmit, onCancel, isSaveDisabled }: ProfileFooterProps) => {
     return (
         <div className="flex flex-col sm:flex-row justify-end gap-3 p-6 border-t border-gray-200">
             <Button
                 type="button"
                 variant="outline"
-                className="flex items-center justify-center w-full sm:w-auto bg-tea_green-100 hover:bg-tea_green-200 text-lapis_lazuli-600 border-verdigris-300 dark:bg-lapis_lazuli-300 dark:text-tea_green-100 dark:hover:bg-lapis_lazuli-200"
+                className="flex items-center justify-center w-full sm:w-auto bg-white hover:bg-light_green-200 hover:text-white text-lapis_lazuli-600 border-verdigris-300 dark:bg-lapis_lazuli-300 dark:text-tea_green-100 dark:hover:bg-lapis_lazuli-200"
                 onClick={onCancel}
+                disabled={isSaveDisabled}
             >
                 <X className="mr-2 h-4 w-4" />
                 Cancel
             </Button>
             <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isSaveDisabled}
                 className="flex items-center justify-center w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white"
                 onClick={onSubmit}
             >

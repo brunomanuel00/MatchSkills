@@ -1,6 +1,5 @@
 // components/ui/modal.tsx
 import { X } from "lucide-react";
-import { useEffect } from "react";
 
 interface ModalProps {
     isOpen: boolean;
@@ -11,18 +10,6 @@ interface ModalProps {
 
 export const Modal = ({ isOpen, onClose, children, title }: ModalProps) => {
     if (!isOpen) return null;
-
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
-
-        return () => {
-            document.body.style.overflow = 'auto';
-        };
-    }, [isOpen]);
 
     return (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">

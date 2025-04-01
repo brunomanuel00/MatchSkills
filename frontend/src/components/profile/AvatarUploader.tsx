@@ -4,6 +4,7 @@ import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 
 import { DEFAULT_AVATAR } from "../../types/profileTypes";
 import { AvatarUploaderProps } from "../../types/profileTypes";
+import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 
 export const AvatarUploader = ({
     avatarPreview,
@@ -15,13 +16,15 @@ export const AvatarUploader = ({
 }: AvatarUploaderProps) => {
     return (
         <div className="flex flex-col justify-center  space-y-2">
-            <div>
-                <Avatar className="flex-shrink-0 h-10 w-10">
-                    <AvatarImage
-                        src={avatarPreview || userAvatar}
-                        alt={userName}
-                        className="object-cover"
-                    />
+            <div className="relative">
+                <Avatar className="flex-shrink-1 h-10 w-10">
+                    <AspectRatio ratio={1 / 1} >
+                        <AvatarImage
+                            src={avatarPreview || userAvatar}
+                            alt={userName}
+                            className="object-cover"
+                        />
+                    </AspectRatio>
                 </Avatar>
             </div>
 
