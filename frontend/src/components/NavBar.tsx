@@ -47,6 +47,18 @@ export const Navbar = () => {
         setTranslatedNavItems(getTranslatedNavItems());
     }, [i18n.language]);
 
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [mobileMenuOpen]);
+
 
     return (
         <>

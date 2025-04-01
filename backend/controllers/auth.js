@@ -3,12 +3,10 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 const express = require('express')
 const authRouter = express.Router()
-
-
-
+const middleware = require('../utils/middleware')
 
 authRouter.post('/register', async (request, response) => {
-    const { name, email, password, skills, lookingFor, rol } = request.body;
+    const { name, email, password, skills, lookingFor, rol, avatar } = request.body;
 
     if (password.length < 8) {
         return response.status(400).json({ error: "password" });
@@ -24,7 +22,9 @@ authRouter.post('/register', async (request, response) => {
         return response.status(400).json({ error: "invalidEmail" });
     }
 
-    let userRol = rol || "user";
+    if (rol === 'admin') {
+        return response.status(400).json({ error: "JSON modificate manually" });
+    }
 
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
@@ -35,7 +35,8 @@ authRouter.post('/register', async (request, response) => {
         passwordHash,
         skills,
         lookingFor,
-        rol: userRol,
+        rol,
+        avatar
     });
 
     const userSaved = await user.save();
@@ -58,7 +59,8 @@ authRouter.post('/login', async (request, response) => {
     }
     const userForToken = {
         email: email,
-        id: user._id
+        id: user._id,
+        rol: user.rol
     }
     const token = jwt.sign(
         userForToken,
@@ -87,7 +89,7 @@ authRouter.post('/logout', (_req, res) => {
     res.status(200).json({ message: 'session closed' });
 });
 
-authRouter.get('/verify-auth', async (req, res) => {
+authRouter.get('/verify-auth', middleware.userExtractor, async (req, res) => {
     const token = req.cookies.token;
 
     if (!token) {

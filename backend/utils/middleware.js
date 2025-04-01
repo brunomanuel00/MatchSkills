@@ -36,9 +36,13 @@ const userExtractor = async (request, response, next) => {
         return response.status(401).json({ error: 'token invalid' });
     }
 
-    const user = await User.findById(decodedToken.id);
+    const user = await User.findById(decodedToken.id).select('-passwordHash -__v');
     if (!user) {
         return response.status(401).json({ error: 'user not found' });
+    }
+
+    if (user.rol !== decodedToken.rol) {
+        return res.status(401).json({ error: 'Permisos alterados: Rol modificado' });
     }
 
     request.user = user;

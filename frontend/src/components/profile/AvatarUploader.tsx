@@ -1,38 +1,33 @@
 import { Button } from "../ui/button";
 import { Trash2, Upload } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { User } from "lucide-react";
-import { DEFAULT_AVATAR } from "../../types/profileTypes";
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 
-interface AvatarUploaderProps {
-    avatarPreview: string | null;
-    userAvatar: string | undefined;
-    userName: string | undefined;
-    onAvatarChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onRemoveAvatar: () => void;
-}
+import { DEFAULT_AVATAR } from "../../types/profileTypes";
+import { AvatarUploaderProps } from "../../types/profileTypes";
 
 export const AvatarUploader = ({
     avatarPreview,
     userAvatar,
     userName,
     onAvatarChange,
-    onRemoveAvatar
+    onRemoveAvatar,
+    t
 }: AvatarUploaderProps) => {
     return (
-        <div className="flex flex-col space-y-2">
-            <label className="text-lapis_lazuli-600 dark:text-tea_green-200">Profile Picture</label>
-            <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border-2 border-dashed rounded-lg border-verdigris-200 dark:border-verdigris-400">
-                <Avatar className="flex-shrink-0 h-24 w-24 border-2 border-emerald-400">
+        <div className="flex flex-col justify-center  space-y-2">
+            <div>
+                <Avatar className="flex-shrink-0 h-10 w-10">
                     <AvatarImage
                         src={avatarPreview || userAvatar}
                         alt={userName}
                         className="object-cover"
                     />
-                    <AvatarFallback className="flex items-center justify-center bg-verdigris-300 text-white">
-                        <User className="h-12 w-12" />
-                    </AvatarFallback>
                 </Avatar>
+            </div>
+
+            <label>{t('edit-profile.change-avatar')}</label>
+            <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border-2 border-dashed rounded-lg border-verdigris-200 dark:border-verdigris-400">
+
 
                 <div className="flex-1 flex flex-col space-y-3">
                     <div className="flex flex-wrap gap-2">

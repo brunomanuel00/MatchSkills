@@ -2,17 +2,13 @@ POST   http://localhost:3001/api/auth/register/
 Content-Type: application/json
 
 {
-  "name": "Bruno",
-  "email": "bruno@gmail.com",
+  "name": "Bartolo",
+  "email": "bartolo@gmail.com",
   "password": "12345678",
   "skills": [
     { "id": "js", "category": "technology" },
     { "id": "java", "category": "technology" },
     { "id": "csharp", "category": "technology" },
-    { "id": "illustrator", "category": "design" },
-    { "id": "indesign", "category": "design" },
-    { "id": "ae", "category": "design" },
-    { "id": "premiere", "category": "design" },
     { "id": "blender", "category": "design" },
     { "id": "3dmax", "category": "design" },
     { "id": "maya", "category": "design" },
@@ -28,10 +24,5 @@ Content-Type: application/json
     { "id": "arduino", "category": "technology" },
     { "id": "raspberry", "category": "technology" },
     { "id": "iot", "category": "technology" }
-  ],
-  "rol": "admin",
-  "avatar": {
-    "public_id": "default_avatar",
-    "url": "https://example.com/default_avatar.png"
-  }
+  ]
 }

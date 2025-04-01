@@ -40,7 +40,11 @@
     },
     "edit-profile": {
         "title": "Editar Perfil",
-        "subtitle": "Actualice su información personal y habilidades"
+        "subtitle": "Actualice su información personal y habilidades",
+        "pI": "Información del Perfil",
+        "s&I": "Habilidades e Intereses",
+        "picture": "Foto de perfil",
+        "change-avatar": "Cambiar Foto de Perfil"
     },
     "language": "Idioma",
     "theme": {

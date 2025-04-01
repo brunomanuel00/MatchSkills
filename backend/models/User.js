@@ -67,7 +67,7 @@ const UserSchema = new mongoose.Schema({
         },
         url: {
             type: String,
-            default: 'https://example.com/default_avatar.png',
+            default: process.env.DEFAULT_AVATAR_URL,
             validate: {
                 validator: function (v) {
                     return /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/.test(v);
@@ -76,7 +76,7 @@ const UserSchema = new mongoose.Schema({
             }
         }
     }
-}, { timestamps: true });
+});
 
 UserSchema.set('toJSON', {
     transform: (_document, returnedObject) => {

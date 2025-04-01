@@ -51,7 +51,7 @@ export default function HomePage() {
                     <ul className="flex flex-wrap justify-start items-center p-12 ">
                         {skills?.length === 0 &&
                             <div >
-                                <div className="flex flex-nowrap">{t('home.without-skills')}<Link className="text-blue-600 hover:text-blue-400" to='/profile'><SquareArrowOutUpRight className="h-4 w-4 mt-1" /></Link></div>
+                                <h2 className="flex flex-nowrap">{t('home.without-skills')}<Link className="text-blue-600 hover:text-blue-400" to='/profile'><SquareArrowOutUpRight className="h-4 w-4 mt-1" /></Link></h2>
                             </div>}
                         {skills?.map((skill, index) => (
                             <motion.div
@@ -61,8 +61,8 @@ export default function HomePage() {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.3, delay: index * 0.1 }}
                                 // whileHover={{ y: -5, boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)" }}
-                                className=" m-4 rounded-xl p-4 text-center">
-                                <li className=" text-lg sm:text-xl">
+                                className=" m-2 md:m-4 rounded-xl p2 md:p-4 text-center">
+                                <li className="text-lg sm:text-xl">
                                     {getTranslatedSkillName(skill)}
                                 </li>
                             </motion.div>

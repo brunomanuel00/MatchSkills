@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     "id": "67dcbf88e9340ef0f5238f8b",
                     "avatar": {
                         "public_id": "default_avatars/default_avatars.svg_lszftj",
-                        "url": "https://example.com/default_avatar.png"
+                        "url": "https://res.cloudinary.com/decnbbgn8/image/upload/v1743115286/default_avatars.svg_lszftj.png"
                     }
                 });
             } catch (error) {

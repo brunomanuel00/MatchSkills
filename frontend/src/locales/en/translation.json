@@ -40,7 +40,11 @@
     },
     "edit-profile": {
         "title": "Edit Profile",
-        "subtitle": "Update your personal information and skills"
+        "subtitle": "Update your personal information and skills",
+        "pI": "Profile Information",
+        "s&I": "Skills & Interests",
+        "picture": "Profile Picture",
+        "change-avatar": "Change Profile Picture"
     },
     "language": "Language",
     "theme": {
