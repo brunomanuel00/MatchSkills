@@ -1,31 +1,32 @@
 import { Button } from "../ui/button";
 import { Save, X } from "lucide-react";
 import { motion } from "framer-motion";
-
+import { TFunction } from "i18next";
 interface ProfileFooterProps {
     isSubmitting: boolean;
     onSubmit: (e: React.FormEvent) => void;
     onCancel: () => void;
     isSaveDisabled?: boolean;
+    t: TFunction
 }
 
-export const ProfileFooter = ({ isSubmitting, onSubmit, onCancel, isSaveDisabled }: ProfileFooterProps) => {
+export const ProfileFooter = ({ isSubmitting, onSubmit, onCancel, isSaveDisabled, t }: ProfileFooterProps) => {
     return (
-        <div className="flex flex-col sm:flex-row justify-end gap-3 p-6 border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 p-6 border-t ">
             <Button
                 type="button"
                 variant="outline"
-                className="flex items-center justify-center w-full sm:w-auto bg-white hover:bg-light_green-200 hover:text-white text-lapis_lazuli-600 border-verdigris-300 dark:bg-lapis_lazuli-300 dark:text-tea_green-100 dark:hover:bg-lapis_lazuli-200"
+                className="flex items-center justify-center w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white hover:text-white  dark:border-none"
                 onClick={onCancel}
                 disabled={isSaveDisabled}
             >
                 <X className="mr-2 h-4 w-4" />
-                Cancel
+                {t("edit-profile.cancel")}
             </Button>
             <Button
                 type="submit"
                 disabled={isSubmitting || isSaveDisabled}
-                className="flex items-center justify-center w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white"
+                className="flex items-center justify-center w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-white"
                 onClick={onSubmit}
             >
                 {isSubmitting ? (
@@ -35,12 +36,12 @@ export const ProfileFooter = ({ isSubmitting, onSubmit, onCancel, isSaveDisabled
                             transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                             className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"
                         />
-                        Saving...
+                        {t("edit-profile.saving")}
                     </>
                 ) : (
                     <>
                         <Save className="mr-2 h-4 w-4" />
-                        Save Changes
+                        {t("edit-profile.save")}
                     </>
                 )}
             </Button>

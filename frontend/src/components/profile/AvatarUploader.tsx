@@ -28,27 +28,30 @@ export const AvatarUploader = ({
                 </Avatar>
             </div>
 
-            <label>{t('edit-profile.change-avatar')}</label>
-            <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border-2 border-dashed rounded-lg border-verdigris-200 dark:border-verdigris-400">
+            <label>{!avatarPreview ? t('edit-profile.add-avatar') : t('edit-profile.change-avatar')}</label>
+            <div className="flex flex-wrap items-center gap-4 py-2  rounded-lg border-verdigris-200 dark:border-verdigris-400">
 
+                <p className="w-full text-s">
+                    {t('edit-profile.recommend-size')}
+                </p>
 
                 <div className="flex-1 flex flex-col space-y-3">
                     <div className="flex flex-wrap gap-2">
                         <Button
                             type="button"
                             variant="outline"
-                            className="flex items-center bg-tea_green-100 hover:bg-tea_green-200 text-lapis_lazuli-600 border-verdigris-300 dark:bg-lapis_lazuli-300 dark:text-tea_green-100 dark:hover:bg-lapis_lazuli-200"
+                            className="flex items-center bg-emerald-500 hover:bg-emerald-600  dark:bg-verdigris-600 dark:hover:bg-verdigris-500"
                             onClick={() => document.getElementById("avatar-upload")?.click()}
                         >
                             <Upload className="mr-2 h-4 w-4" />
-                            Upload New Image
+                            {t('edit-profile.upload')}
                         </Button>
 
                         {(avatarPreview || userAvatar !== DEFAULT_AVATAR.url) && (
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="flex items-center bg-red-100 hover:bg-red-200 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+                                className="flex items-center bg-red-100 hover:bg-red-200 text-red-600 border-red-600 dark:bg-transparent dark:hover:bg-red-600"
                                 onClick={onRemoveAvatar}
                             >
                                 <Trash2 className="mr-2 h-4 w-4" />
@@ -64,10 +67,6 @@ export const AvatarUploader = ({
                         className="hidden"
                         onChange={onAvatarChange}
                     />
-
-                    <p className="text-sm text-lapis_lazuli-400 dark:text-tea_green-100/70">
-                        Recommended: Square image, at least 300x300px
-                    </p>
                 </div>
             </div>
         </div>

@@ -2,28 +2,43 @@ import { useState, useEffect } from 'react';
 import { Skill, SelectedSkills, SkillCategory } from '../types/skillTypes';
 import { SKILL_CATEGORIES, ALL_SKILLS, getSkillsByCategory, searchSkills } from '../data/skillsData';
 import { useTranslation } from 'react-i18next';
+import { isEqual } from 'lodash';
 
 interface SkillsSelectorProps {
-    initialSkills?: SelectedSkills;
+    currentSkills: SelectedSkills;
     onSkillsChange: (skills: SelectedSkills) => void;
     maxSkills?: number;
 }
 
 export const SkillsSelector = ({
-    initialSkills = { mySkills: [], desiredSkills: [] },
+    currentSkills,
     onSkillsChange,
     maxSkills = 15,
 }: SkillsSelectorProps) => {
     const { t } = useTranslation();
-    const [selectedSkills, setSelectedSkills] = useState<SelectedSkills>(initialSkills);
+    const [localSkills, setLocalSkills] = useState<SelectedSkills>(currentSkills);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState<SkillCategory | 'all'>('all');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
+    // Sincronizar con las props actuales cuando cambien
+    useEffect(() => {
+        if (!isEqual(currentSkills, localSkills)) {
+            setLocalSkills(currentSkills);
+        }
+    }, [currentSkills]);
+
+    // Notificar cambios al padre cuando se modifiquen las habilidades locales
+    useEffect(() => {
+        if (!isEqual(localSkills, currentSkills)) {
+            onSkillsChange(localSkills);
+        }
+    }, [localSkills]);
+
     // Obtener habilidades no seleccionadas
     const unselectedSkills = ALL_SKILLS.filter(skill =>
-        !selectedSkills.mySkills.some(s => s.id === skill.id) &&
-        !selectedSkills.desiredSkills.some(s => s.id === skill.id)
+        !localSkills.mySkills.some(s => s.id === skill.id) &&
+        !localSkills.desiredSkills.some(s => s.id === skill.id)
     );
 
     // Aplicar filtros
@@ -31,7 +46,6 @@ export const SkillsSelector = ({
     const filteredSkills = searchTerm
         ? searchSkills(categoryFilteredSkills, searchTerm, t)
         : categoryFilteredSkills;
-
 
     // Función para obtener el nombre traducido de una habilidad
     const getTranslatedSkillName = (skill: Skill) => {
@@ -52,39 +66,40 @@ export const SkillsSelector = ({
 
     // Manejar agregar habilidad
     const handleAddSkill = (skill: Skill, type: 'my' | 'desired') => {
-        if (selectedSkills[`${type}Skills`].length >= maxSkills) return;
+        if (localSkills[`${type}Skills`].length >= maxSkills) return;
 
         const oppositeType = type === 'my' ? 'desired' : 'my';
-        const newOppositeSkills = selectedSkills[`${oppositeType}Skills`]
+        const newOppositeSkills = localSkills[`${oppositeType}Skills`]
             .filter(s => s.id !== skill.id);
 
-        setSelectedSkills({
-            ...selectedSkills,
-            [`${type}Skills`]: [...selectedSkills[`${type}Skills`], skill],
+        const newSkills = {
+            ...localSkills,
+            [`${type}Skills`]: [...localSkills[`${type}Skills`], skill],
             [`${oppositeType}Skills`]: newOppositeSkills
-        });
+        };
+
+        setLocalSkills(newSkills);
     };
 
     // Manejar remover habilidad
     const handleRemoveSkill = (skillId: string, type: 'my' | 'desired') => {
-        setSelectedSkills(prev => ({
-            ...prev,
-            [`${type}Skills`]: prev[`${type}Skills`].filter(s => s.id !== skillId)
-        }));
+        const newSkills = {
+            ...localSkills,
+            [`${type}Skills`]: localSkills[`${type}Skills`].filter(s => s.id !== skillId)
+        };
+
+        setLocalSkills(newSkills);
     };
 
     // Limpiar todas las habilidades de un tipo
     const handleClearAll = (type: 'my' | 'desired') => {
-        setSelectedSkills(prev => ({
-            ...prev,
+        const newSkills = {
+            ...localSkills,
             [`${type}Skills`]: []
-        }));
-    };
+        };
 
-    // Notificar cambios al componente padre
-    useEffect(() => {
-        onSkillsChange(selectedSkills);
-    }, [selectedSkills]);
+        setLocalSkills(newSkills);
+    };
 
     return (
         <div className="space-y-6">
@@ -93,19 +108,22 @@ export const SkillsSelector = ({
                 <input
                     type="text"
                     placeholder={t('skills.ui.searchPlaceholder')}
-                    className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:placeholder:text-white/80 dark:bg-lapis_lazuli-300/70  dark:border-verdigris-400"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
 
                 <div className="relative">
                     <button
-                        onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                        className="w-full px-4 py-2 border rounded-lg text-left flex justify-between items-center"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setIsCategoryOpen(!isCategoryOpen);
+                        }}
+                        className="w-full px-4 py-2 border rounded-lg text-left flex justify-between items-center dark:bg-lapis_lazuli-300/70 dark:border-verdigris-400"
                     >
                         <span>{getTranslatedCategoryName(activeCategory)}</span>
                         <svg
-                            className={`w-5 h-5 transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`}
+                            className={`w-5 h-5 transition-transform ${isCategoryOpen ? 'rotate-180' : ''} `}
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -115,10 +133,11 @@ export const SkillsSelector = ({
                     </button>
 
                     {isCategoryOpen && (
-                        <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-lapis_lazuli-300 dark:border-verdigris-400 border rounded-lg shadow-lg max-h-60 overflow-y-auto">
                             <div
-                                className="p-3 hover:bg-gray-100 cursor-pointer border-b"
-                                onClick={() => {
+                                className="p-3 hover:bg-gray-100 dark:hover:bg-verdigris-600 cursor-pointer border-b dark:border-b-verdigris-400"
+                                onClick={(e) => {
+                                    e.preventDefault();
                                     setActiveCategory('all');
                                     setIsCategoryOpen(false);
                                 }}
@@ -128,8 +147,9 @@ export const SkillsSelector = ({
                             {SKILL_CATEGORIES.map(category => (
                                 <div
                                     key={category}
-                                    className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
-                                    onClick={() => {
+                                    className="p-3 hover:bg-gray-100 dark:hover:bg-verdigris-600 cursor-pointer border-b dark:border-b-verdigris-400 last:border-b-0"
+                                    onClick={(e) => {
+                                        e.preventDefault();
                                         setActiveCategory(category);
                                         setIsCategoryOpen(false);
                                     }}
@@ -145,16 +165,19 @@ export const SkillsSelector = ({
             {/* Secciones de habilidades seleccionadas */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Mis habilidades */}
-                <div className="p-4 border rounded-lg shadow-sm">
-                    <div className="flex justify-between items-center mb-3">
+                <div className="p-4 border rounded-lg shadow-sm dark:border-verdigris-400">
+                    <div className="flex justify-between items-center mb-3 ">
                         <h3 className="text-lg font-semibold">{t('skills.ui.mySkills')}</h3>
                         <div className="flex gap-2 items-center">
                             <span className="text-sm text-gray-500">
-                                {selectedSkills.mySkills.length}/{maxSkills} {t('skills.ui.skillsSelected')}
+                                {localSkills.mySkills.length}/{maxSkills} {t('skills.ui.skillsSelected')}
                             </span>
-                            {selectedSkills.mySkills.length > 0 && (
+                            {localSkills.mySkills.length > 0 && (
                                 <button
-                                    onClick={() => handleClearAll('my')}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleClearAll('my');
+                                    }}
                                     className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
                                 >
                                     {t('skills.ui.clearAll')}
@@ -163,15 +186,18 @@ export const SkillsSelector = ({
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-2 min-h-20">
-                        {selectedSkills.mySkills.length > 0 ? (
-                            selectedSkills.mySkills.map(skill => (
+                        {localSkills.mySkills.length > 0 ? (
+                            localSkills.mySkills.map(skill => (
                                 <div
                                     key={`my-${skill.id}`}
                                     className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
                                 >
                                     {getTranslatedSkillName(skill)}
                                     <button
-                                        onClick={() => handleRemoveSkill(skill.id, 'my')}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleRemoveSkill(skill.id, 'my');
+                                        }}
                                         className="ml-2 text-blue-500 hover:text-blue-700"
                                         aria-label={t('skills.ui.removeSkill')}
                                     >
@@ -186,16 +212,19 @@ export const SkillsSelector = ({
                 </div>
 
                 {/* Habilidades deseadas */}
-                <div className="p-4 border rounded-lg shadow-sm">
-                    <div className="flex justify-between items-center mb-3">
+                <div className="p-4 border rounded-lg shadow-sm dark:border-verdigris-400">
+                    <div className="flex justify-between items-center mb-3 ">
                         <h3 className="text-lg font-semibold">{t('skills.ui.desiredSkills')}</h3>
                         <div className="flex gap-2 items-center">
                             <span className="text-sm text-gray-500">
-                                {selectedSkills.desiredSkills.length}/{maxSkills} {t('skills.ui.skillsSelected')}
+                                {localSkills.desiredSkills.length}/{maxSkills} {t('skills.ui.skillsSelected')}
                             </span>
-                            {selectedSkills.desiredSkills.length > 0 && (
+                            {localSkills.desiredSkills.length > 0 && (
                                 <button
-                                    onClick={() => handleClearAll('desired')}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleClearAll('desired');
+                                    }}
                                     className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
                                 >
                                     {t('skills.ui.clearAll')}
@@ -203,16 +232,19 @@ export const SkillsSelector = ({
                             )}
                         </div>
                     </div>
-                    <div className="flex flex-wrap gap-2 min-h-20">
-                        {selectedSkills.desiredSkills.length > 0 ? (
-                            selectedSkills.desiredSkills.map(skill => (
+                    <div className="flex flex-wrap gap-2 min-h-20 ">
+                        {localSkills.desiredSkills.length > 0 ? (
+                            localSkills.desiredSkills.map(skill => (
                                 <div
                                     key={`desired-${skill.id}`}
-                                    className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full hover:bg-green-200 transition-colors"
+                                    className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full hover:bg-green-200 transition-colors "
                                 >
                                     {getTranslatedSkillName(skill)}
                                     <button
-                                        onClick={() => handleRemoveSkill(skill.id, 'desired')}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleRemoveSkill(skill.id, 'desired');
+                                        }}
                                         className="ml-2 text-green-500 hover:text-green-700"
                                         aria-label={t('skills.ui.removeSkill')}
                                     >
@@ -237,29 +269,35 @@ export const SkillsSelector = ({
                         {filteredSkills.map(skill => (
                             <div
                                 key={skill.id}
-                                className="p-3 border rounded-lg hover:bg-gray-50 transition-colors flex flex-col"
+                                className="p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-verdigris-500 transition-colors flex flex-col dark:border-verdigris-400 "
                             >
                                 <span className="text-sm font-medium mb-2">
                                     {getTranslatedSkillName(skill)}
                                 </span>
                                 <div className="flex gap-2 mt-auto">
                                     <button
-                                        onClick={() => handleAddSkill(skill, 'my')}
-                                        className={`text-xs px-3 py-1 rounded flex-1 ${selectedSkills.mySkills.length >= maxSkills
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleAddSkill(skill, 'my');
+                                        }}
+                                        className={`text-xs px-3 py-1 rounded flex-1 ${localSkills.mySkills.length >= maxSkills
                                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                             : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
                                             }`}
-                                        disabled={selectedSkills.mySkills.length >= maxSkills}
+                                        disabled={localSkills.mySkills.length >= maxSkills}
                                     >
                                         + {t('skills.ui.addToMySkills')}
                                     </button>
                                     <button
-                                        onClick={() => handleAddSkill(skill, 'desired')}
-                                        className={`text-xs px-3 py-1 rounded flex-1 ${selectedSkills.desiredSkills.length >= maxSkills
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleAddSkill(skill, 'desired');
+                                        }}
+                                        className={`text-xs px-3 py-1 rounded flex-1 ${localSkills.desiredSkills.length >= maxSkills
                                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                             : 'bg-green-100 text-green-800 hover:bg-green-200'
                                             }`}
-                                        disabled={selectedSkills.desiredSkills.length >= maxSkills}
+                                        disabled={localSkills.desiredSkills.length >= maxSkills}
                                     >
                                         + {t('skills.ui.addToDesired')}
                                     </button>

@@ -13,7 +13,13 @@ export const DEFAULT_AVATAR = {
 export interface ProfileFormProps {
     userEdit: any;
     setUserEdit: (user: any) => void;
-    t: TFunction<"translation", undefined>;
+    t: (key: string) => string;
+    passwords: {
+        newPassword: string;
+        confirmPassword: string;
+    };
+    onPasswordChange: (field: 'newPassword' | 'confirmPassword', value: string) => void;
+    passwordError?: string;
 }
 export interface ProfileTabsProps {
     onTabChange: (value: string) => void;

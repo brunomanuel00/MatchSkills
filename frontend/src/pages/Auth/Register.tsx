@@ -56,8 +56,10 @@ export function Register() {
             const user: RegisterCredentials = { name, email, password, skills: [], lookingFor: [], rol }
             const dataUser = await authService.register(user)
             const credentials = { email: dataUser.email, password }
-            login(credentials)
-            navigate('/home')
+            if (dataUser) {
+                await login(credentials)
+                navigate('/home')
+            }
         } catch (err) {
             if (axios.isAxiosError(err) && err.response?.data?.error === 'invalidEmail') {
                 setError(err.response.data.error);

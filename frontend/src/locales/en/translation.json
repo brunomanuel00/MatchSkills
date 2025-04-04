@@ -36,7 +36,8 @@
         }
     },
     "validation": {
-        "passwordMatch": "Passwords do not match"
+        "passwordMatch": "Passwords do not match",
+        "passwordLength": "The password is too short, min 8 characters"
     },
     "edit-profile": {
         "title": "Edit Profile",
@@ -44,7 +45,29 @@
         "pI": "Profile Information",
         "s&I": "Skills & Interests",
         "picture": "Profile Picture",
-        "change-avatar": "Change Profile Picture"
+        "change-avatar": "Change Profile Picture",
+        "add-avatar": "Add a Picture",
+        "recommend-size": "Recommended: Square image, at least 300x300px",
+        "upload": "Upload New Image",
+        "cancel": "Cancel",
+        "save": "Save Changes",
+        "saving": "Saving...."
+    },
+    "errorMessages": {
+        "updateUser": "Error updating profile",
+        "idInvalid": "Invalid user ID",
+        "invalidFormateIMG": "Only images are allowed",
+        "oversized": "The image must not exceed 10MB"
+    },
+    "toaster": {
+        "success": {
+            "title": "Success!",
+            "description": "The action were performed correctly."
+        },
+        "error": {
+            "title": "Error!",
+            "description": "Please try again, something went wrong."
+        }
     },
     "language": "Language",
     "theme": {

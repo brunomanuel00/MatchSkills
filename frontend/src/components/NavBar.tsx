@@ -118,6 +118,7 @@ export const Navbar = () => {
                         <nav className="flex flex-col gap-2">
                             {translatedNavItems.map((item) => (
                                 <Link
+                                    onClick={() => setMobileMenuOpen(false)}
                                     key={item.path}
                                     to={item.path}
                                     className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname === item.path

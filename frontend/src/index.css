@@ -30,6 +30,7 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -62,7 +63,45 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Animaciones específicas para toast */
+.ToastRoot[data-state="open"] {
+  animation: toastSlideInFromRight 300ms ease-out;
+}
+
+.ToastRoot[data-state="closed"] {
+  animation: toastSlideOutToRight 300ms ease-in;
+}
+
+.ToastRoot[data-swipe="end"] {
+  animation: toastSlideOutToRight 200ms ease-out;
+}
+
+@keyframes toastSlideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(100%);
+    opacity: 0;
   }
 }

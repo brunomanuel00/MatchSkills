@@ -17,42 +17,42 @@ const skillSchema = new mongoose.Schema({
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'El nombre es requerido'],
+        required: [true, 'The name is required'],
         trim: true,
-        maxlength: [50, 'El nombre no puede exceder 50 caracteres']
+        maxlength: [50, 'The name cannot exceed 50 characters']
     },
     email: {
         type: String,
-        required: [true, 'El email es requerido'],
+        required: [true, 'Email is required'],
         unique: true,
         lowercase: true,
         validate: {
             validator: function (v) {
                 return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
             },
-            message: props => `${props.value} no es un email válido!`
+            message: props => `${props.value} is not a valid email!`
         }
     },
     passwordHash: {
         type: String,
-        required: [true, 'La contraseña es requerida']
+        required: [true, 'Password is required']
     },
     skills: {
         type: [skillSchema],
         validate: {
             validator: function (v) {
-                return v.length <= 20;
+                return v.length <= 15;
             },
-            message: 'No puede tener más de 20 habilidades'
+            message: 'You cannot have more than 15 skills'
         }
     },
     lookingFor: {
         type: [skillSchema],
         validate: {
             validator: function (v) {
-                return v.length <= 10;
+                return v.length <= 15;
             },
-            message: 'No puede buscar más de 10 habilidades'
+            message: 'You cannot search for more than 15 skills'
         }
     },
     rol: {
@@ -72,7 +72,7 @@ const UserSchema = new mongoose.Schema({
                 validator: function (v) {
                     return /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/.test(v);
                 },
-                message: props => `${props.value} no es una URL válida!`
+                message: props => `${props.value} is not a valid URL!`
             }
         }
     }

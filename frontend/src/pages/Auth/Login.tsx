@@ -25,6 +25,7 @@ export function Login() {
     const navigate = useNavigate()
     const [errorType, setErrorType] = useState<string | null>(null);
     const { login, user } = useAuth()
+    const [isSubmiting, setIsSubmitting] = useState<boolean>(false)
 
     useEffect(() => {
         const logged = async () => {
@@ -40,6 +41,7 @@ export function Login() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErrorType(null);
+        setIsSubmitting(true)
         try {
             const credentials: AuthCredentials = { email, password };
             const rol = await login(credentials);
@@ -55,6 +57,8 @@ export function Login() {
             if (axios.isAxiosError(err)) {
                 setErrorType(err.response?.status === 401 ? 'invalidCredentials' : 'genericError');
             }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -173,8 +177,22 @@ export function Login() {
                                     type="submit"
                                     className="w-full bg-lapis_lazuli hover:bg-lapis_lazuli-600 dark:bg-verdigris dark:hover:bg-verdigris-400"
                                 >
-                                    <LogIn className="mr-2 h-4 w-4" />
-                                    {t("login.button")}
+                                    {isSubmiting ? (
+                                        <>
+                                            <motion.div
+                                                animate={{ rotate: 360 }}
+                                                transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                                                className="mr-2 h-4 w-4 border-2 border-white dark:border-black dark:border-t-verdigris-400 border-t-transparent rounded-full"
+                                            />
+                                            {t("login.button")}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <LogIn className="mr-2 h-4 w-4" />
+                                            {t("login.button")}
+                                        </>
+                                    )}
+
                                 </Button>
                             </motion.div>
                         </form>

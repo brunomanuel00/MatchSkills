@@ -27,8 +27,6 @@ export default function HomePage() {
         }
     };
 
-
-
     return (
         <>
             <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-tea_green-500 to-light_green-300 dark:from-lapis_lazuli-500 dark:to-verdigris-700">

@@ -7,14 +7,13 @@ import { Eye, EyeOff } from "lucide-react";
 export const ProfileForm = ({
     userEdit,
     setUserEdit,
-    t
+    t,
+    passwords,
+    onPasswordChange,
+    passwordError
 }: ProfileFormProps) => {
-
-    const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [passwordError, setPasswordError] = useState("")
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     return (
         <div className="space-y-4">
@@ -51,16 +50,9 @@ export const ProfileForm = ({
                             id="new-password"
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
-                            value={password}
+                            value={passwords.newPassword}
                             minLength={8}
-                            onChange={(e) => {
-                                setPassword(e.target.value)
-                                if (confirmPassword && e.target.value !== confirmPassword) {
-                                    setPasswordError(t("validation.passwordMatch"))
-                                } else {
-                                    setPasswordError("")
-                                }
-                            }}
+                            onChange={(e) => onPasswordChange('newPassword', e.target.value)}
                             required
                             className=" bg-white /70 dark:bg-lapis_lazuli-300/70 border-verdigris-200 dark:border-verdigris-400"
                         />
@@ -73,22 +65,15 @@ export const ProfileForm = ({
                         </button>
                     </div>
                     <div className="flex flex-col space-y-2">
-                        <Label htmlFor="confirm-new-password">{t("register.confirmPassword")}</Label>
+                        <Label htmlFor="confirm-password">{t("register.confirmPassword")}</Label>
                         <div className="relative">
                             <Input
-                                id="confirm-new-password"
+                                id="confirm-password"
                                 type={showConfirmPassword ? "text" : "password"}
                                 placeholder="••••••••"
-                                value={confirmPassword}
+                                value={passwords.confirmPassword}
                                 minLength={8}
-                                onChange={(e) => {
-                                    setConfirmPassword(e.target.value)
-                                    if (password && e.target.value !== password) {
-                                        setPasswordError(t("validation.passwordMatch"))
-                                    } else {
-                                        setPasswordError("")
-                                    }
-                                }}
+                                onChange={(e) => onPasswordChange('confirmPassword', e.target.value)}
                                 required
                                 className={`"bg-white/70 dark:bg-lapis_lazuli-300/70 border-verdigris-200 dark:border-verdigris-400 ${passwordError ? "border-destructive" : ""
                                     }`}
@@ -102,6 +87,9 @@ export const ProfileForm = ({
                             </button>
                         </div>
                     </div>
+                    {passwordError && (
+                        <p className="text-sm text-red-500">{passwordError}</p>
+                    )}
                 </div>
             </div>
         </div>

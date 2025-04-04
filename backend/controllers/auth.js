@@ -49,7 +49,7 @@ authRouter.post('/login', async (request, response) => {
 
     const user = await User.findOne({ email })
     if (!user) {
-        return response.status(400).json({ error: "invalid email" })
+        return response.status(404).json({ error: "invalid email" })
     }
     const passwordCorrect = user === null
         ? false

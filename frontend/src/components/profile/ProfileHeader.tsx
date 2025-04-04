@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { AvatarUploader } from "./AvatarUploader";
-import { Modal } from "../Modal"; // Asegúrate de tener este componente
+import { Modal } from "../Modal";
 
 interface ProfileHeaderProps {
     avatarPreview: string | null;
@@ -45,7 +45,7 @@ export const ProfileHeader = ({
                         {t('edit-profile.subtitle')}
                     </h2>
                 </div>
-                <div className="w-[50px]">
+                <div className="relative w-[50px]">
                     <AspectRatio
                         ratio={1 / 1}
                         className="bg-muted rounded-full cursor-pointer"
@@ -57,6 +57,9 @@ export const ProfileHeader = ({
                             className="object-cover rounded-full w-full h-full"
                         />
                     </AspectRatio>
+                    {!avatarPreview &&
+                        <span className="absolute -top-2 -right-2 font-semibold text-xl">?</span>
+                    }
                 </div>
             </div>
 
