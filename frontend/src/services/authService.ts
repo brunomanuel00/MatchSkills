@@ -10,7 +10,7 @@ const login = async (credentials: AuthCredentials) => {
 
 const logout = async () => {
     const response = await axios.post(`${baseUrl}/logout`, {}, { withCredentials: true })
-    return response.data
+    return response
 }
 
 const verifyAuth = async () => {

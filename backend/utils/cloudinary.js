@@ -11,7 +11,7 @@ cloudinary.config({
 // Configuración global de Cloudinary
 cloudinary.config({
     upload_preset: 'ml_default', // Opcional: Crea un upload preset en tu cuenta
-    api_proxy: process.env.CLOUDINARY_PROXY // Si necesitas proxy
+    // api_proxy: process.env.CLOUDINARY_PROXY // Si necesitas proxy
 });
 
 module.exports = cloudinary;

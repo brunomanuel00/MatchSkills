@@ -169,7 +169,6 @@ export default function ProfilePage() {
 
             toastEasy('success');
 
-            // Resetear estados
             setPasswords({ newPassword: '', confirmPassword: '' });
             setAvatarFile(null);
             setAvatarPreview(null);
@@ -177,7 +176,7 @@ export default function ProfilePage() {
 
 
         } catch (error) {
-            console.error('Error en handleSubmit:', error); // Debug
+            console.error('Error en handleSubmit:', error);
             const errorMessage = error instanceof Error
                 ? error.message
                 : t("errorMessage.updateUser");

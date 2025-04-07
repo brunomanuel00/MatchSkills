@@ -69,7 +69,11 @@
             "description": "Por favor inténtalo de nuevo, algo salió mal."
         }
     },
-    "language": "Idioma",
+    "language": {
+        "title": "Lenguaje",
+        "english": "Inglés",
+        "spanish": "Español"
+    },
     "theme": {
         "toggle": "Cambiar tema"
     },

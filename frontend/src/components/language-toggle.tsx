@@ -24,19 +24,19 @@ export function LanguageToggle() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button title={t('language')} variant="ghost" size="icon" className="rounded-full">
+                <Button title={t('language.title')} variant="ghost" size="icon" className="rounded-full">
                     <motion.div transition={{ duration: 0.2 }}>
                         <Globe className="h-5 w-5 text-lapis_lazuli dark:text-white" />
-                        <span className="sr-only">{t("language")}</span>
+                        <span className="sr-only">title={t('language.title')}</span>
                     </motion.div>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => changeLanguage("en")}>
-                    English {i18n.language === "en" && "✓"}
+                    {t("language.english")} {i18n.language === "en" && "✓"}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => changeLanguage("es")}>
-                    Español {i18n.language === "es" && "✓"}
+                    {t("language.spanish")} {i18n.language === "es" && "✓"}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

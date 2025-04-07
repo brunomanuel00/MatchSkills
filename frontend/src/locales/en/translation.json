@@ -69,7 +69,11 @@
             "description": "Please try again, something went wrong."
         }
     },
-    "language": "Language",
+    "language": {
+        "title": "Language",
+        "english": "English",
+        "spanish": "Spanish"
+    },
     "theme": {
         "toggle": "Toggle theme"
     },

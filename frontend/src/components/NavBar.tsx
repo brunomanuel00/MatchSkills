@@ -29,7 +29,7 @@ export const Navbar = () => {
     };
 
     const navItems = user?.rol === 'admin'
-        ? [...baseNavItems, adminNavItem]  // Admin: todos los ítems
+        ? [...baseNavItems, adminNavItem]
         : baseNavItems;
 
 

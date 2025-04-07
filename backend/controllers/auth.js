@@ -99,7 +99,7 @@ authRouter.get('/verify-auth', middleware.userExtractor, async (req, res) => {
         return res.status(204).json({ error: 'No vacio' });
     }
     const decoded = jwt.verify(token, process.env.SECRET);
-    const user = await User.findById(decoded.id); // Obtén los datos del usuario
+    const user = await User.findById(decoded.id);
 
     if (!user) {
         return res.status(401).json({ error: 'Usuario no encontrado' });
