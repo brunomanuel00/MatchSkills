@@ -49,7 +49,7 @@ export default function HomePage() {
                     <ul className="flex flex-wrap justify-start items-center p-12 ">
                         {skills?.length === 0 &&
                             <div >
-                                <h2 className="flex flex-nowrap">{t('home.without-skills')}<Link className="text-blue-600 hover:text-blue-400" to='/profile'><SquareArrowOutUpRight className="h-4 w-4 mt-1" /></Link></h2>
+                                <h2 className="flex flex-nowrap">{t('home.without-skills')}<Link className="text-blue-600 hover:text-blue-400" to='/profile?tab=skills'><SquareArrowOutUpRight className="h-4 w-4 mt-1" /></Link></h2>
                             </div>}
                         {skills?.map((skill, index) => (
                             <motion.div

@@ -13,6 +13,8 @@ import { useTranslation } from "react-i18next";
 import { isEqual } from "lodash";
 import { toastEasy } from "../components/hooks/toastEasy";
 import userService from "../services/userService";
+import { useSearchParams } from "react-router-dom";
+
 
 export default function ProfilePage() {
     const { user, updateUser } = useAuth();
@@ -38,7 +40,9 @@ export default function ProfilePage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState(TAB_VALUES.PROFILE);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const initialTab = searchParams.get("tab") ?? TAB_VALUES.PROFILE;
+    const [activeTab, setActiveTab] = useState(initialTab);
     const [passwords, setPasswords] = useState({
         newPassword: '',
         confirmPassword: ''
@@ -69,7 +73,12 @@ export default function ProfilePage() {
         const passwordChanged = passwords.newPassword.length > 0;
 
         setHasChanges(basicChanges || skillsChanged || avatarChanged || passwordChanged);
+
     }, [userEdit, initialUserState, avatarFile, avatarPreview, passwords.newPassword]);
+
+    useEffect(() => {
+        setSearchParams({ tab: activeTab });
+    }, [activeTab, setSearchParams]);
 
     useEffect(() => {
         if (passwords.newPassword && passwords.confirmPassword) {
@@ -253,7 +262,7 @@ export default function ProfilePage() {
                                 <TabsContent value={TAB_VALUES.SKILLS} className="h-full">
                                     <CardContent className="p-6">
                                         <SkillsTab
-                                            key={`skills-${JSON.stringify(initialSkillsState)}`}
+                                            key={`skills - ${JSON.stringify(initialSkillsState)}`}
                                             skills={skills}
                                             onSkillsChange={handleSkillsChange}
                                         />

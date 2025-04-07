@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             throw new Error('Role not found in user data');
         }
 
+
         setUser(userData.user as Readonly<User>);
         return userData.user.rol;
 
