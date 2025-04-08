@@ -87,6 +87,16 @@ export const ProfileForm = ({
                             </button>
                         </div>
                     </div>
+
+                    {userEdit?.rol === "admin" &&
+                        <div className="flex flex-col space-y-2">
+                            <Label htmlFor="confirm-password">{t("register.confirmPassword")}</Label>
+                            <div className="relative">
+
+                                Role
+                            </div>
+                        </div>
+                    }
                     {passwordError && (
                         <p className="text-sm text-red-500">{passwordError}</p>
                     )}
