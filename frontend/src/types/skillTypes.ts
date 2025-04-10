@@ -17,3 +17,9 @@ export interface SelectedSkills {
     mySkills: Skill[];
     desiredSkills: Skill[];
 }
+
+export interface SkillsSelectorProps {
+    currentSkills: SelectedSkills;
+    onSkillsChange: (skills: SelectedSkills) => void;
+    maxSkills?: number;
+}

@@ -51,7 +51,10 @@
         "upload": "Upload New Image",
         "cancel": "Cancel",
         "save": "Save Changes",
-        "saving": "Saving...."
+        "saving": "Saving....",
+        "role": "Select a Role",
+        "user-label": "User",
+        "admin-label": "Administrator"
     },
     "errorMessages": {
         "updateUser": "Error updating profile",

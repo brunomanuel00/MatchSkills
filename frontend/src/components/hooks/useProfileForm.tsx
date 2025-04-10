@@ -1,30 +1,37 @@
+// hooks/useProfileForm.ts
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { isEqual } from "lodash";
-import { toastEasy } from "./toastEasy";
+import { toastEasy } from "../hooks/toastEasy";
 import { DEFAULT_AVATAR, TAB_VALUES } from "../../types/profileTypes";
 import userService from "../../services/userService";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../components/context/AuthContext";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { SelectedSkills } from "../../types/skillTypes";
+import { UseProfileFormOptions } from "../../types/profileTypes";
+import authService from "../../services/authService";
 
-export function useProfileForm() {
-    const { user, updateUser } = useAuth();
+export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions = {}) {
+    const { user: authUser, updateUser } = useAuth();
     const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // 1. Memorizar estado inicial y datos costosos
+    // El usuario a editar: si externalUser existe, lo usamos; si no, el del contexto
+    const baseUser = externalUser ?? authUser;
+    if (!baseUser) throw new Error("No hay usuario para editar");
+
+    // 1. Estados iniciales memoizados
     const initialUserState = useMemo(() => ({
-        ...user,
-        avatar: user?.avatar || DEFAULT_AVATAR,
-        skills: user?.skills ? [...user.skills] : [],
-        lookingFor: user?.lookingFor ? [...user.lookingFor] : []
-    }), [user]);
+        ...baseUser,
+        avatar: baseUser.avatar || DEFAULT_AVATAR,
+        skills: baseUser.skills ? [...baseUser.skills] : [],
+        lookingFor: baseUser.lookingFor ? [...baseUser.lookingFor] : []
+    }), [baseUser]);
 
     const initialSkillsState = useMemo(() => ({
-        mySkills: user?.skills ? [...user.skills] : [],
-        desiredSkills: user?.lookingFor ? [...user.lookingFor] : []
-    }), [user?.skills, user?.lookingFor]);
+        mySkills: baseUser.skills ? [...baseUser.skills] : [],
+        desiredSkills: baseUser.lookingFor ? [...baseUser.lookingFor] : []
+    }), [baseUser.skills, baseUser.lookingFor]);
 
     // 2. Estados
     const [userEdit, setUserEdit] = useState(initialUserState);
@@ -35,46 +42,39 @@ export function useProfileForm() {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const initialTab = searchParams.get("tab") ?? TAB_VALUES.PROFILE;
     const [activeTab, setActiveTab] = useState(initialTab);
-    const [passwords, setPasswords] = useState({
-        newPassword: '',
-        confirmPassword: ''
-    });
-    const [passwordError, setPasswordError] = useState('');
+    const [passwords, setPasswords] = useState({ newPassword: "", confirmPassword: "" });
+    const [passwordError, setPasswordError] = useState("");
 
     // 3. Efectos
 
-    // Detectar cambios (comparación profunda)
+    // Detectar cambios
     useEffect(() => {
         const basicChanges = !isEqual(
-            { name: userEdit?.name, email: userEdit?.email },
-            { name: initialUserState?.name, email: initialUserState?.email }
+            { name: userEdit.name, email: userEdit.email, rol: userEdit.rol },
+            { name: initialUserState.name, email: initialUserState.email, rol: initialUserState.rol },
         );
 
         const skillsChanged = !isEqual(
-            {
-                skills: userEdit?.skills,
-                lookingFor: userEdit?.lookingFor
-            },
-            {
-                skills: initialSkillsState?.mySkills,
-                lookingFor: initialSkillsState?.desiredSkills
-            }
+            { skills: userEdit.skills, lookingFor: userEdit.lookingFor },
+            { skills: initialSkillsState.mySkills, lookingFor: initialSkillsState.desiredSkills }
         );
-
         const avatarChanged = avatarFile !== null ||
-            (avatarPreview === null && userEdit?.avatar.url !== initialUserState?.avatar.url);
-
+            (avatarPreview === null && userEdit.avatar.url !== initialUserState.avatar.url);
         const passwordChanged = passwords.newPassword.length > 0;
 
         setHasChanges(basicChanges || skillsChanged || avatarChanged || passwordChanged);
-    }, [userEdit, initialUserState, avatarFile, avatarPreview, passwords.newPassword, initialSkillsState]);
+    }, [
+        userEdit, initialUserState, initialSkillsState,
+        avatarFile, avatarPreview, passwords.newPassword, initialSkillsState.mySkills,
+        initialSkillsState.desiredSkills
+    ]);
 
-    // Actualizar parámetro de búsqueda (tab)
+    // Sincronizar query param `tab`
     useEffect(() => {
         setSearchParams({ tab: activeTab });
     }, [activeTab, setSearchParams]);
 
-    // Validar contraseñas
+    // Validar passwords
     useEffect(() => {
         if (passwords.newPassword && passwords.confirmPassword) {
             if (passwords.newPassword !== passwords.confirmPassword) {
@@ -82,10 +82,10 @@ export function useProfileForm() {
             } else if (passwords.newPassword.length < 8) {
                 setPasswordError(t("validation.passwordLength"));
             } else {
-                setPasswordError('');
+                setPasswordError("");
             }
         } else {
-            setPasswordError('');
+            setPasswordError("");
         }
     }, [passwords.newPassword, passwords.confirmPassword, t]);
 
@@ -94,8 +94,8 @@ export function useProfileForm() {
     const handleSkillsChange = useCallback((newSkills: SelectedSkills) => {
         setUserEdit(prev => ({
             ...prev!,
-            skills: newSkills?.mySkills ?? [],
-            lookingFor: newSkills?.desiredSkills ?? []
+            skills: newSkills.mySkills,
+            lookingFor: newSkills.desiredSkills
         }));
         setSkills(newSkills);
     }, []);
@@ -103,17 +103,14 @@ export function useProfileForm() {
     const handleAvatarChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
-        if (!file.type.startsWith('image/')) {
+        if (!file.type.startsWith("image/")) {
             toastEasy("error", t("errorMessage.invalidFormateIMG"));
             return;
         }
-
         if (file.size > 10 * 1024 * 1024) {
             toastEasy("error", t("errorMessage.oversized"));
             return;
         }
-
         const reader = new FileReader();
         reader.onloadend = () => setAvatarPreview(reader.result as string);
         reader.readAsDataURL(file);
@@ -123,72 +120,79 @@ export function useProfileForm() {
     const removeAvatar = useCallback(() => {
         setAvatarFile(null);
         setAvatarPreview(null);
-        setUserEdit(prev => ({
-            ...prev!,
-            avatar: DEFAULT_AVATAR
-        }));
+        setUserEdit(prev => ({ ...prev!, avatar: DEFAULT_AVATAR }));
         setHasChanges(true);
     }, []);
 
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
-
         if (passwords.newPassword && passwords.newPassword.length < 8) {
-            return toastEasy('error', t("validation.passwordLength"));
+            return toastEasy("error", t("validation.passwordLength"));
         }
-        if (!userEdit?.id || typeof userEdit.id !== 'string') {
+        if (!userEdit.id) {
             throw new Error(t("errorMessage.idInvalid"));
         }
-
         setIsSubmitting(true);
         try {
-            // Preparar datos para actualización
-            const updatePayload = {
-                name: userEdit?.name !== initialUserState?.name ? userEdit?.name : undefined,
-                email: userEdit?.email !== initialUserState?.email ? userEdit?.email : undefined,
-                skills: !isEqual(userEdit?.skills, initialUserState?.skills) ? userEdit?.skills : undefined,
-                lookingFor: !isEqual(userEdit?.lookingFor, initialUserState?.lookingFor) ? userEdit?.lookingFor : undefined,
+            const payload: any = {
+                name: userEdit.name !== initialUserState.name ? userEdit.name : undefined,
+                email: userEdit.email !== initialUserState.email ? userEdit.email : undefined,
+                skills: !isEqual(userEdit.skills, initialUserState.skills) ? userEdit.skills : undefined,
+                lookingFor: !isEqual(userEdit.lookingFor, initialUserState.lookingFor) ? userEdit.lookingFor : undefined,
                 password: passwords.newPassword || undefined,
-                avatar: avatarFile || (avatarPreview === null ? '' : undefined)
+                avatar: avatarFile || (avatarPreview === null ? "" : undefined)
             };
-
-            const updatedUserData = await userService.updateUser(userEdit.id, updatePayload);
-            updateUser(updatedUserData);
-            toastEasy('success');
-
-            setPasswords({ newPassword: '', confirmPassword: '' });
+            const updated = await userService.updateUser(userEdit.id, payload);
+            // Si es usuario propio, actualizamos el contexto
+            if (!externalUser) updateUser(updated);
+            toastEasy("success");
+            // reset
+            const newInitialState = {
+                ...updated,
+                avatar: updated.avatar || DEFAULT_AVATAR,
+                skills: updated.skills ? [...updated.skills] : [],
+                lookingFor: updated.lookingFor ? [...updated.lookingFor] : [],
+            };
+            setUserEdit(newInitialState);
+            setPasswords({ newPassword: "", confirmPassword: "" });
             setAvatarFile(null);
             setAvatarPreview(null);
             setHasChanges(false);
-        } catch (error) {
-            console.error('Error en handleSubmit:', error);
-            const errorMessage = error instanceof Error
-                ? error.message
-                : t("errorMessage.updateUser");
-            toastEasy('error', errorMessage);
+            // si hay onClose, lo llamamos (para modal)
+            onClose?.();
+
+        } catch (err: any) {
+            console.error(err);
+            toastEasy("error", err.message || t("errorMessage.updateUser"));
         } finally {
             setIsSubmitting(false);
+
         }
-    }, [userEdit, initialUserState, passwords, avatarFile, avatarPreview, t, updateUser]);
+    }, [
+        userEdit, initialUserState, passwords,
+        avatarFile, avatarPreview, externalUser, updateUser, t
+    ]);
 
     const handleCancel = useCallback(() => {
-        setUserEdit({
-            ...initialUserState,
-            skills: [...initialUserState.skills],
-            lookingFor: [...initialUserState.lookingFor]
-        });
-        setSkills({
-            mySkills: [...initialUserState.skills],
-            desiredSkills: [...initialUserState.lookingFor]
-        });
-        setAvatarFile(null);
-        setAvatarPreview(
-            initialUserState.avatar.url === DEFAULT_AVATAR.url ? null : initialUserState.avatar.url
-        );
-        setPasswords({ newPassword: '', confirmPassword: '' });
-        setPasswordError('');
-        setHasChanges(false);
+        if (externalUser) {
+            onClose?.();
+        } else {
+            setUserEdit({ ...initialUserState, skills: [...initialUserState.skills], lookingFor: [...initialUserState.lookingFor], avatar: { ...initialUserState.avatar } });
+            setSkills({ mySkills: [...initialUserState.skills], desiredSkills: [...initialUserState.lookingFor] });
+            setAvatarFile(null);
+            setAvatarPreview(initialUserState.avatar.url === DEFAULT_AVATAR.url ? null : initialUserState.avatar.url);
+            setPasswords({ newPassword: "", confirmPassword: "" });
+            setPasswordError("");
+            setHasChanges(false);
+            onClose?.();
+        }
     }, [initialUserState]);
+
+    const deleteUser = useCallback(async () => {
+        await userService.deleteUser(userEdit.id);
+        await authService.verifyAuth()
+
+    }, [])
 
     return {
         userEdit,
@@ -196,7 +200,6 @@ export function useProfileForm() {
         skills,
         hasChanges,
         isSubmitting,
-        avatarFile,
         avatarPreview,
         activeTab,
         setActiveTab,
@@ -208,6 +211,9 @@ export function useProfileForm() {
         removeAvatar,
         handleSubmit,
         handleCancel,
-        t
+        t,
+        deleteUser
     };
+
+
 }

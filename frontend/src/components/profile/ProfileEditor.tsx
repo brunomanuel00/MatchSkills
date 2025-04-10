@@ -1,182 +1,16 @@
-// hooks/useProfileForm.ts
-import { useMemo, useState, useEffect, useCallback } from "react";
-import { isEqual } from "lodash";
-import { toastEasy } from "../hooks/toastEasy";
-import { DEFAULT_AVATAR, TAB_VALUES } from "../../types/profileTypes";
-import userService from "../../services/userService";
-import { useAuth } from "../../components/context/AuthContext";
-import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
-import { SelectedSkills } from "../../types/skillTypes";
-import { User } from "../../types/authTypes";
+import { Tabs, TabsContent } from "../ui/tabs";
+import { CardContent } from "../ui/card";
+import { ProfileHeader } from "./ProfileHeader";
+import { ProfileTabs } from "./ProfileTabs";
+import { ProfileForm } from "./ProfileForm";
+import { SkillsTab } from "./SkillsTab";
+import { ProfileFooter } from "./ProfileFooter";
+import { TAB_VALUES } from "../../types/profileTypes";
+import { useProfileForm } from "../hooks/useProfileForm";
+import { ProfileEditorProps } from "../../types/profileTypes";
 
-interface UseProfileFormOptions {
-    externalUser?: User;
-}
-
-export function useProfileForm({ externalUser }: UseProfileFormOptions = {}) {
-    const { user: authUser, updateUser } = useAuth();
-    const { t } = useTranslation();
-    const [searchParams, setSearchParams] = useSearchParams();
-
-    // El usuario a editar: si externalUser existe, lo usamos; si no, el del contexto
-    const baseUser = externalUser ?? authUser;
-    if (!baseUser) throw new Error("No hay usuario para editar");
-
-    // 1. Estados iniciales memoizados
-    const initialUserState = useMemo(() => ({
-        ...baseUser,
-        avatar: baseUser.avatar || DEFAULT_AVATAR,
-        skills: baseUser.skills ? [...baseUser.skills] : [],
-        lookingFor: baseUser.lookingFor ? [...baseUser.lookingFor] : []
-    }), [baseUser]);
-
-    const initialSkillsState = useMemo(() => ({
-        mySkills: baseUser.skills ? [...baseUser.skills] : [],
-        desiredSkills: baseUser.lookingFor ? [...baseUser.lookingFor] : []
-    }), [baseUser.skills, baseUser.lookingFor]);
-
-    // 2. Estados
-    const [userEdit, setUserEdit] = useState(initialUserState);
-    const [skills, setSkills] = useState(initialSkillsState);
-    const [hasChanges, setHasChanges] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [avatarFile, setAvatarFile] = useState<File | null>(null);
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    const initialTab = searchParams.get("tab") ?? TAB_VALUES.PROFILE;
-    const [activeTab, setActiveTab] = useState(initialTab);
-    const [passwords, setPasswords] = useState({ newPassword: "", confirmPassword: "" });
-    const [passwordError, setPasswordError] = useState("");
-
-    // 3. Efectos
-
-    // Detectar cambios
-    useEffect(() => {
-        const basicChanges = !isEqual(
-            { name: userEdit.name, email: userEdit.email },
-            { name: initialUserState.name, email: initialUserState.email }
-        );
-        const skillsChanged = !isEqual(
-            { skills: userEdit.skills, lookingFor: userEdit.lookingFor },
-            { skills: initialSkillsState.mySkills, lookingFor: initialSkillsState.desiredSkills }
-        );
-        const avatarChanged = avatarFile !== null ||
-            (avatarPreview === null && userEdit.avatar.url !== initialUserState.avatar.url);
-        const passwordChanged = passwords.newPassword.length > 0;
-
-        setHasChanges(basicChanges || skillsChanged || avatarChanged || passwordChanged);
-    }, [
-        userEdit, initialUserState, initialSkillsState,
-        avatarFile, avatarPreview, passwords.newPassword
-    ]);
-
-    // Sincronizar query param `tab`
-    useEffect(() => {
-        setSearchParams({ tab: activeTab });
-    }, [activeTab, setSearchParams]);
-
-    // Validar passwords
-    useEffect(() => {
-        if (passwords.newPassword && passwords.confirmPassword) {
-            if (passwords.newPassword !== passwords.confirmPassword) {
-                setPasswordError(t("validation.passwordMatch"));
-            } else if (passwords.newPassword.length < 8) {
-                setPasswordError(t("validation.passwordLength"));
-            } else {
-                setPasswordError("");
-            }
-        } else {
-            setPasswordError("");
-        }
-    }, [passwords.newPassword, passwords.confirmPassword, t]);
-
-    // 4. Handlers
-
-    const handleSkillsChange = useCallback((newSkills: SelectedSkills) => {
-        setUserEdit(prev => ({
-            ...prev!,
-            skills: newSkills.mySkills,
-            lookingFor: newSkills.desiredSkills
-        }));
-        setSkills(newSkills);
-    }, []);
-
-    const handleAvatarChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        if (!file.type.startsWith("image/")) {
-            toastEasy("error", t("errorMessage.invalidFormateIMG"));
-            return;
-        }
-        if (file.size > 10 * 1024 * 1024) {
-            toastEasy("error", t("errorMessage.oversized"));
-            return;
-        }
-        const reader = new FileReader();
-        reader.onloadend = () => setAvatarPreview(reader.result as string);
-        reader.readAsDataURL(file);
-        setAvatarFile(file);
-    }, [t]);
-
-    const removeAvatar = useCallback(() => {
-        setAvatarFile(null);
-        setAvatarPreview(null);
-        setUserEdit(prev => ({ ...prev!, avatar: DEFAULT_AVATAR }));
-        setHasChanges(true);
-    }, []);
-
-    const handleSubmit = useCallback(async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (passwords.newPassword && passwords.newPassword.length < 8) {
-            return toastEasy("error", t("validation.passwordLength"));
-        }
-        if (!userEdit.id) {
-            throw new Error(t("errorMessage.idInvalid"));
-        }
-        setIsSubmitting(true);
-        try {
-            const payload: any = {
-                name: userEdit.name !== initialUserState.name ? userEdit.name : undefined,
-                email: userEdit.email !== initialUserState.email ? userEdit.email : undefined,
-                skills: !isEqual(userEdit.skills, initialUserState.skills) ? userEdit.skills : undefined,
-                lookingFor: !isEqual(userEdit.lookingFor, initialUserState.lookingFor) ? userEdit.lookingFor : undefined,
-                password: passwords.newPassword || undefined,
-                avatar: avatarFile || (avatarPreview === null ? "" : undefined)
-            };
-            const updated = await userService.updateUser(userEdit.id, payload);
-            // Si es usuario propio, actualizamos el contexto
-            if (!externalUser) updateUser(updated);
-            toastEasy("success");
-            // reset
-            setPasswords({ newPassword: "", confirmPassword: "" });
-            setAvatarFile(null);
-            setAvatarPreview(null);
-            setHasChanges(false);
-            // si hay onClose, lo llamamos (para modal)
-            options.onClose?.();
-        } catch (err: any) {
-            console.error(err);
-            toastEasy("error", err.message || t("errorMessage.updateUser"));
-        } finally {
-            setIsSubmitting(false);
-        }
-    }, [
-        userEdit, initialUserState, passwords,
-        avatarFile, avatarPreview, externalUser, updateUser, t
-    ]);
-
-    const handleCancel = useCallback(() => {
-        setUserEdit({ ...initialUserState, skills: [...initialUserState.skills], lookingFor: [...initialUserState.lookingFor] });
-        setSkills({ mySkills: [...initialUserState.skills], desiredSkills: [...initialUserState.lookingFor] });
-        setAvatarFile(null);
-        setAvatarPreview(initialUserState.avatar.url === DEFAULT_AVATAR.url ? null : initialUserState.avatar.url);
-        setPasswords({ newPassword: "", confirmPassword: "" });
-        setPasswordError("");
-        setHasChanges(false);
-        options.onClose?.();
-    }, [initialUserState]);
-
-    return {
+export function ProfileEditor({ user, onClose, isModal }: ProfileEditorProps) {
+    const {
         userEdit,
         setUserEdit,
         skills,
@@ -194,5 +28,61 @@ export function useProfileForm({ externalUser }: UseProfileFormOptions = {}) {
         handleSubmit,
         handleCancel,
         t
-    };
+    } = useProfileForm({ externalUser: user, onClose });
+
+    return (
+        <div className={isModal ? "p-4" : "min-h-screen flex justify-center items-center bg-gradient-to-br from-tea_green-500 to-light_green-300 dark:from-lapis_lazuli-500 dark:to-verdigris-700"}>
+            <div className={isModal ? "p-4" : "min-w-full px-4 py-6 mt-20 md:px- md:py-8"}>
+                <div className="bg-white dark:bg-lapis_lazuli-300 rounded-lg shadow-lg overflow-hidden">
+                    <ProfileHeader
+                        avatarPreview={avatarPreview}
+                        userAvatar={userEdit.avatar.url}
+                        userName={userEdit.name}
+                        onAvatarChange={handleAvatarChange}
+                        onRemoveAvatar={removeAvatar}
+                    />
+
+                    <form onSubmit={handleSubmit} className="flex flex-col h-full p-4">
+                        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+                            <ProfileTabs t={t} onTabChange={setActiveTab} />
+
+                            <div className="flex-1 overflow-auto">
+                                <TabsContent value={TAB_VALUES.PROFILE} className="h-full">
+                                    <CardContent className="p-0 space-y-6">
+                                        <ProfileForm
+                                            userEdit={userEdit}
+                                            setUserEdit={setUserEdit}
+                                            t={t}
+                                            passwords={passwords}
+                                            onPasswordChange={(field, value) =>
+                                                setPasswords(prev => ({ ...prev, [field]: value }))
+                                            }
+                                            passwordError={passwordError}
+                                        />
+                                    </CardContent>
+                                </TabsContent>
+
+                                <TabsContent value={TAB_VALUES.SKILLS} className="h-full">
+                                    <CardContent className="p-0">
+                                        <SkillsTab
+                                            skills={skills}
+                                            onSkillsChange={handleSkillsChange}
+                                        />
+                                    </CardContent>
+                                </TabsContent>
+                            </div>
+
+                            <ProfileFooter
+                                isSubmitting={isSubmitting}
+                                onSubmit={handleSubmit}
+                                onCancel={handleCancel}
+                                isSaveDisabled={!hasChanges || isSubmitting}
+                                t={t}
+                            />
+                        </Tabs>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
 }

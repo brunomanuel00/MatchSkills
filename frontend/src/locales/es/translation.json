@@ -51,7 +51,10 @@
         "upload": "Subir Nueva Imagen",
         "cancel": "Cancelar",
         "save": "Guardar Cambios",
-        "saving": "Guardando...."
+        "saving": "Guardando....",
+        "role": "Seleccione un Rol",
+        "user-label": "Usuario",
+        "admin-label": "Administrador"
     },
     "errorMessages": {
         "updateUser": "Error al actualizar el perfil",

@@ -12,7 +12,7 @@ interface ProfileFooterProps {
 
 export const ProfileFooter = ({ isSubmitting, onSubmit, onCancel, isSaveDisabled, t }: ProfileFooterProps) => {
     return (
-        <div className="flex flex-col sm:flex-row justify-end gap-3 p-6 border-t ">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 px-0 pt-3 border-t ">
             <Button
                 type="button"
                 variant="outline"

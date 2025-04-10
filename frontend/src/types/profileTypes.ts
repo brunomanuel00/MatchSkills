@@ -1,4 +1,5 @@
 import { TFunction } from "i18next";
+import { User } from "./authTypes";
 
 export const TAB_VALUES = {
     PROFILE: "profile",
@@ -34,4 +35,15 @@ export interface AvatarUploaderProps {
     onAvatarChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onRemoveAvatar: () => void;
     t: TFunction<"translation", undefined>;
+}
+
+export interface ProfileEditorProps {
+    user?: User;           // Si no viene, edita al usuario logueado
+    onClose?: () => void;  // Para cerrar modal
+    isModal?: boolean;     // Ajustes de estilo en modal
+}
+
+export interface UseProfileFormOptions {
+    externalUser?: User;
+    onClose?: () => void;
 }

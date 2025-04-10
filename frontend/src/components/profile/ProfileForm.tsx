@@ -3,6 +3,7 @@ import { Input } from "../ui/input";
 import { ProfileFormProps } from '../../types/profileTypes'
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 export const ProfileForm = ({
     userEdit,
@@ -14,6 +15,12 @@ export const ProfileForm = ({
 }: ProfileFormProps) => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [role] = useState(userEdit.rol)
+
+    const roles = [
+        { value: "user", label: t("edit-profile.user-label") },
+        { value: "admin", label: t("edit-profile.admin-label") }
+    ];
 
     return (
         <div className="space-y-4">
@@ -88,15 +95,26 @@ export const ProfileForm = ({
                         </div>
                     </div>
 
-                    {userEdit?.rol === "admin" &&
+                    {role && (
                         <div className="flex flex-col space-y-2">
-                            <Label htmlFor="confirm-password">{t("register.confirmPassword")}</Label>
-                            <div className="relative">
-
-                                Role
-                            </div>
+                            <Label htmlFor="role">{t("edit-profile.role")}</Label>
+                            <Select
+                                value={userEdit.rol}
+                                onValueChange={(value) => setUserEdit({ ...userEdit!, rol: value })}
+                            >
+                                <SelectTrigger className="bg-white/70 dark:bg-lapis_lazuli-300/70 border-verdigris-200 dark:border-verdigris-400">
+                                    <SelectValue placeholder="Selecciona un rol" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {roles.map((role) => (
+                                        <SelectItem key={role.value} value={role.value}>
+                                            {role.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
-                    }
+                    )}
                     {passwordError && (
                         <p className="text-sm text-red-500">{passwordError}</p>
                     )}

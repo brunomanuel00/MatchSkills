@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { SkillsSelector } from "../SkillsSelector";
+import { SkillsSelector } from "./SkillsSelector";
 import { SelectedSkills } from "../../types/skillTypes";
 
 interface SkillsTabProps {

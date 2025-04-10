@@ -1,14 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Skill, SelectedSkills, SkillCategory } from '../types/skillTypes';
-import { SKILL_CATEGORIES, ALL_SKILLS, getSkillsByCategory, searchSkills } from '../data/skillsData';
+import { useState, useEffect, useCallback } from 'react';
+import { Skill, SelectedSkills, SkillCategory } from '../../types/skillTypes';
+import { SKILL_CATEGORIES, ALL_SKILLS, getSkillsByCategory, searchSkills } from '../../data/skillsData';
 import { useTranslation } from 'react-i18next';
 import { isEqual } from 'lodash';
-
-interface SkillsSelectorProps {
-    currentSkills: SelectedSkills;
-    onSkillsChange: (skills: SelectedSkills) => void;
-    maxSkills?: number;
-}
+import { SkillsSelectorProps } from '../../types/skillTypes'
 
 export const SkillsSelector = ({
     currentSkills,
@@ -20,6 +15,7 @@ export const SkillsSelector = ({
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState<SkillCategory | 'all'>('all');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
 
     // Sincronizar con las props actuales cuando cambien
     useEffect(() => {
@@ -47,64 +43,63 @@ export const SkillsSelector = ({
         ? searchSkills(categoryFilteredSkills, searchTerm, t)
         : categoryFilteredSkills;
 
-    // Función para obtener el nombre traducido de una habilidad
-    const getTranslatedSkillName = (skill: Skill) => {
+    // Traducción de nombre de habilidad
+    const getTranslatedSkillName = useCallback((skill: Skill) => {
         try {
             return t(`skills.${skill.category}.${skill.id}`);
         } catch (error) {
             console.error(`Translation not found for skill: ${skill.category}.${skill.id}`);
             return skill.id;
         }
-    };
+    }, [t]);
 
-    // Función para obtener el nombre traducido de una categoría
-    const getTranslatedCategoryName = (category: SkillCategory | 'all') => {
+    // Traducción de categoría
+    const getTranslatedCategoryName = useCallback((category: SkillCategory | 'all') => {
         return category === 'all'
             ? t('skills.ui.allCategories')
             : t(`skills.categories.${category}`);
-    };
+    }, [t]);
 
-    // Manejar agregar habilidad
-    const handleAddSkill = (skill: Skill, type: 'my' | 'desired') => {
+    // Agregar habilidad
+    const handleAddSkill = useCallback((skill: Skill, type: 'my' | 'desired') => {
         if (localSkills[`${type}Skills`].length >= maxSkills) return;
 
         const oppositeType = type === 'my' ? 'desired' : 'my';
-        const newOppositeSkills = localSkills[`${oppositeType}Skills`]
-            .filter(s => s.id !== skill.id);
+        const newOppositeSkills = localSkills[`${oppositeType}Skills`].filter(s => s.id !== skill.id);
 
         const newSkills = {
             ...localSkills,
             [`${type}Skills`]: [...localSkills[`${type}Skills`], skill],
-            [`${oppositeType}Skills`]: newOppositeSkills
+            [`${oppositeType}Skills`]: newOppositeSkills,
         };
 
         setLocalSkills(newSkills);
-    };
+    }, [localSkills, maxSkills]);
 
-    // Manejar remover habilidad
-    const handleRemoveSkill = (skillId: string, type: 'my' | 'desired') => {
+    // Remover habilidad
+    const handleRemoveSkill = useCallback((skillId: string, type: 'my' | 'desired') => {
         const newSkills = {
             ...localSkills,
-            [`${type}Skills`]: localSkills[`${type}Skills`].filter(s => s.id !== skillId)
+            [`${type}Skills`]: localSkills[`${type}Skills`].filter(s => s.id !== skillId),
         };
 
         setLocalSkills(newSkills);
-    };
+    }, [localSkills]);
 
     // Limpiar todas las habilidades de un tipo
-    const handleClearAll = (type: 'my' | 'desired') => {
+    const handleClearAll = useCallback((type: 'my' | 'desired') => {
         const newSkills = {
             ...localSkills,
-            [`${type}Skills`]: []
+            [`${type}Skills`]: [],
         };
 
         setLocalSkills(newSkills);
-    };
+    }, [localSkills]);
 
     return (
         <div className="space-y-6">
             {/* Filtros y búsqueda */}
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col md:flex-row gap-2 px-0.5">
                 <input
                     type="text"
                     placeholder={t('skills.ui.searchPlaceholder')}
@@ -113,7 +108,7 @@ export const SkillsSelector = ({
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
 
-                <div className="relative">
+                <div className="relative md:w-72">
                     <button
                         onClick={(e) => {
                             e.preventDefault();
@@ -133,25 +128,47 @@ export const SkillsSelector = ({
                     </button>
 
                     {isCategoryOpen && (
-                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-lapis_lazuli-300 dark:border-verdigris-400 border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <div
+                            className="absolute z-10 w-full mt-1 bg-white dark:bg-lapis_lazuli-300 dark:border-verdigris-400 border rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                            role="menu"
+                            aria-orientation="vertical"
+                        >
                             <div
-                                className="p-3 hover:bg-gray-100 dark:hover:bg-verdigris-600 cursor-pointer border-b dark:border-b-verdigris-400"
+                                role="menuitem"
+                                tabIndex={0}
+                                className="p-3 hover:bg-gray-100 dark:hover:bg-verdigris-600 cursor-pointer border-b dark:border-b-verdigris-400 focus:bg-gray-100 dark:focus:bg-verdigris-600 focus:outline-none focus:ring-2 focus:ring-primary"
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setActiveCategory('all');
                                     setIsCategoryOpen(false);
                                 }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        setActiveCategory('all');
+                                        setIsCategoryOpen(false);
+                                    }
+                                }}
                             >
                                 {t('skills.ui.allCategories')}
                             </div>
-                            {SKILL_CATEGORIES.map(category => (
+                            {SKILL_CATEGORIES.map((category) => (
                                 <div
                                     key={category}
-                                    className="p-3 hover:bg-gray-100 dark:hover:bg-verdigris-600 cursor-pointer border-b dark:border-b-verdigris-400 last:border-b-0"
+                                    role="menuitem"
+                                    tabIndex={0}
+                                    className="p-3 hover:bg-gray-100 dark:hover:bg-verdigris-600 cursor-pointer focus:m-0.5 border-b dark:border-b-verdigris-400"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         setActiveCategory(category);
                                         setIsCategoryOpen(false);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            setActiveCategory(category);
+                                            setIsCategoryOpen(false);
+                                        }
                                     }}
                                 >
                                     {getTranslatedCategoryName(category)}
@@ -169,8 +186,11 @@ export const SkillsSelector = ({
                     <div className="flex justify-between items-center mb-3 ">
                         <h3 className="text-lg font-semibold">{t('skills.ui.mySkills')}</h3>
                         <div className="flex gap-2 items-center">
-                            <span className="text-sm text-gray-500">
+                            <span className=" hidden md:inline text-sm text-gray-500">
                                 {localSkills.mySkills.length}/{maxSkills} {t('skills.ui.skillsSelected')}
+                            </span>
+                            <span className=" md:hidden text-sm text-gray-500">
+                                {localSkills.mySkills.length}/{maxSkills}
                             </span>
                             {localSkills.mySkills.length > 0 && (
                                 <button
@@ -216,8 +236,11 @@ export const SkillsSelector = ({
                     <div className="flex justify-between items-center mb-3 ">
                         <h3 className="text-lg font-semibold">{t('skills.ui.desiredSkills')}</h3>
                         <div className="flex gap-2 items-center">
-                            <span className="text-sm text-gray-500">
+                            <span className="hidden md:inline text-sm text-gray-500">
                                 {localSkills.desiredSkills.length}/{maxSkills} {t('skills.ui.skillsSelected')}
+                            </span>
+                            <span className="md:hidden text-sm text-gray-500">
+                                {localSkills.desiredSkills.length}/{maxSkills}
                             </span>
                             {localSkills.desiredSkills.length > 0 && (
                                 <button
@@ -274,7 +297,7 @@ export const SkillsSelector = ({
                                 <span className="text-sm font-medium mb-2">
                                     {getTranslatedSkillName(skill)}
                                 </span>
-                                <div className="flex gap-2 mt-auto">
+                                <div className="flex flex-wrap gap-2 mt-auto">
                                     <button
                                         onClick={(e) => {
                                             e.preventDefault();

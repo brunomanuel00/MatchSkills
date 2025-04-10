@@ -57,9 +57,6 @@ export const ProfileHeader = ({
                             className="object-cover rounded-full w-full h-full"
                         />
                     </AspectRatio>
-                    {!avatarPreview &&
-                        <span className="absolute -top-2 -right-2 font-semibold text-xl">?</span>
-                    }
                 </div>
             </div>
 

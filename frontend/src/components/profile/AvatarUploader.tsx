@@ -15,14 +15,14 @@ export const AvatarUploader = ({
     t
 }: AvatarUploaderProps) => {
     return (
-        <div className="flex flex-col justify-center  space-y-2">
+        <div className="flex flex-col justify-center space-y-2">
             <div className="relative">
-                <Avatar className="flex-shrink-1 h-10 w-10">
-                    <AspectRatio ratio={1 / 1} >
+                <Avatar className="flex-shrink-1 ">
+                    <AspectRatio ratio={1 / 1}>
                         <AvatarImage
                             src={avatarPreview || userAvatar}
                             alt={userName}
-                            className="object-cover"
+                            className="object-cover w-full h-full object-center "
                         />
                     </AspectRatio>
                 </Avatar>
@@ -35,7 +35,7 @@ export const AvatarUploader = ({
                     {t('edit-profile.recommend-size')}
                 </p>
 
-                <div className="flex-1 flex flex-col space-y-3">
+                <div className="flex-1 flex flex-col overflow-autos space-y-3">
                     <div className="flex flex-wrap gap-2">
                         <Button
                             type="button"
