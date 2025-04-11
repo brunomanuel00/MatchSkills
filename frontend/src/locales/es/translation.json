@@ -17,7 +17,7 @@
         "signUp": "Regístrate",
         "errors": {
             "invalidCredentials": "Correo electrónico o contraseña incorrectos",
-            "genericError": "Ocurrió un error. Por favor, inténtalo de nuevo."
+            "generic-error": "Ocurrió un error. Por favor, inténtalo de nuevo."
         }
     },
     "register": {
@@ -31,13 +31,13 @@
         "haveAccount": "¿Ya tienes una cuenta?",
         "signIn": "Inicia sesión",
         "errors": {
-            "invalidEmail": "Este correo electrónico ya existe",
-            "genericError": "Ocurrió un error. Por favor, inténtalo de nuevo."
+            "invalid-email": "Este correo electrónico ya existe",
+            "generic-error": "Ocurrió un error. Por favor, inténtalo de nuevo."
         }
     },
     "validation": {
-        "passwordMatch": "Las contraseñas no coinciden",
-        "passwordLength": "La contraseña es demasiado corta, minimo 8 caracteress"
+        "password-match": "Las contraseñas no coinciden",
+        "password-length": "La contraseña es demasiado corta, minimo 8 caracteress"
     },
     "edit-profile": {
         "title": "Editar Perfil",
@@ -54,13 +54,24 @@
         "saving": "Guardando....",
         "role": "Seleccione un Rol",
         "user-label": "Usuario",
-        "admin-label": "Administrador"
+        "admin-label": "Administrador",
+        "delete-account": "Eliminar Cuenta",
+        "delete-description": "Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, asegúrate."
+    },
+    "modal": {
+        "delete-account": {
+            "title": "Confirmar la eliminación de la cuenta",
+            "description": "¿Seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer.",
+            "cancel": "Cancelar",
+            "accept": "Sí, Eliminar"
+        }
     },
     "errorMessages": {
         "updateUser": "Error al actualizar el perfil",
         "idInvalid": "ID de usuario no válido",
         "invalidFormateIMG": "Solo se permiten imágenes",
-        "oversized": "La imagen no debe exceder 10MB"
+        "oversized": "La imagen no debe exceder 10MB",
+        "loadingUsers": "Se ha producido un error al cargar los usuarios."
     },
     "toaster": {
         "success": {

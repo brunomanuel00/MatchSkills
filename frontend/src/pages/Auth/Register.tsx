@@ -49,7 +49,7 @@ export function Register() {
         e.preventDefault()
 
         if (password !== confirmPassword) {
-            setPasswordError(t("validation.passwordMatch"))
+            setPasswordError(t("validation.password-match"))
             return
         }
         try {
@@ -61,10 +61,10 @@ export function Register() {
                 navigate('/home')
             }
         } catch (err) {
-            if (axios.isAxiosError(err) && err.response?.data?.error === 'invalidEmail') {
+            if (axios.isAxiosError(err) && err.response?.data?.error === 'invalid-email') {
                 setError(err.response.data.error);
             } else {
-                setError('genericError');
+                setError('generic-error');
             }
         }
 
@@ -176,7 +176,7 @@ export function Register() {
                                         onChange={(e) => {
                                             setPassword(e.target.value)
                                             if (confirmPassword && e.target.value !== confirmPassword) {
-                                                setPasswordError(t("validation.passwordMatch"))
+                                                setPasswordError(t("validation.password-match"))
                                             } else {
                                                 setPasswordError("")
                                             }
@@ -206,7 +206,7 @@ export function Register() {
                                         onChange={(e) => {
                                             setConfirmPassword(e.target.value)
                                             if (password && e.target.value !== password) {
-                                                setPasswordError(t("validation.passwordMatch"))
+                                                setPasswordError(t("validation.password-match"))
                                             } else {
                                                 setPasswordError("")
                                             }

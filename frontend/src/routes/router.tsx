@@ -7,7 +7,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import Layout from "../pages/Layout";
 import MatchesPage from "../pages/MatchesPage";
 import ProfilePage from "../pages/ProfilePage";
-import DashboardPage from "../pages/DashboardPage";
+import AdminDashboardPage from "../pages/AdminDashboardPage";
 
 
 const router = createBrowserRouter([
@@ -41,7 +41,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/admin-dashboard',
-                element: <DashboardPage />
+                element: <AdminDashboardPage />
             },
 
         ]

@@ -55,7 +55,7 @@ export function Login() {
 
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                setErrorType(err.response?.status === 401 ? 'invalidCredentials' : 'genericError');
+                setErrorType(err.response?.status === 401 ? 'invalidCredentials' : 'generic-error');
             }
         } finally {
             setIsSubmitting(false)

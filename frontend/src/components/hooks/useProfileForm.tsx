@@ -78,9 +78,9 @@ export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions 
     useEffect(() => {
         if (passwords.newPassword && passwords.confirmPassword) {
             if (passwords.newPassword !== passwords.confirmPassword) {
-                setPasswordError(t("validation.passwordMatch"));
+                setPasswordError(t("validation.password-match"));
             } else if (passwords.newPassword.length < 8) {
-                setPasswordError(t("validation.passwordLength"));
+                setPasswordError(t("validation.password-length"));
             } else {
                 setPasswordError("");
             }
@@ -127,7 +127,7 @@ export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions 
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (passwords.newPassword && passwords.newPassword.length < 8) {
-            return toastEasy("error", t("validation.passwordLength"));
+            return toastEasy("error", t("validation.password-length"));
         }
         if (!userEdit.id) {
             throw new Error(t("errorMessage.idInvalid"));

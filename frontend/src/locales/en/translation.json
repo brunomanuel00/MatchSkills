@@ -17,7 +17,7 @@
         "signUp": "Sign up",
         "errors": {
             "invalidCredentials": "Invalid email or password",
-            "genericError": "An error occurred. Please try again."
+            "generic-error": "An error occurred. Please try again."
         }
     },
     "register": {
@@ -31,13 +31,13 @@
         "haveAccount": "Already have an account?",
         "signIn": "Sign in",
         "errors": {
-            "invalidEmail": "This email already exist",
-            "genericError": "An error occurred. Please try again."
+            "invalid-email": "This email already exist",
+            "generic-error": "An error occurred. Please try again."
         }
     },
     "validation": {
-        "passwordMatch": "Passwords do not match",
-        "passwordLength": "The password is too short, min 8 characters"
+        "password-match": "Passwords do not match",
+        "password-length": "The password is too short, min 8 characters"
     },
     "edit-profile": {
         "title": "Edit Profile",
@@ -54,13 +54,24 @@
         "saving": "Saving....",
         "role": "Select a Role",
         "user-label": "User",
-        "admin-label": "Administrator"
+        "admin-label": "Administrator",
+        "delete-account": "Delete Account",
+        "delete-description": "Once you delete your account, there is no going back. Please be certain."
+    },
+    "modal": {
+        "delete-account": {
+            "title": "Confirm Account Deletion",
+            "description": "Are you sure you want to delete your account? This action cannot be undone.",
+            "cancel": "Cancel",
+            "accept": "Yes,Delete"
+        }
     },
     "errorMessages": {
         "updateUser": "Error updating profile",
         "idInvalid": "Invalid user ID",
         "invalidFormateIMG": "Only images are allowed",
-        "oversized": "The image must not exceed 10MB"
+        "oversized": "The image must not exceed 10MB",
+        "loadingUsers": "Has been occurred an error loading the users"
     },
     "toaster": {
         "success": {

@@ -8,6 +8,7 @@ import { ProfileFooter } from "./ProfileFooter";
 import { TAB_VALUES } from "../../types/profileTypes";
 import { useProfileForm } from "../hooks/useProfileForm";
 import { ProfileEditorProps } from "../../types/profileTypes";
+import DeleteAccount from "../DeleteAccount";
 
 export function ProfileEditor({ user, onClose, isModal }: ProfileEditorProps) {
     const {
@@ -48,7 +49,7 @@ export function ProfileEditor({ user, onClose, isModal }: ProfileEditorProps) {
 
                             <div className="flex-1 overflow-auto">
                                 <TabsContent value={TAB_VALUES.PROFILE} className="h-full">
-                                    <CardContent className="p-0 space-y-6">
+                                    <CardContent className="p-1 space-y-6">
                                         <ProfileForm
                                             userEdit={userEdit}
                                             setUserEdit={setUserEdit}
@@ -70,6 +71,8 @@ export function ProfileEditor({ user, onClose, isModal }: ProfileEditorProps) {
                                         />
                                     </CardContent>
                                 </TabsContent>
+
+
                             </div>
 
                             <ProfileFooter
@@ -79,6 +82,18 @@ export function ProfileEditor({ user, onClose, isModal }: ProfileEditorProps) {
                                 isSaveDisabled={!hasChanges || isSubmitting}
                                 t={t}
                             />
+                            <div className="w-full h-0.5 mt-4 bg-gray-400 dark:bg-verdigris-500 "></div>
+                            <div className="pt-5">
+                                <TabsContent value={TAB_VALUES.PROFILE} className="h-full">
+                                    <h2 className="text-red-600 dark:text-red-500 font-semibold text-2xl mx-6">{t('edit-profile.delete-account')}</h2>
+                                    <CardContent className="flex flex-col justify-between ">
+                                        <p className="my-3">
+                                            {t("edit-profile.delete-description")}
+                                        </p>
+                                        <DeleteAccount t={t} id={userEdit.id} />
+                                    </CardContent>
+                                </TabsContent>
+                            </div>
                         </Tabs>
                     </form>
                 </div>
