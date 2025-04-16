@@ -96,7 +96,7 @@ authRouter.get('/verify-auth', middleware.userExtractor, async (req, res) => {
     const token = req.cookies.token;
 
     if (!token) {
-        return res.status(204).json({ error: 'No vacio' });
+        return res.status(200).json({ error: 'empty token' });
     }
     const decoded = jwt.verify(token, process.env.SECRET);
     const user = await User.findById(decoded.id);

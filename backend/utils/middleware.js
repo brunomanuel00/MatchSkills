@@ -20,14 +20,7 @@ const userExtractor = async (request, response, next) => {
     const token = request.cookies.token;
 
     if (!token) {
-        const authHeader = request.get('Authorization');
-        if (authHeader?.startsWith('Bearer ')) {
-            token = authHeader.replace('Bearer ', '');
-        }
-    }
-
-    if (!token) {
-        return response.status(401).json({ error: 'no token provided' });
+        return response.status(204).json({ error: 'no token provided' });
     }
 
     const decodedToken = jwt.verify(token, process.env.SECRET);

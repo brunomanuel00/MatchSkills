@@ -1,4 +1,3 @@
-// hooks/useProfileForm.ts
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { isEqual } from "lodash";
 import { toastEasy } from "../hooks/toastEasy";
@@ -10,8 +9,10 @@ import { useSearchParams } from "react-router-dom";
 import { SelectedSkills } from "../../types/skillTypes";
 import { UseProfileFormOptions } from "../../types/profileTypes";
 import authService from "../../services/authService";
+import { useUsers } from "../context/UserContext";
 
 export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions = {}) {
+    const { setUsers, refreshUsers } = useUsers();
     const { user: authUser, updateUser } = useAuth();
     const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -80,7 +81,7 @@ export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions 
             if (passwords.newPassword !== passwords.confirmPassword) {
                 setPasswordError(t("validation.password-match"));
             } else if (passwords.newPassword.length < 8) {
-                setPasswordError(t("validation.password-length"));
+                setPasswordError(t("validation.passwordLength"));
             } else {
                 setPasswordError("");
             }
@@ -127,7 +128,7 @@ export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions 
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (passwords.newPassword && passwords.newPassword.length < 8) {
-            return toastEasy("error", t("validation.password-length"));
+            return toastEasy("error", t("validation.passwordLength"));
         }
         if (!userEdit.id) {
             throw new Error(t("errorMessage.idInvalid"));
@@ -140,11 +141,23 @@ export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions 
                 skills: !isEqual(userEdit.skills, initialUserState.skills) ? userEdit.skills : undefined,
                 lookingFor: !isEqual(userEdit.lookingFor, initialUserState.lookingFor) ? userEdit.lookingFor : undefined,
                 password: passwords.newPassword || undefined,
-                avatar: avatarFile || (avatarPreview === null ? "" : undefined)
+                avatar: avatarFile || (avatarPreview === null ? "" : undefined),
+                rol: userEdit.rol !== initialUserState.rol ? userEdit.rol : undefined
             };
+
+            console.log("este es el rol de userEdit: ", userEdit.rol)
+            console.log("este es el payload", payload)
             const updated = await userService.updateUser(userEdit.id, payload);
+            console.log("esta es la respuesta del backend", updated)
             // Si es usuario propio, actualizamos el contexto
-            if (!externalUser) updateUser(updated);
+            if (!externalUser) {
+                updateUser(updated)
+            } else {
+                // 2) Si es edición desde AdminTable, actualizamos el contexto global de usuarios
+                setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+                refreshUsers()
+
+            }
             toastEasy("success");
             // reset
             const newInitialState = {

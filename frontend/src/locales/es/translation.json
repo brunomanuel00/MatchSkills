@@ -61,10 +61,13 @@
     "modal": {
         "delete-account": {
             "title": "Confirmar la eliminación de la cuenta",
-            "description": "¿Seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer.",
+            "description": "¿Seguro que quieres eliminar esta cuenta? Esta acción no se puede deshacer.",
             "cancel": "Cancelar",
             "accept": "Sí, Eliminar"
         }
+    },
+    "edit-user": {
+        "title": "Editando usuario"
     },
     "errorMessages": {
         "updateUser": "Error al actualizar el perfil",

@@ -37,7 +37,6 @@ export function Login() {
 
     }, [])
 
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErrorType(null);
@@ -55,7 +54,7 @@ export function Login() {
 
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                setErrorType(err.response?.status === 401 ? 'invalidCredentials' : 'generic-error');
+                setErrorType(err.response?.status === 401 ? 'invalidCredentials' : 'genericError');
             }
         } finally {
             setIsSubmitting(false)
@@ -121,7 +120,7 @@ export function Login() {
                             </motion.p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
                             {errorType &&
                                 <motion.div
                                     className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-md"
@@ -137,8 +136,10 @@ export function Login() {
                                 <Input
                                     id="email"
                                     type="email"
+                                    name="email"
                                     placeholder="your@email.com"
                                     value={email}
+                                    autoComplete="email"
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
                                     className="border-verdigris focus:ring-emerald text-foreground dark:text-foreground bg-background dark:bg-lapis_lazuli-300 placeholder:text-muted-foreground"
@@ -156,7 +157,9 @@ export function Login() {
                                     <Input
                                         id="password"
                                         type={showPassword ? "text" : "password"}
+                                        autoComplete="current-password"
                                         placeholder="••••••••"
+                                        name="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required

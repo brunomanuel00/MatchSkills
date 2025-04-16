@@ -20,7 +20,7 @@ userRouter.delete('/:id', userExtractor, async (request, response) => {
     const userIdToDelete = request.params.id;
     const userRequesting = request.user;
 
-    if (userRequesting.id !== userIdToDelete && userRequesting.role !== 'admin') {
+    if (userRequesting.id !== userIdToDelete && userRequesting.rol !== 'admin') {
         const error = new Error("You don't have permission for change user");
         error.name = 'UnauthorizedError';
         throw error;
@@ -114,6 +114,8 @@ userRouter.patch("/:id", userExtractor, upload.single('avatar'), handleMulterErr
         { $set: updates },
         { new: true, runValidators: true }
     );
+
+    console.log("Respuesta de la actualizacion para ver el rol: ", updatedUser)
 
     // Preparar respuesta
     const userResponse = updatedUser.toObject();

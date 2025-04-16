@@ -2,8 +2,6 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 import { User, AuthCredentials } from '../../types/authTypes';
 import authService from "../../services/authService"
 import { Spinner } from '../ui/spinner';
-import axios from 'axios';
-
 
 type AuthContextType = {
     user: Readonly<User> | null;
@@ -30,12 +28,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const verifyAuth = async () => {
             try {
                 const userData = await authService.verifyAuth();
+                if (userData.error) {
+                    throw new Error("unAuthorized")
+                }
                 setUser(userData as Readonly<User>)
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status === 401) {
 
-
-                }
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -51,7 +49,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (!userData?.user?.rol) {
             throw new Error('Role not found in user data');
         }
-
 
         setUser(userData.user as Readonly<User>);
         return userData.user.rol;
@@ -81,3 +78,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         </AuthContext.Provider>
     );
 };
+
+
+// console.log(userData)
+// setUser({
+//     avatar: {
+//         public_id: "default_avatar",
+//         url: "https://res.cloudinary.com/decnbbgn8/image/upload/v1743115286/default_avatars.svg_lszftj.png"
+//     },
+//     email: "fer@gmail.com",
+//     id: "67ef57d15c81926e025f9e26",
+//     lookingFor: [
+//         { id: 'yoga', category: 'others' },
+//         { id: 'medicine', category: 'sciences' },
+//         { id: 'go', category: 'technology' }
+//     ],
+//     name: "Fernando Padilla",
+//     rol: "admin",
+//     skills
+//         : [
+//             { id: 'ts', category: 'technology' },
+//             { id: 'py', category: 'technology' },
+//             { id: 'java', category: 'technology' },
+//             { id: 'csharp', category: 'technology' },
+//             { id: 'meditation', category: 'others' },
+//             { id: 'swift', category: 'technology' },
+//             { id: 'biology', category: 'sciences' },
+//             { id: 'php', category: 'technology' },
+//             { id: 'react', category: 'technology' },
+//             { id: 'angular', category: 'technology' },
+//             { id: 'ruby', category: 'technology' }]
+// })

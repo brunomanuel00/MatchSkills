@@ -9,7 +9,6 @@ import MatchesPage from "../pages/MatchesPage";
 import ProfilePage from "../pages/ProfilePage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
 
-
 const router = createBrowserRouter([
     {
         path: "/",
@@ -25,7 +24,11 @@ const router = createBrowserRouter([
     },
     {
         path: "",
-        element: <ProtectedRoute><Layout /></ProtectedRoute>,
+        element:
+
+            <ProtectedRoute>
+                <Layout />
+            </ProtectedRoute>,
         children: [
             {
                 path: '/home',

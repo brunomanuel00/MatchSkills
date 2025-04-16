@@ -14,8 +14,16 @@ const logout = async () => {
 }
 
 const verifyAuth = async () => {
-    const response = await axios.get(`${baseUrl}/verify-auth`, { withCredentials: true });
-    return response.data;
+    try {
+        const response = await axios.get(`${baseUrl}/verify-auth`, { withCredentials: true });
+        return response.data;
+
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+
+        }
+
+    }
 }
 
 const register = async (credentials: RegisterCredentials) => {

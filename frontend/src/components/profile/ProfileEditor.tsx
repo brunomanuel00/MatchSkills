@@ -90,7 +90,7 @@ export function ProfileEditor({ user, onClose, isModal }: ProfileEditorProps) {
                                         <p className="my-3">
                                             {t("edit-profile.delete-description")}
                                         </p>
-                                        <DeleteAccount t={t} id={userEdit.id} />
+                                        <DeleteAccount t={t} id={userEdit.id} showText={true} />
                                     </CardContent>
                                 </TabsContent>
                             </div>

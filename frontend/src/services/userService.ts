@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { User } from '../types/authTypes';
+import { Skill } from '../types/skillTypes';
 
 
 const baseUrl = '/api/users';
@@ -34,9 +35,10 @@ const updateUser = async (id: string, updateData: {
     id?: string
     name?: string;
     email?: string;
-    skills?: any;
-    lookingFor?: any;
+    skills?: Skill[];
+    lookingFor?: Skill[];
     password?: string;
+    rol?: string,
     avatar?: File | string;
 }) => {
     const formData = new FormData();
@@ -44,6 +46,7 @@ const updateUser = async (id: string, updateData: {
     // Añadir campos básicos
     if (updateData.name !== undefined) formData.append('name', updateData.name);
     if (updateData.email !== undefined) formData.append('email', updateData.email);
+    if (updateData.rol !== undefined) formData.append('rol', updateData.rol);
 
     // Manejo especial para skills y lookingFor
     if (updateData.skills !== undefined) {
