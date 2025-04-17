@@ -66,6 +66,22 @@
             "accept": "Sí, Eliminar"
         }
     },
+    "table": {
+        "selectAll": "Seleccionar Todos",
+        "photo": "Foto",
+        "user": "Usuarios",
+        "email": "Email",
+        "role": "Rol",
+        "action": "Acciones",
+        "edit": "Editar",
+        "show": "Mostrar: ",
+        "paginate": "por página",
+        "delete": "Eliminar",
+        "showing": "Mostrando ",
+        "of": "de",
+        "users": "usuarios",
+        "not-found": "No se encontraron usuarios"
+    },
     "edit-user": {
         "title": "Editando usuario"
     },

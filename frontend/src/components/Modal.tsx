@@ -38,7 +38,7 @@ export const Modal = ({ isOpen, onClose, children, title, size = "md" }: ModalPr
                             </button>
                         </div>
                         <div className="w-full h-px bg-slate-600 dark:bg-slate-50"></div>
-                        <div className="p-4">
+                        <div className="">
                             {children}
                         </div>
                     </motion.div>

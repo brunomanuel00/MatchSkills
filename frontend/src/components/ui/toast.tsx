@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -16,7 +14,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed top-4 right-4 z-[100] flex flex-col gap-2 w-full max-w-xs",
+      "fixed top-4 right-4 z-[100] flex flex-col gap-2 w-full max-w-xs", // Modificado
       className
     )}
     {...props}
@@ -32,7 +30,7 @@ const toastVariants = cva(
         default: "border bg-background text-foreground",
         destructive:
           "destructive group border-destructive bg-destructive text-destructive-foreground",
-        success: "border-green-500 bg-green-50 text-green-900"
+        success: "border-green-500 bg-green-50 text-green-900 "
       },
     },
     defaultVariants: {
@@ -118,6 +116,7 @@ const ToastDescription = React.forwardRef<
 ToastDescription.displayName = ToastPrimitives.Description.displayName
 
 type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
+
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
 export {

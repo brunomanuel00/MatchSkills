@@ -6,8 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Checkbox } from "../ui/checkbox";
 import { Badge } from "../ui/badge";
 import { Spinner } from "../ui/spinner";
-import { ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
-// import { UsersTableProps } from "../../types/tableTypes";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import DeleteAccount from "../DeleteAccount";
 import { useTranslation } from "react-i18next";
 import { Modal } from "../Modal";
@@ -18,12 +17,13 @@ import { useUsers } from "../context/UserContext";
 export function AdminTable() {
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [pageSize, setPageSize] = useState(10);
-    const { users, refreshUsers } = useUsers()
+    const { users, refreshUsers, loading } = useUsers()
+
     const [currentPage, setCurrentPage] = useState(1);
-    const isLoading = false
     const { t } = useTranslation()
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [userToEdit, setUserToEdit] = useState<User | undefined>(undefined);
+    const [deploy, setDeploy] = useState(false)
 
     const totalPages = Math.ceil(users.length / pageSize);
     const paginatedUsers = users.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -46,6 +46,7 @@ export function AdminTable() {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+        handleDeleteSelected()
     };
 
     const handleDeleteSelected = () => {
@@ -63,11 +64,22 @@ export function AdminTable() {
             {/* Controles superiores */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                    <DropdownMenu>
+                    <DropdownMenu onOpenChange={(open) => setDeploy(open)}>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline">
-                                Mostrar: {pageSize}
-                                <MoreVertical className="ml-2 h-4 w-4" />
+                            <Button
+                                variant="outline"
+
+                                className="w-full px-4 py-2 border rounded-lg text-left flex justify-between items-center dark:bg-lapis_lazuli-300/70 dark:border-verdigris-400"
+                            >
+                                <span>{t('table.show')} {pageSize}</span>
+                                <svg
+                                    className={`w-5 h-5 transition-transform ${deploy ? 'rotate-180' : ''} `}
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -79,7 +91,7 @@ export function AdminTable() {
                                         setCurrentPage(1);
                                     }}
                                 >
-                                    {size} por página
+                                    {size} {t("table.paginate")}
                                 </DropdownMenuItem>
                             ))}
                         </DropdownMenuContent>
@@ -87,17 +99,17 @@ export function AdminTable() {
 
                     {selectedUsers.length > 0 && (
                         <Button variant="destructive" onClick={handleDeleteSelected}>
-                            Eliminar seleccionados ({selectedUsers.length})
+                            {t('table.delete')} ({selectedUsers.length})
                         </Button>
                     )}
                 </div>
             </div>
 
             {/* Tabla */}
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow >
+            <div className="rounded-md border border-cyan-700">
+                <Table className=" border-cyan-700">
+                    <TableHeader className=" border-cyan-700">
+                        <TableRow className=" border-cyan-700" >
                             <TableHead className="flex items-center gap-x-2 text-black dark:text-white">
                                 <Checkbox
                                     checked={
@@ -106,17 +118,17 @@ export function AdminTable() {
                                     }
                                     onCheckedChange={handleSelectAll}
                                 />
-                                select All
+                                {t('table.selectAll')}
                             </TableHead>
-                            <TableHead className="text-black dark:text-white md:-translate-x-10">Photo</TableHead>
-                            <TableHead className="text-black dark:text-white md:-translate-x-10">Usuario</TableHead>
-                            <TableHead className="text-black dark:text-white md:-translate-x-10">Email</TableHead>
-                            <TableHead className="text-black dark:text-white md:-translate-x-10">Rol</TableHead>
-                            <TableHead className="text-black dark:text-white md:translate-x-14">Acciones</TableHead>
+                            <TableHead className="text-black dark:text-white md:-translate-x-10">{t('table.photo')}</TableHead>
+                            <TableHead className="text-black dark:text-white md:-translate-x-10">{t('table.user')}</TableHead>
+                            <TableHead className="text-black dark:text-white md:-translate-x-10">{t('table.email')}</TableHead>
+                            <TableHead className="text-black dark:text-white md:-translate-x-10">{t('table.role')}</TableHead>
+                            <TableHead className="text-black dark:text-white md:translate-x-14">{t('table.action')}</TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
+                    <TableBody className="border-cyan-700">
+                        {loading ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="h-24 text-center">
                                     <Spinner />
@@ -124,7 +136,7 @@ export function AdminTable() {
                             </TableRow>
                         ) : paginatedUsers.length > 0 ? (
                             paginatedUsers.map(user => (
-                                <TableRow key={user.id}>
+                                <TableRow key={user.id} className=" border-cyan-700">
                                     <TableCell>
                                         <Checkbox
                                             checked={selectedUsers.includes(user.id)}
@@ -161,9 +173,10 @@ export function AdminTable() {
                                         <Button
                                             variant="ghost"
                                             size="sm"
+                                            className="bg-gray-400 hover:bg-green-300 dark:hover:hover:bg-cyan-800"
                                             onClick={() => editUser(user)}
                                         >
-                                            Editar
+                                            {t('table.edit')}
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -171,7 +184,7 @@ export function AdminTable() {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={7} className="h-24 text-center">
-                                    No se encontraron usuarios
+                                    {t('table.not-found')}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -181,9 +194,9 @@ export function AdminTable() {
 
             {/* Paginación */}
             <div className="flex items-center justify-between px-2">
-                <div className="text-sm text-muted-foreground">
-                    Mostrando {(currentPage - 1) * pageSize + 1}-
-                    {Math.min(currentPage * pageSize, users.length)} de {users.length} usuarios
+                <div className="text-sm text-gray-600 dark:text-white text-muted-foreground">
+                    {t('table.showing')} {(currentPage - 1) * pageSize + 1}-
+                    {Math.min(currentPage * pageSize, users.length)} {t('table.of')} {users.length} {t('table.users')}
                 </div>
                 <div className="flex items-center space-x-2">
                     <Button

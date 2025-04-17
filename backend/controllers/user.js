@@ -9,9 +9,86 @@ userRouter.get('/', userExtractor, async (_request, response) => {
     response.json(users)
 })
 
+userRouter.post('/array_users', userExtractor, async (request, response) => {
+    const users = request.body;
+    const userRequesting = request.user;
+
+    if (userRequesting.rol !== 'admin') {
+        const error = new Error("You don't have permission for change user");
+        error.name = 'UnauthorizedError';
+        throw error;
+    }
+
+    if (!Array.isArray(users)) {
+        return response.status(400).json({ error: 'Invalid format. Expected an array of users.' });
+    }
+
+    try {
+        const saltRounds = 10;
+
+        const createdUsers = await Promise.all(
+            users.map(async user => {
+                const { name, email, password, skills, lookingFor, rol, avatar } = user;
+
+                if (!name || !email || !password) {
+                    throw new Error(`Missing required fields for user: ${name || email}`);
+                }
+
+                if (password.length < 8) {
+                    throw new Error(`Password too short for user: ${email}`);
+                }
+
+                const existEmail = await User.findOne({ email });
+
+                if (existEmail) {
+                    throw new Error(`Email already exists: ${email}`);
+                }
+
+                if (rol === 'admin') {
+                    throw new Error(`Attempt to create admin user: ${email}`);
+                }
+
+                const passwordHash = await bcrypt.hash(password, saltRounds);
+
+                const newUser = new User({
+                    name,
+                    email,
+                    passwordHash,
+                    skills,
+                    lookingFor,
+                    rol,
+                    avatar
+                });
+
+                return await newUser.save();
+            })
+        );
+
+        response.status(201).json({ success: true, count: createdUsers.length, users: createdUsers });
+    } catch (error) {
+        response.status(400).json({ error: error.message });
+    }
+});
+
+
 userRouter.get('/:id', userExtractor, async (request, response) => {
     const user = await User.findById(request.params.id)
     response.json(user)
+})
+
+userRouter.delete('/array_users', userExtractor, async (request, response) => {
+
+    const userRequesting = request.user;
+
+    if (userRequesting.rol !== 'admin') {
+        const error = new Error("You don't have permission for change user");
+        error.name = 'UnauthorizedError';
+        throw error;
+    }
+
+    await User.findByIdAndDelete(userIdToDelete);
+
+    response.status(204).end();
 })
 
 
@@ -114,8 +191,6 @@ userRouter.patch("/:id", userExtractor, upload.single('avatar'), handleMulterErr
         { $set: updates },
         { new: true, runValidators: true }
     );
-
-    console.log("Respuesta de la actualizacion para ver el rol: ", updatedUser)
 
     // Preparar respuesta
     const userResponse = updatedUser.toObject();

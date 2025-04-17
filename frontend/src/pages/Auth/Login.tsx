@@ -139,7 +139,7 @@ export function Login() {
                                     name="email"
                                     placeholder="your@email.com"
                                     value={email}
-                                    autoComplete="email"
+                                    // autoComplete="email"
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
                                     className="border-verdigris focus:ring-emerald text-foreground dark:text-foreground bg-background dark:bg-lapis_lazuli-300 placeholder:text-muted-foreground"
@@ -157,7 +157,7 @@ export function Login() {
                                     <Input
                                         id="password"
                                         type={showPassword ? "text" : "password"}
-                                        autoComplete="current-password"
+                                        // autoComplete="current-password"
                                         placeholder="••••••••"
                                         name="password"
                                         value={password}

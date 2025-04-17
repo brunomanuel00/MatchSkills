@@ -1,17 +1,16 @@
-// src/contexts/UserContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User } from "../../types/authTypes";
 import userService from "../../services/userService";
 import { toastEasy } from "../hooks/toastEasy";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "../ui/spinner";
-import authService from "../../services/authService";
 import { useAuth } from "./AuthContext";
 
 interface UserContextValue {
     users: User[];
     setUsers: React.Dispatch<React.SetStateAction<User[]>>;
     refreshUsers: () => Promise<void>;
+    loading: boolean
 }
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
@@ -33,7 +32,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (user?.rol === 'admin') {
                 const response = await userService.getUsers();
                 setUsers(response)
-                console.log("arreeeeeee palmiche1", response)
             }
 
         } catch (err) {
@@ -55,7 +53,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     return (
-        <UserContext.Provider value={{ users, setUsers, refreshUsers: loadUsers }}>
+        <UserContext.Provider value={{ users, setUsers, refreshUsers: loadUsers, loading }}>
             {children}
         </UserContext.Provider>
     );
