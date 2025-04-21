@@ -80,7 +80,9 @@
         "showing": "Mostrando ",
         "of": "de",
         "users": "usuarios",
-        "not-found": "No se encontraron usuarios"
+        "not-found": "No se encontraron usuarios",
+        "delete-users": "Eliminar usuarios",
+        "description-delete-users": "¿Está seguro de que desea eliminar los usuarios seleccionados?"
     },
     "edit-user": {
         "title": "Editando usuario"
@@ -90,7 +92,8 @@
         "idInvalid": "ID de usuario no válido",
         "invalidFormateIMG": "Solo se permiten imágenes",
         "oversized": "La imagen no debe exceder 10MB",
-        "loadingUsers": "Se ha producido un error al cargar los usuarios."
+        "loadingUsers": "Se ha producido un error al cargar los usuarios.",
+        "deleteUsers": "Error al intentar eliminar a los usuarios"
     },
     "toaster": {
         "success": {
@@ -100,7 +103,8 @@
         "error": {
             "title": "Error!",
             "description": "Por favor inténtalo de nuevo, algo salió mal."
-        }
+        },
+        "delete-success": "Los usuarios han sido eliminados con éxito."
     },
     "language": {
         "title": "Lenguaje",

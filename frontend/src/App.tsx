@@ -1,4 +1,3 @@
-import './App.css'
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider } from './components/context/AuthContext';
 import { ThemeProvider } from './components/context/theme-context';
@@ -14,8 +13,7 @@ function App() {
         </UserProvider>
       </ThemeProvider>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
-
+export default App;

@@ -80,7 +80,9 @@
         "showing": "Showing ",
         "of": "of",
         "users": "users",
-        "not-found": "No users found"
+        "not-found": "No users found",
+        "delete-users": "Delete Users",
+        "description-delete-users": "Are you sure you want to delete the selected users?"
     },
     "edit-user": {
         "title": "Editing user"
@@ -90,7 +92,8 @@
         "idInvalid": "Invalid user ID",
         "invalidFormateIMG": "Only images are allowed",
         "oversized": "The image must not exceed 10MB",
-        "loadingUsers": "Has been occurred an error loading the users"
+        "loadingUsers": "Has been occurred an error loading the users",
+        "deleteUsers": "Error trying to delete users"
     },
     "toaster": {
         "success": {
@@ -100,7 +103,8 @@
         "error": {
             "title": "Error!",
             "description": "Please try again, something went wrong."
-        }
+        },
+        "delete-success": "Users have been successfully deleted."
     },
     "language": {
         "title": "Language",

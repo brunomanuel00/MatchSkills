@@ -10,7 +10,7 @@ const SIZE_CLASSES = {
     xl: "max-w-5xl",
 };
 
-export const Modal = ({ isOpen, onClose, children, title, size = "md" }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, children, title, size = "md", large = false }: ModalProps) => {
     if (!isOpen) return null;
 
     return createPortal(
@@ -24,7 +24,7 @@ export const Modal = ({ isOpen, onClose, children, title, size = "md" }: ModalPr
                     onClick={onClose}
                 >
                     <motion.div
-                        className={`bg-white dark:bg-gray-800 ${SIZE_CLASSES[size]} ${children && "h-full"} rounded-lg w-full max-h-[90vh] overflow-y-auto`}
+                        className={`bg-white dark:bg-gray-800 p-2 ${SIZE_CLASSES[size]} ${large && "h-full"} rounded-lg w-full max-h-[90vh] overflow-y-auto`}
                         onClick={(e) => e.stopPropagation()}
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}

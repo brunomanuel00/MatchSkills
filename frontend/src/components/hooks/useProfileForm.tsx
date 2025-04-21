@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { isEqual } from "lodash";
-import { toastEasy } from "../hooks/toastEasy";
+import { toastEasy } from "./toastEasy";
 import { DEFAULT_AVATAR, TAB_VALUES } from "../../types/profileTypes";
 import userService from "../../services/userService";
 import { useAuth } from "../../components/context/AuthContext";

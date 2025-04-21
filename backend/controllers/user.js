@@ -4,10 +4,46 @@ const bcrypt = require('bcrypt')
 const { userExtractor } = require('../utils/middleware')
 const { upload, handleMulterError, handleAvatarUpload } = require('./cloudinary')
 
-userRouter.get('/', userExtractor, async (_request, response) => {
-    const users = await User.find({})
-    response.json(users)
-})
+
+userRouter.get('/', userExtractor, async (req, res) => {
+    try {
+        const page = parseInt(req.query.page, 10) || 1; // Base 10 explícita
+        const limit = parseInt(req.query.limit, 10) || 10;
+        const skip = (page - 1) * limit;
+
+        // Añadir validación numérica
+        if (isNaN(page) || isNaN(limit)) {
+            return res.status(400).json({ error: 'Parámetros inválidos' });
+        }
+
+        const [users, total] = await Promise.all([
+            User.find({}).skip(skip).limit(limit).lean(),
+            User.countDocuments()
+        ]);
+
+        // Forzar tipo numérico
+        const numericTotal = Number(total);
+        const totalPages = Math.ceil(numericTotal / limit);
+
+        res.json({
+            users: users.map(user => ({
+                ...user,
+                // Transformación adicional por si acaso
+                id: user._id ? user._id.toString() : user.id,
+                _id: undefined
+            })),
+            pagination: {
+                total: numericTotal, // <- Asegurar número
+                totalPages,
+                currentPage: page,
+                pageSize: limit
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener usuarios' });
+    }
+});
 
 userRouter.post('/array_users', userExtractor, async (request, response) => {
     const users = request.body;
@@ -77,19 +113,73 @@ userRouter.get('/:id', userExtractor, async (request, response) => {
 })
 
 userRouter.delete('/array_users', userExtractor, async (request, response) => {
+    try {
+        // 1. Verificar usuario autenticado
+        const userRequesting = request.user;
+        if (!userRequesting) {
+            return response.status(401).json({ error: 'token missing or invalid' });
+        }
 
-    const userRequesting = request.user;
+        // 2. Validar rol de administrador
+        if (userRequesting.rol !== 'admin') {
+            const error = new Error("Requires admin privileges");
+            error.name = 'AuthorizationError';
+            error.status = 403;
+            throw error;
+        }
 
-    if (userRequesting.rol !== 'admin') {
-        const error = new Error("You don't have permission for change user");
-        error.name = 'UnauthorizedError';
-        throw error;
+        // 3. Validar estructura del body
+        const { ids } = request.body;
+
+        if (!Array.isArray(ids)) {
+            return response.status(400).json({
+                error: 'Invalid request format: expected array of user IDs'
+            });
+        }
+
+        if (ids.length === 0) {
+            return response.status(400).json({
+                error: 'No users selected for deletion'
+            });
+        }
+
+        // 4. Prevenir auto-eliminación
+        if (ids.includes(userRequesting.id)) {
+            return response.status(403).json({
+                error: 'Admin users cannot delete themselves'
+            });
+        }
+
+        // 5. Validar formato de IDs
+        // const invalidIds = ids.filter(id => !mongoose.Types.ObjectId.isValid(id));
+        // if (invalidIds.length > 0) {
+        //     return response.status(400).json({
+        //         error: 'Invalid user IDs',
+        //         invalidIds
+        //     });
+        // }
+
+        // 6. Eliminar usuarios y obtener resultado
+        const deleteResult = await User.deleteMany({
+            _id: { $in: ids },
+            rol: { $ne: 'admin' } // Prevenir eliminación de otros admins
+        });
+
+        // 7. Verificar si se eliminaron todos los solicitados
+        if (deleteResult.deletedCount === 0) {
+            return response.status(404).json({
+                error: 'No valid users found for deletion',
+                details: 'Users may be admin or non-existent'
+            });
+        }
+
+        // 8. Respuesta exitosa
+        response.status(204).end();
+
+    } catch (error) {
+        response.status(400).json({ error: error.message })
     }
-
-    await User.findByIdAndDelete(userIdToDelete);
-
-    response.status(204).end();
-})
+});
 
 
 userRouter.delete('/:id', userExtractor, async (request, response) => {

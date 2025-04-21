@@ -1,16 +1,36 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { User } from "../../types/authTypes";
 import userService from "../../services/userService";
 import { toastEasy } from "../hooks/toastEasy";
 import { useTranslation } from "react-i18next";
-import { Spinner } from "../ui/spinner";
 import { useAuth } from "./AuthContext";
-
+import axios from "axios";
 interface UserContextValue {
+    // Estados
     users: User[];
-    setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+    currentPage: number;
+    pageSize: number;
+    totalPages: number;
+    totalUsers: number;
+    loading: boolean;
+    selectedUsers: string[];
+    isEditModalOpen: boolean;
+    isDeleteModalOpen: boolean;
+    userToEdit?: User;
+    loadingUser: boolean;
+
+    // Funciones
+    setPageSize: (size: number) => void;
+    setCurrentPage: (page: number) => void;
     refreshUsers: () => Promise<void>;
-    loading: boolean
+    handleSelectionToggle: (userId: string) => void;
+    handleSelectAll: () => void;
+    handleDeleteSelected: () => void;
+    editUser: (userId: string) => Promise<void>;
+    closeEditModal: () => void;
+    closeDeleteModal: () => void;
+    openDeleteModal: () => void;
+    setUsers: React.Dispatch<React.SetStateAction<User[]>>;
 }
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
@@ -22,41 +42,171 @@ export function useUsers() {
 }
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [users, setUsers] = useState<User[]>([]);
-    const { user } = useAuth()
-    const [loading, setLoading] = useState(true);
     const { t } = useTranslation();
+    const { user } = useAuth();
 
-    const loadUsers = async () => {
+    // Estados principales
+    const [users, setUsers] = useState<User[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [loading, setLoading] = useState(true);
+
+    // Estados de selección
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+
+    // Estados de edición
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [userToEdit, setUserToEdit] = useState<User>();
+    const [loadingUser, setLoadingUser] = useState(false);
+
+    const loadUsers = useCallback(async (newPage?: number, newSize?: number) => {
         try {
-            if (user?.rol === 'admin') {
-                const response = await userService.getUsers();
-                setUsers(response)
+            setLoading(true);
+            const response = await userService.getUsers(
+                newPage || currentPage,
+                newSize || pageSize
+            );
+
+            // Validación de tipos
+            if (!response.pagination || typeof response.pagination.total !== 'number') {
+                return
             }
 
-        } catch (err) {
-            console.error(err)
+            setUsers(response.users);
+            setTotalUsers(Number(response.pagination.total)); // Conversión explícita
+            setTotalPages(Number(response.pagination.totalPages));
+
+        } catch (error) {
+            console.error('Error loading users:', error);
             toastEasy("error", t("errorMessages.loadingUsers"));
+            setTotalUsers(0); // Resetear a 0 en caso de error
         } finally {
             setLoading(false);
         }
-    };
+    }, [])
 
-
+    // Efectos
     useEffect(() => {
         loadUsers();
     }, [user]);
 
+    // Handlers
+    const handleSelectionToggle = useCallback((userId: string) => {
+        setSelectedUsers(prev =>
+            prev.includes(userId)
+                ? prev.filter(id => id !== userId)
+                : [...prev, userId]
+        );
+    }, [])
 
-    if (loading) {
-        return <Spinner />;
+    const handleSelectAll = () => {
+        setSelectedUsers(prev =>
+            prev.length === users.length
+                ? []
+                : users.map(user => user.id)
+        );
     }
 
+    const handleDeleteSelected = useCallback(async () => {
+        try {
+            if (selectedUsers.length === 0) return;
+
+            setLoading(true);
+
+            // Confirmación básica
+            await userService.deleteArrayUsers(selectedUsers);
+
+            toastEasy('success', t('toaster.delete-success'))
+            // Actualización después de éxito
+            setSelectedUsers([]);
+            refreshUsers();
+
+        } catch (error) {
+            let errorMessage = 'Failed to delete users';
+            if (axios.isAxiosError(error)) {
+                errorMessage = error.response?.data?.error || errorMessage;
+            }
+            console.error('Delete error:', error);
+            toastEasy("error", `${errorMessage}`);
+        } finally {
+            setLoading(false);
+            setIsDeleteModalOpen(false);
+
+        }
+    }, [selectedUsers]);
+
+    const editUser = useCallback(async (userId: string) => {
+        setIsEditModalOpen(true);
+        setLoadingUser(true);
+        try {
+            const userData = await userService.getUserId(userId);
+            setUserToEdit(userData);
+
+        } catch (error) {
+            console.error(error)
+            toastEasy("error", t("errorMessages.fetchingUser"));
+        } finally {
+            setLoadingUser(false);
+        }
+    }, [])
+
+    const closeEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+        setUserToEdit(undefined);
+    }, [])
+
+    const refreshUsers = useCallback(async () => {
+        await loadUsers();
+    }, [])
+
+    const openDeleteModal = () => {
+        setIsDeleteModalOpen(true);
+    }
+
+    const closeDeleteModal = useCallback(() => {
+        setIsDeleteModalOpen(false);
+    }, [])
+
     return (
-        <UserContext.Provider value={{ users, setUsers, refreshUsers: loadUsers, loading }}>
+        <UserContext.Provider
+            value={{
+                users,
+                currentPage,
+                pageSize,
+                totalPages,
+                totalUsers,
+                loading,
+                selectedUsers,
+                isEditModalOpen,
+                isDeleteModalOpen,
+                userToEdit,
+                loadingUser,
+                setUsers,
+                setPageSize: (size) => {
+                    setPageSize(size);
+                    loadUsers(1, size);
+                },
+                setCurrentPage: (page) => {
+                    if (page === currentPage) {
+                        return
+                    }
+                    setCurrentPage(page);
+                    loadUsers(page);
+                },
+                refreshUsers,
+                handleSelectionToggle,
+                handleSelectAll,
+                handleDeleteSelected,
+                editUser,
+                closeEditModal,
+                closeDeleteModal,
+                openDeleteModal
+            }}
+        >
             {children}
         </UserContext.Provider>
     );
 };
-
-

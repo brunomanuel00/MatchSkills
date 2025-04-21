@@ -69,6 +69,7 @@
   }
 }
 
+
 /* Animaciones específicas para toast */
 .ToastRoot[data-state="open"] {
   animation: toastSlideInFromRight 300ms ease-out;

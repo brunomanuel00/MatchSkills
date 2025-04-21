@@ -11,12 +11,10 @@ const apiClient = axios.create({
     withCredentials: true,
 });
 
-const getUsers = async () => {
-    const response = await apiClient.get('/');
+const getUsers = async (page: number, pageSize: number) => {
+    const response = await apiClient.get(`?page=${page}&limit=${pageSize}`);
     return response.data;
 };
-
-
 
 const getUserId = async (id: string) => {
     const response = await apiClient.get(`/${id}`);
@@ -30,6 +28,13 @@ const createUser = async (credentials: User) => {
 
 const deleteUser = async (id: string) => {
     const response = await apiClient.delete(`/${id}`);
+    return response.data;
+};
+
+const deleteArrayUsers = async (ids: string[]) => {
+    const response = await apiClient.delete('/array_users', {
+        data: { ids } // Envía el array directamente en el body
+    });
     return response.data;
 };
 
@@ -96,5 +101,6 @@ export default {
     updateUser,
     getUserId,
     createUser,
-    deleteUser
+    deleteUser,
+    deleteArrayUsers
 };

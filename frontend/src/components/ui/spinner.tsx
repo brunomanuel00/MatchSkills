@@ -5,47 +5,33 @@ interface SpinnerProps {
     isModal?: boolean;
 }
 
-export const Spinner = ({ isModal = false }: SpinnerProps) => {
-    const [isMounted, setIsMounted] = useState(false);
-    const [theme, setTheme] = useState("light");
+export const Spinner = ({ isModal = true }: SpinnerProps) => {
+    const [theme, setTheme] = useState<"light" | "dark">("light");
 
     useEffect(() => {
-        setIsMounted(true);
-
-        // Solo acceder a localStorage y window después del montaje
-        if (typeof window !== 'undefined') {
-            const storedTheme = localStorage.getItem("theme") ||
+        const updateTheme = () => {
+            const storedTheme = localStorage.getItem("theme") as "light" | "dark" ||
                 (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
             setTheme(storedTheme);
-        }
+        };
+
+        // Detectar tema inmediatamente
+        updateTheme();
+
+        // Escuchar cambios en tiempo real
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        mediaQuery.addEventListener('change', updateTheme);
+        return () => mediaQuery.removeEventListener('change', updateTheme);
     }, []);
 
-    if (!isMounted) {
-        return (
-            <div className="h-screen w-full flex justify-center items-center bg-gray-100 dark:bg-gray-900">
-                <Loader2 className="h-16 w-16 animate-spin text-gray-400" />
-            </div>
-        );
-    }
-
-    // Estilo para modal (con blur)
     if (isModal) {
         return (
-            <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-30 backdrop-blur-sm z-50">
-                <Loader2 className={`h-16 w-16 animate-spin ${theme === 'light' ? 'text-blue-500' : 'text-white'}`} />
+            <div className="fixed inset-0 flex justify-center items-center z-50 backdrop-blur-sm">
+                <Loader2 className={`h-16 w-16 animate-spin ${theme === 'light' ? 'text-blue-600' : 'text-verdigris-400'
+                    }`} />
             </div>
         );
     }
 
-    // Estilo normal (con gradient)
-    return (
-        <div className={`h-screen w-full flex justify-center items-center 
-            ${theme === 'light'
-                ? 'bg-gradient-to-br from-tea_green-500 to-light_green-300'
-                : 'bg-gradient-to-br from-lapis_lazuli-500 to-verdigris-700'
-            }`}
-        >
-            <Loader2 className={`h-16 w-16 animate-spin ${theme === 'light' ? 'text-blue-500' : 'text-white'}`} />
-        </div>
-    );
+    return null;
 };

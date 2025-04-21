@@ -1,16 +1,70 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 
 <head>
+
   <meta charset="UTF-8" />
   <link rel="icon" href="./src/assets/Match de habilidades.jpg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Match Habilitates</title>
+  <script>
+    (() => {
+      // 1. Bloquear renderizado inicial
+      document.write(`
+        <style>
+          html, body { margin: 0; padding: 0;  }
+          #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #1e293b;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(13, 148, 136, 0.3);
+            border-top-color: #0d9488;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin { to { transform: rotate(360deg); } }
+        </style>
+        <div id="preloader">
+          <div class="spinner"></div>
+        </div>
+      `);
+
+      // 2. Cargar React después del preloader
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = '/src/main.tsx';
+      script.onload = () => {
+        // 3. Eliminar preloader cuando React esté listo
+        const checkReact = setInterval(() => {
+          if (document.getElementById('root')?.children.length > 0) {
+            clearInterval(checkReact);
+            document.getElementById('preloader').style.opacity = '0';
+            setTimeout(() => {
+              document.getElementById('preloader').remove();
+              document.body.style.overflow = 'visible';
+            }, 500);
+          }
+        }, 50);
+      };
+      document.head.appendChild(script);
+    })();
+  </script>
+
 </head>
 
 <body>
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
 </body>
 
 </html>

@@ -4,4 +4,5 @@ export interface ModalProps {
     children: React.ReactNode;
     title?: string;
     size?: "sm" | "md" | "lg" | "xl";
+    large?: boolean
 }
