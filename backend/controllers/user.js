@@ -3,7 +3,7 @@ const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const { userExtractor } = require('../utils/middleware')
 const { upload, handleMulterError, handleAvatarUpload } = require('./cloudinary')
-
+const matchRouter = require('./match');
 
 userRouter.get('/', userExtractor, async (req, res) => {
     try {
@@ -96,8 +96,17 @@ userRouter.post('/array_users', userExtractor, async (request, response) => {
                     avatar
                 });
 
-                return await newUser.save();
+                const savedUser = await newUser.save();
+
+                await fetch('http://localhost:3001/api/matches/calculate', { // Ajusta la URL de tu servidor si es diferente
+                    method: 'POST',
+                    headers: {
+                        'Cookie': `token=${request.cookies.token}` // Envía la cookie para la autenticación
+                    }
+                });
+                return savedUser;
             })
+
         );
 
         response.status(201).json({ success: true, count: createdUsers.length, users: createdUsers });
@@ -150,22 +159,13 @@ userRouter.delete('/array_users', userExtractor, async (request, response) => {
             });
         }
 
-        // 5. Validar formato de IDs
-        // const invalidIds = ids.filter(id => !mongoose.Types.ObjectId.isValid(id));
-        // if (invalidIds.length > 0) {
-        //     return response.status(400).json({
-        //         error: 'Invalid user IDs',
-        //         invalidIds
-        //     });
-        // }
-
-        // 6. Eliminar usuarios y obtener resultado
+        // 5. Eliminar usuarios y obtener resultado
         const deleteResult = await User.deleteMany({
             _id: { $in: ids },
             rol: { $ne: 'admin' } // Prevenir eliminación de otros admins
         });
 
-        // 7. Verificar si se eliminaron todos los solicitados
+        // 6. Verificar si se eliminaron todos los solicitados
         if (deleteResult.deletedCount === 0) {
             return response.status(404).json({
                 error: 'No valid users found for deletion',
@@ -173,7 +173,7 @@ userRouter.delete('/array_users', userExtractor, async (request, response) => {
             });
         }
 
-        // 8. Respuesta exitosa
+        // 7. Respuesta exitosa
         response.status(204).end();
 
     } catch (error) {
@@ -288,6 +288,14 @@ userRouter.patch("/:id", userExtractor, upload.single('avatar'), handleMulterErr
     delete userResponse.__v;
 
     response.json(userResponse);
+    if (updateData.lookingFor !== undefined) {
+        fetch('http://localhost:3001/api/matches/calculate', { // Ajusta la URL de tu servidor si es diferente
+            method: 'POST',
+            headers: {
+                'Cookie': `token=${request.cookies.token}` // Envía la cookie para la autenticación
+            }
+        });
+    }
 });
 
 module.exports = userRouter
