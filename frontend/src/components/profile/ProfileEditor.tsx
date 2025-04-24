@@ -64,15 +64,13 @@ export function ProfileEditor({ user, onClose, isModal }: ProfileEditorProps) {
                                 </TabsContent>
 
                                 <TabsContent value={TAB_VALUES.SKILLS} className="h-full">
-                                    <CardContent className="p-0">
+                                    <CardContent className="p-0 pb-4">
                                         <SkillsTab
                                             skills={skills}
                                             onSkillsChange={handleSkillsChange}
                                         />
                                     </CardContent>
                                 </TabsContent>
-
-
                             </div>
 
                             <ProfileFooter

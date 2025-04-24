@@ -1,7 +1,6 @@
 import type React from "react"
 import axios from "axios"
 
-
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router-dom"

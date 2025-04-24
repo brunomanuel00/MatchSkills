@@ -3,7 +3,7 @@ const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const { userExtractor } = require('../utils/middleware')
 const { upload, handleMulterError, handleAvatarUpload } = require('./cloudinary')
-const matchRouter = require('./match');
+const Match = require('../models/Match')
 
 userRouter.get('/', userExtractor, async (req, res) => {
     try {
@@ -98,10 +98,10 @@ userRouter.post('/array_users', userExtractor, async (request, response) => {
 
                 const savedUser = await newUser.save();
 
-                await fetch('http://localhost:3001/api/matches/calculate', { // Ajusta la URL de tu servidor si es diferente
+                await fetch('http://localhost:3001/api/matches/calculate', {
                     method: 'POST',
                     headers: {
-                        'Cookie': `token=${request.cookies.token}` // Envía la cookie para la autenticación
+                        'Cookie': `token=${request.cookies.token}`
                     }
                 });
                 return savedUser;
@@ -165,6 +165,13 @@ userRouter.delete('/array_users', userExtractor, async (request, response) => {
             rol: { $ne: 'admin' } // Prevenir eliminación de otros admins
         });
 
+        await Match.updateMany(
+            { 'matches.id': { $in: ids } },
+            { $pull: { matches: { id: { $in: ids } } } }
+        );
+
+        await Match.deleteMany({ userId: { $in: ids } });
+
         // 6. Verificar si se eliminaron todos los solicitados
         if (deleteResult.deletedCount === 0) {
             return response.status(404).json({
@@ -194,6 +201,13 @@ userRouter.delete('/:id', userExtractor, async (request, response) => {
     }
 
     await User.findByIdAndDelete(userIdToDelete);
+
+    await Match.updateMany(
+        { 'matches.id': userIdToDelete },
+        { $pull: { matches: { id: userIdToDelete } } }
+    );
+
+    await Match.deleteOne({ userIdToDelete });
 
     response.status(204).end();
 })

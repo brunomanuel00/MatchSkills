@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const matchSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true },
-    lookingForHash: String,
     matches: [
         {
             matchedUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

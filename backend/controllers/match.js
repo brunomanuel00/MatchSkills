@@ -3,7 +3,7 @@ const Match = require('../models/Match');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const { userExtractor } = require('../utils/middleware');
-const { getSkillMatches } = require('../service/aimlapi');
+const { getSkillMatches } = require('../service/geminiAI');
 
 matchRouter.post('/calculate', userExtractor, async (req, res) => {
     const userRequesting = req.user;
@@ -39,7 +39,7 @@ matchRouter.post('/calculate', userExtractor, async (req, res) => {
 
         const matchDocument = await Match.findOneAndUpdate(
             { userId: userRequesting.id },
-            { lookingForHash: lookingForHash, matches: formattedMatches },
+            { matches: formattedMatches },
             { upsert: true, new: true }
         );
 

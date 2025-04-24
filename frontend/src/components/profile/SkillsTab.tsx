@@ -16,7 +16,7 @@ export const SkillsTab = ({ skills, onSkillsChange }: SkillsTabProps) => {
             className="h-full"
         >
             <SkillsSelector
-                currentSkills={skills} // Nueva prop para el estado actual
+                currentSkills={skills}
                 onSkillsChange={onSkillsChange}
             />
         </motion.div>
