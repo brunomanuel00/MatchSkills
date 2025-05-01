@@ -95,7 +95,7 @@ export const ProfileForm = ({
                         </div>
                     </div>
 
-                    {role && (
+                    {role === 'admin' && (
                         <div className="flex flex-col space-y-2">
                             <Label htmlFor="role">{t("edit-profile.role")}</Label>
                             <Select

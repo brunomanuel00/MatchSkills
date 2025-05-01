@@ -24,6 +24,9 @@ userRouter.get('/', userExtractor, async (req, res) => {
         // Forzar tipo numérico
         const numericTotal = Number(total);
         const totalPages = Math.ceil(numericTotal / limit);
+        // console.log("Estos son los users", await User.find({}))
+        // const usersTotal = await User.find({})
+        // res.json(usersTotal)
 
         res.json({
             users: users.map(user => ({

@@ -5,12 +5,18 @@ import { useTranslation } from "react-i18next"
 import { motion } from "framer-motion";
 import { Skill } from "../types/skillTypes";
 import { SquareArrowOutUpRight } from "lucide-react";
+import { useMatch } from "../components/context/MatchContext";
+import CardMatches from "../components/CardMatches";
+import CardInfo from "../components/CardInfo";
+import { useBenefits } from "../types/utils";
 
 export default function HomePage() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { t } = useTranslation()
     const skills: Skill[] | undefined = user?.skills as Skill[] | undefined;
+    const { bestMatches } = useMatch()
+    const benefits = useBenefits()
 
     useEffect(() => {
         if (!user) {
@@ -36,9 +42,14 @@ export default function HomePage() {
                 <div>
                     <h3 className="m-12 text-2xl">{t('home.subtitle')}</h3>
                 </div>
+                <div className="flex flex-wrap justify-center items-center gap-2 mt-10">
+                    {benefits.map((item) => (
+                        <CardInfo key={item.title} content={item} />
+                    ))}
+                </div>
             </div>
             <div
-                className="flex flex-col items-center justify-center p-4 bg-slate-200 dark:bg-slate-900">
+                className="flex flex-col items-center justify-center p-4 dark:bg-slate-900">
                 <motion.div initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -69,14 +80,29 @@ export default function HomePage() {
                     </ul>
                 </div>
             </div >
-            {skills?.length !== 0 &&
-                <div className="flex flex-col items-center justify-center p-4  bg-lig bg-verdigris-400 dark:bg-lapis_lazuli-400">
+            {bestMatches?.length !== 0 &&
+                <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-verdigris-400 to-emerald-400  dark:bg-gradient-to-tl dark:from-lapis_lazuli-400 dark:to-sky-700">
                     <div className=" md:px-40 ">
                         <h2 className=" font-bold text-center text-5xl sm:text-6xl">{t('home.suggested')}</h2>
                     </div>
                     <div>
                         <h3 className="m-11 text-2xl">{t('home.subtitle-suggested')}</h3>
                     </div>
+                    <div className="flex flex-wrap justify-center items-center mt-4 gap-2">
+                        {bestMatches?.map((item, index) => (
+                            <motion.div
+                                key={item.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.3, delay: index * 0.2 }}
+                                className="w-full max-w-[350px] bg-light_green-800/25 dark:bg-slate-950/25 rounded-md p-4 flex flex-col"
+                            >
+                                <CardMatches user={item} />
+                            </motion.div>
+                        ))}
+                    </div>
+
                 </div>
 
             }

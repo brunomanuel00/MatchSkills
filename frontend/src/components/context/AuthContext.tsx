@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         setUser(userData.user as Readonly<User>);
+
         return userData.user.rol;
 
         //usar try/catch en caso de que se quiera mostrar algun toast

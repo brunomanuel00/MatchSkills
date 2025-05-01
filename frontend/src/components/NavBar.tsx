@@ -62,7 +62,7 @@ export const Navbar = () => {
 
     return (
         <>
-            <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md ">
+            <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-3xl ">
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                     <Link to="/home" className="flex items-center gap-2">
                         <motion.img
@@ -81,7 +81,7 @@ export const Navbar = () => {
                                 to={item.path}
                                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname === item.path
                                     ? 'bg-tea_green-200 dark:bg-verdigris-600 text-gray-900 dark:text-white'
-                                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                    : 'text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
                                     }`}
                             >
                                 {item.icon}

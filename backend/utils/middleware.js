@@ -34,7 +34,7 @@ const userExtractor = async (request, response, next) => {
     }
 
     if (user.rol !== decodedToken.rol) {
-        return res.status(401).json({ error: 'Permisos alterados: Rol modificado' });
+        return response.status(401).json({ error: 'Permisos alterados: Rol modificado' });
     }
 
     request.user = user;

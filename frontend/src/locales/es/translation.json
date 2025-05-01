@@ -139,10 +139,28 @@
     "home": {
         "title": "Encuentra personas con las habilidades que necesitas",
         "subtitle": "Conéctate con personas que complementan tus habilidades",
-        "title-skills": "Your Skills",
+        "title-skills": "Tus Habilidades",
         "without-skills": "Aún no tienes ninguna habilidad. Quieres añadir algunas?",
         "suggested": "Coincidencias Sugeridas",
         "subtitle-suggested": "Personas con habilidades que pueden complementar las tuyas"
+    },
+    "matches": {
+        "skills-found": "Habilidades",
+        "view-skills": "Ver coincidencias"
+    },
+    "benefits": {
+        "find": {
+            "title": "Encuentra Colaboradores",
+            "description": "Conecta con personas que tienen las habilidades complementarias para tus proyectos."
+        },
+        "chat": {
+            "title": "Chatea en Tiempo Real",
+            "description": "Comunícate directamente con tus matches para discutir proyectos y oportunidades."
+        },
+        "collaborate": {
+            "title": "Colabora en Proyectos",
+            "description": "Trabaja en conjunto para desarrollar ideas y llevar tus proyectos al siguiente nivel."
+        }
     },
     "skills": {
         "categories": {

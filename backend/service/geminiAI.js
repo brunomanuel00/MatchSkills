@@ -5,7 +5,7 @@ const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
 export async function getSkillMatches(userRequesting, otherUsers) {
 
-    const prompt = `
+  const prompt = `
 Eres un sistema que encuentra coincidencias de habilidades entre un usuario (Usuario A) y otros usuarios (Usuarios B).
 Tu objetivo es analizar las habilidades que el Usuario A está buscando y devolver un resultado estructurado que indique exactamente qué usuarios tienen habilidades coincidentes.
 
@@ -52,34 +52,35 @@ ${JSON.stringify(userRequesting.lookingFor)}
 
 Y estos son los usuarios con sus habilidades ("users"):
 ${JSON.stringify(
-        otherUsers.map((u) => ({
-            userId: u._id.toString(),
-            skills: u.skills.map(({ id, category }) => ({ id, category }))
-        }))
-    )}
+    otherUsers.map((u) => ({
+      userId: u._id.toString(),
+      skills: u.skills.map(({ id, category }) => ({ id, category }))
+    }))
+  )}
+  )}
 
 `;
 
-    try {
-        const result = await model.generateContent({
-            contents: [{ parts: [{ text: prompt }] }],
-        });
+  try {
+    const result = await model.generateContent({
+      contents: [{ parts: [{ text: prompt }] }],
+    });
 
-        const responseText = await result.response.text();
+    const responseText = await result.response.text();
 
-        let cleanResponse = responseText.trim();
+    let cleanResponse = responseText.trim();
 
-        if (cleanResponse.startsWith('```')) {
-            cleanResponse = cleanResponse.replace(/```(?:json)?/g, '').trim();
-        }
-
-        // Intentamos parsear la respuesta como JSON
-
-        const matches = JSON.parse(cleanResponse);
-
-        return matches;
-    } catch (error) {
-        console.error('Error en getSkillMatches:', error);
-        return [];
+    if (cleanResponse.startsWith('```')) {
+      cleanResponse = cleanResponse.replace(/```(?:json)?/g, '').trim();
     }
+
+    // Intentamos parsear la respuesta como JSON
+
+    const matches = JSON.parse(cleanResponse);
+
+    return matches;
+  } catch (error) {
+    console.error('Error en getSkillMatches:', error);
+    return [];
+  }
 };

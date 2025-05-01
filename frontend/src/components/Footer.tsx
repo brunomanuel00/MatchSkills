@@ -48,8 +48,8 @@ export const Footer = () => {
 
     return (
         <footer className="bg-white dark:bg-lapis_lazuli-400 border-t border-gray-200 dark:border-white mt-auto">
-            <div className="container mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className=" mx-auto py-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 px-5 gap-8 mb-8">
                     <div className="md:col-span-2">
                         <h3 className="text-xl font-bold mb-4">{t('footer.title')}</h3>
                         <p className="text-gray-600 dark:text-gray-300">
@@ -99,9 +99,9 @@ export const Footer = () => {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-200 dark:border-white my-6"></div>
+                <div className="border-t border-gray-200 dark:border-white my-6 px-0" />
 
-                <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 dark:text-white">
+                <div className="flex flex-col md:flex-row justify-between items-center text-sm px-5 text-gray-500 dark:text-white">
                     <p>© {new Date().getFullYear()} {t('footer.copyright')}</p>
                     {user && (
                         <p className="mt-2 md:mt-0">

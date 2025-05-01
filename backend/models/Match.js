@@ -18,6 +18,17 @@ matchSchema.set('toJSON', {
         returnedObject.id = returnedObject._id.toString()
         delete returnedObject._id
         delete returnedObject.__v
+        if (returnedObject.matches) {
+            returnedObject.matches = returnedObject.matches.map(match => {
+                if (match.matchingSkills) {
+                    match.matchingSkills = match.matchingSkills.map(skill => {
+                        const { _id, ...skillWithoutId } = skill;
+                        return skillWithoutId;
+                    });
+                }
+                return match;
+            });
+        }
     }
 })
 

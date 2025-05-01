@@ -8,6 +8,8 @@ import Layout from "../pages/Layout";
 import MatchesPage from "../pages/MatchesPage";
 import ProfilePage from "../pages/ProfilePage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
+import { MatchProvider } from "../components/context/MatchContext";
+import NotFound from "../pages/NotFount";
 
 const router = createBrowserRouter([
     {
@@ -31,11 +33,11 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '/home',
-                element: <HomePage />
+                element: <MatchProvider><HomePage /></MatchProvider>
             },
             {
                 path: '/matches',
-                element: <MatchesPage />
+                element: <MatchProvider><MatchesPage /></MatchProvider>
             },
             {
                 path: '/profile',
@@ -47,6 +49,10 @@ const router = createBrowserRouter([
             },
 
         ]
+    },
+    {
+        path: '*',
+        element: <NotFound />
     }
 ])
 export default router;

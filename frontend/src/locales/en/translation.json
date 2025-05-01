@@ -144,6 +144,24 @@
         "suggested": "Matches Suggested",
         "subtitle-suggested": "People with skills that can complement yours"
     },
+    "matches": {
+        "skills-found": "Skills",
+        "view-skills": "See matches"
+    },
+    "benefits": {
+        "find": {
+            "title": "Find Collaborators",
+            "description": "Connect with people who have complementary skills for your projects."
+        },
+        "chat": {
+            "title": "Real-Time Chat",
+            "description": "Communicate directly with your matches to discuss projects and opportunities."
+        },
+        "collaborate": {
+            "title": "Collaborate on Projects",
+            "description": "Work together to develop ideas and take your projects to the next level."
+        }
+    },
     "skills": {
         "categories": {
             "technology": "Technology",
