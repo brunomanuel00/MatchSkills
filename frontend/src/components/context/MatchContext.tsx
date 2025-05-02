@@ -14,13 +14,13 @@ const MatchContext = createContext<MatchContextType | undefined>(undefined);
 
 export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
     const [matches, setMatches] = useState<MatchedUser[] | undefined>(undefined);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [hasFetched, setHasFetched] = useState(false);
     const [bestMatches, setBestMatches] = useState<MatchedUser[] | undefined>(undefined)
 
     const fetchMatches = useCallback(async () => {
-        setLoading(true);
+        // setLoading(true);
         setError(null);
         try {
             const calculate = await matchService.createMatches();
@@ -29,11 +29,12 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
                 setMatches(data);
                 setHasFetched(true);
             }
+            setLoading(false);
             setBestMatches(matches?.slice(0, 5))
         } catch (err: any) {
             setError(err.response?.data?.error || "Error al cargar los matches");
         } finally {
-            setLoading(false);
+
         }
     }, [hasFetched]);
 

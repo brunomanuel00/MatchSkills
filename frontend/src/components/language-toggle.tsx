@@ -26,7 +26,7 @@ export function LanguageToggle() {
             <DropdownMenuTrigger asChild>
                 <Button title={t('language.title')} variant="ghost" size="icon" className="rounded-full">
                     <motion.div transition={{ duration: 0.2 }}>
-                        <Globe className="h-5 w-5 text-lapis_lazuli dark:text-white" />
+                        <Globe className="h-5 w-5 text-cyan-950 dark:text-white" />
                         <span className="sr-only">title={t('language.title')}</span>
                     </motion.div>
                 </Button>

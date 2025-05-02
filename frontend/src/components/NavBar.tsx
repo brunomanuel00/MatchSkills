@@ -1,47 +1,120 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Waypoints, User, LayoutDashboard } from 'lucide-react';
+import { Menu, X, Home, Waypoints, User, LayoutDashboard, Plus, Users, SunMoon, LogOut, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LanguageToggle } from './language-toggle';
 import { ThemeToggle } from './theme-toggle';
 import logo from '../assets/match de habilidades.jpg';
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next";
 import LogoutButton from './LogoutButton';
 import { useAuth } from './context/AuthContext';
+import { useTheme } from './context/theme-context';
+
+interface NavItem {
+    translationKey: string;
+    path: string;
+    icon: React.ReactNode;
+    name?: string;
+    dropdown?: DropdownItem[];
+}
+
+interface DropdownItem {
+    translationKey: string;
+    path: string;
+    icon: React.ReactNode;
+    name?: string;
+}
 
 export const Navbar = () => {
-    const { t, i18n } = useTranslation()
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { t, i18n } = useTranslation();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+    const [profileMenuOpen, setProfileMenuOpen] = useState<boolean>(false);
+    const [teamMenuOpen, setTeamMenuOpen] = useState<boolean>(false);
+    const [notificationsOpen, setNotificationsOpen] = useState<boolean>(false);
+    const [hasNotifications, setHasNotifications] = useState<boolean>(false);
     const location = useLocation();
-    const { user } = useAuth()
+    const { user } = useAuth();
+    const { toggleTheme } = useTheme();
 
+    // Refs para manejar clicks fuera de los menús
+    const profileMenuRef = useRef<HTMLDivElement>(null);
+    const teamMenuRef = useRef<HTMLDivElement>(null);
+    const notificationsMenuRef = useRef<HTMLDivElement>(null);
 
-    const baseNavItems = [
-        { translationKey: 'logged.home', path: '/home', icon: <Home className="h-5 w-5" /> },
-        { translationKey: 'logged.matches', path: '/matches', icon: <Waypoints className="h-5 w-5" /> },
-        { translationKey: 'logged.profile', path: '/profile', icon: <User className="h-5 w-5" /> },
+    // Cerrar menús al hacer click fuera
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+                setProfileMenuOpen(false);
+            }
+            if (teamMenuRef.current && !teamMenuRef.current.contains(event.target as Node)) {
+                setTeamMenuOpen(false);
+            }
+            if (notificationsMenuRef.current && !notificationsMenuRef.current.contains(event.target as Node)) {
+                setNotificationsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const baseNavItems: NavItem[] = [
+        {
+            translationKey: 'logged.home',
+            path: '/home',
+            icon: <Home className="h-5 w-5" />
+        },
+        {
+            translationKey: 'logged.matches',
+            path: '/matches',
+            icon: <Waypoints className="h-5 w-5" />
+        },
+        {
+            translationKey: 'logged.teams',
+            path: '/teams',
+            icon: <Users className="h-5 w-5" />,
+            dropdown: [
+                {
+                    translationKey: 'logged.create-team',
+                    path: '/create-team',
+                    icon: <Plus className="h-4 w-4" />
+                },
+                {
+                    translationKey: 'logged.team-requests',
+                    path: '/team-requests',
+                    icon: <Users className="h-4 w-4" />
+                }
+            ]
+        },
     ];
 
-    const adminNavItem = {
+    const adminNavItem: NavItem = {
         translationKey: 'logged.dashboard',
         path: '/admin-dashboard',
         icon: <LayoutDashboard className="h-5 w-5" />
     };
 
-    const navItems = user?.rol === 'admin'
+    const navItems: NavItem[] = user?.rol === 'admin'
         ? [...baseNavItems, adminNavItem]
         : baseNavItems;
 
-
-    const getTranslatedNavItems = () => {
+    const getTranslatedNavItems = (): NavItem[] => {
         return navItems.map(item => ({
             ...item,
-            name: t(item.translationKey)
+            name: t(item.translationKey),
+            ...(item.dropdown && {
+                dropdown: item.dropdown.map(dropItem => ({
+                    ...dropItem,
+                    name: t(dropItem.translationKey)
+                }))
+            })
         }));
     };
 
-
-    const [translatedNavItems, setTranslatedNavItems] = useState(getTranslatedNavItems());
+    const [translatedNavItems, setTranslatedNavItems] = useState<NavItem[]>(getTranslatedNavItems());
 
     useEffect(() => {
         setTranslatedNavItems(getTranslatedNavItems());
@@ -59,10 +132,14 @@ export const Navbar = () => {
         };
     }, [mobileMenuOpen]);
 
+    // Simular notificaciones
+    useEffect(() => {
+        // setHasNotifications(true);
+    }, []);
 
     return (
         <>
-            <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-3xl ">
+            <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-3xl">
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                     <Link to="/home" className="flex items-center gap-2">
                         <motion.img
@@ -76,26 +153,163 @@ export const Navbar = () => {
 
                     <nav className="hidden md:flex items-center gap-2">
                         {translatedNavItems.map((item) => (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname === item.path
-                                    ? 'bg-tea_green-200 dark:bg-verdigris-600 text-gray-900 dark:text-white'
-                                    : 'text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
-                                    }`}
-                            >
-                                {item.icon}
-                                <span>{item.name}</span>
-                            </Link>
+                            <div key={item.path} className="relative" ref={item.dropdown ? teamMenuRef : null}>
+                                {item.dropdown ? (
+                                    <>
+                                        <button
+                                            onClick={() => {
+                                                setTeamMenuOpen(!teamMenuOpen);
+                                                setProfileMenuOpen(false);
+                                                setNotificationsOpen(false);
+                                            }}
+                                            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname.startsWith(item.path)
+                                                ? 'bg-tea_green-200 dark:bg-verdigris-600 text-gray-900 dark:text-white'
+                                                : 'text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                                }`}
+                                        >
+                                            {item.icon}
+                                            <span>{item.name}</span>
+                                        </button>
+
+                                        {teamMenuOpen && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                className="absolute left-0 mt-2 w-56 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
+                                            >
+                                                {item.dropdown?.map((dropItem) => (
+                                                    <Link
+                                                        key={dropItem.path}
+                                                        to={dropItem.path}
+                                                        className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                        onClick={() => setTeamMenuOpen(false)}
+                                                    >
+                                                        {dropItem.icon}
+                                                        <span>{dropItem.name}</span>
+                                                    </Link>
+                                                ))}
+                                            </motion.div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <Link
+                                        to={item.path}
+                                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname === item.path
+                                            ? 'bg-tea_green-200 dark:bg-verdigris-600 text-gray-900 dark:text-white'
+                                            : 'text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                            }`}
+                                    >
+                                        {item.icon}
+                                        <span>{item.name}</span>
+                                    </Link>
+                                )}
+                            </div>
                         ))}
                     </nav>
 
                     <div className="flex items-center gap-4">
                         <div className="hidden md:flex items-center gap-2">
-                            <ThemeToggle />
+                            {/* Notificaciones */}
+                            <div className="relative" ref={notificationsMenuRef}>
+                                <button
+                                    onClick={() => {
+                                        setNotificationsOpen(!notificationsOpen);
+                                        setProfileMenuOpen(false);
+                                        setTeamMenuOpen(false);
+                                    }}
+                                    className="p-2 rounded-lg text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 relative"
+                                >
+                                    <Bell className="h-5 w-5" />
+                                    {hasNotifications && (
+                                        <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+                                    )}
+                                </button>
+
+                                {notificationsOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="absolute right-0 mt-2 w-72 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
+                                    >
+                                        <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-600">
+                                            <h3 className="font-medium text-gray-900 dark:text-white">{t('logged.notifications')}</h3>
+                                        </div>
+                                        <div className="max-h-60 overflow-y-auto">
+                                            <div className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer">
+                                                <div className="flex items-start">
+                                                    <div className="ml-3 flex-1">
+                                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                            {t('logged.new_team_request')}
+                                                        </p>
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                            {t('logged.user_wants_to_join')}
+                                                        </p>
+                                                        <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
+                                                            {t('logged.hours_ago', { count: 2 })}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Link
+                                            to="/notifications"
+                                            className="block px-4 py-2 text-sm text-center text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 border-t border-gray-200 dark:border-gray-600"
+                                            onClick={() => setNotificationsOpen(false)}
+                                        >
+                                            {t('logged.view-all')}
+                                        </Link>
+                                    </motion.div>
+                                )}
+                            </div>
                             <LanguageToggle />
-                            <LogoutButton />
+                            {/* Menú desplegable del perfil */}
+                            <div className="relative" ref={profileMenuRef}>
+                                <button
+                                    onClick={() => {
+                                        setProfileMenuOpen(!profileMenuOpen);
+                                        setTeamMenuOpen(false);
+                                        setNotificationsOpen(false);
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                    <User className="h-5 w-5" />
+                                </button>
+
+
+                                {profileMenuOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="absolute right-0 mt-2 w-56 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
+                                    >
+                                        <Link
+                                            to="/profile"
+                                            className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                            onClick={() => setProfileMenuOpen(false)}
+                                        >
+                                            <User className="h-4 w-4" />
+                                            <span>{t('logged.profile')}</span>
+                                        </Link>
+                                        <div onClick={toggleTheme} className="px-4 py-2 flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer">
+                                            <span>{t('theme.toggle')}</span>
+                                            <div className="ml-auto">
+                                                <ThemeToggle />
+                                            </div>
+                                        </div>
+                                        <div className="px-4 py-2 flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer">
+                                            <span>{t('session.close')}</span>
+                                            <div className="ml-auto">
+                                                <LogoutButton />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </div>
                         </div>
+
                         <button
                             className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -117,19 +331,65 @@ export const Navbar = () => {
                     <div className="flex flex-col h-full">
                         <nav className="flex flex-col gap-2">
                             {translatedNavItems.map((item) => (
-                                <Link
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    key={item.path}
-                                    to={item.path}
-                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname === item.path
-                                        ? 'bg-tea_green-200 dark:bg-verdigris-600 text-gray-900 dark:text-white'
-                                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                                        }`}
-                                >
-                                    {item.icon}
-                                    <span>{item.name}</span>
-                                </Link>
+                                <div key={item.path}>
+                                    <Link
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        to={item.path}
+                                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname === item.path
+                                            ? 'bg-tea_green-200 dark:bg-verdigris-600 text-gray-900 dark:text-white'
+                                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                            }`}
+                                    >
+                                        {item.icon}
+                                        <span>{item.name}</span>
+                                    </Link>
+
+                                    {item.dropdown && (
+                                        <div className="ml-4">
+                                            {item.dropdown.map((dropItem) => (
+                                                <Link
+                                                    key={dropItem.path}
+                                                    to={dropItem.path}
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname === dropItem.path
+                                                        ? 'bg-tea_green-200 dark:bg-verdigris-600 text-gray-900 dark:text-white'
+                                                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                                        }`}
+                                                >
+                                                    {dropItem.icon}
+                                                    <span>{dropItem.name}</span>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             ))}
+
+                            {/* Sección de notificaciones en móvil */}
+                            <div className="mt-4">
+                                <h3 className="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400">{t('logged.notifications')}</h3>
+                                <Link
+                                    to="/notifications"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                    <Bell className="h-5 w-5" />
+                                    <span>{t('logged.view-all')}</span>
+                                </Link>
+                            </div>
+
+                            {/* Sección de perfil en móvil */}
+                            <div className="mt-4">
+                                <h3 className="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400">{t('logged.profile')}</h3>
+                                <Link
+                                    to="/profile"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                    <User className="h-5 w-5" />
+                                    <span>{t('logged.profile')}</span>
+                                </Link>
+                            </div>
                         </nav>
 
                         <div className="mt-auto mb-8 flex flex-col gap-4">
@@ -141,7 +401,6 @@ export const Navbar = () => {
                         </div>
                     </div>
                 </motion.div>
-
             )}
 
             {mobileMenuOpen && (

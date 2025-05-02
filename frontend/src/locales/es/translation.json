@@ -122,7 +122,12 @@
         "matches": "Matches",
         "profile": "Perfil",
         "dashboard": "Panel",
-        "title": "Match de Habilidades"
+        "title": "Match de Habilidades",
+        "notifications": "Notificaciones",
+        "teams": "Grupos",
+        "create-team": "Crear Grupo",
+        "team-requests": "Solicitud de equipo",
+        "view-all": "Ver Todo"
     },
     "footer": {
         "title": "Match de Habilidades",

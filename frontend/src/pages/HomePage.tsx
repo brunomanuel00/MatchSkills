@@ -9,13 +9,14 @@ import { useMatch } from "../components/context/MatchContext";
 import CardMatches from "../components/CardMatches";
 import CardInfo from "../components/CardInfo";
 import { useBenefits } from "../types/utils";
+import { Spinner } from "../components/ui/spinner";
 
 export default function HomePage() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { t } = useTranslation()
     const skills: Skill[] | undefined = user?.skills as Skill[] | undefined;
-    const { bestMatches } = useMatch()
+    const { bestMatches, loading } = useMatch()
     const benefits = useBenefits()
 
     useEffect(() => {
@@ -35,7 +36,7 @@ export default function HomePage() {
 
     return (
         <>
-            <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-tea_green-500 to-light_green-300 dark:from-lapis_lazuli-500 dark:to-verdigris-700">
+            <div className="min-h-screen flex flex-col pt-32 items-center justify-center p-4 bg-gradient-to-br from-tea_green-500 to-light_green-300 dark:from-lapis_lazuli-500 dark:to-verdigris-700">
                 <div className=" md:px-40 ">
                     <h2 className=" font-bold text-center text-5xl sm:text-6xl">{t('home.title')}</h2>
                 </div>
@@ -49,7 +50,7 @@ export default function HomePage() {
                 </div>
             </div>
             <div
-                className="flex flex-col items-center justify-center p-4 dark:bg-slate-900">
+                className="flex flex-col items-center justify-center p-4 bg-slate-300  dark:bg-slate-900">
                 <motion.div initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -88,20 +89,24 @@ export default function HomePage() {
                     <div>
                         <h3 className="m-11 text-2xl">{t('home.subtitle-suggested')}</h3>
                     </div>
-                    <div className="flex flex-wrap justify-center items-center mt-4 gap-2">
-                        {bestMatches?.map((item, index) => (
-                            <motion.div
-                                key={item.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.3, delay: index * 0.2 }}
-                                className="w-full max-w-[350px] bg-light_green-800/25 dark:bg-slate-950/25 rounded-md p-4 flex flex-col"
-                            >
-                                <CardMatches user={item} />
-                            </motion.div>
-                        ))}
-                    </div>
+                    {loading
+                        ? <Spinner isModal={false} />
+                        :
+                        <div className="flex flex-wrap justify-center items-center mt-4 gap-2">
+                            {bestMatches?.map((item, index) => (
+                                <motion.div
+                                    key={item.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.3, delay: index * 0.2 }}
+                                    className="w-full max-w-[350px] bg-light_green-800/25 dark:bg-slate-950/25 rounded-md p-4 flex flex-col"
+                                >
+                                    <CardMatches user={item} />
+                                </motion.div>
+                            ))}
+                        </div>
+                    }
 
                 </div>
 

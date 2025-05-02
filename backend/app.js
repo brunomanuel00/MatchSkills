@@ -5,6 +5,7 @@ const cors = require('cors')
 const authRoutes = require('./controllers/auth')
 const userRoutes = require('./controllers/user')
 const matchRoutes = require('./controllers/match')
+const messageRoutes = require('./controllers/message');
 const cookieParser = require('cookie-parser');
 const middleware = require('./utils/middleware')
 const config = require('./utils/config')
@@ -52,6 +53,7 @@ app.use(middleware.morganMiddleware)
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/matches', matchRoutes)
+app.use('/api/messages', messageRoutes);
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)

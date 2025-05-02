@@ -106,3 +106,20 @@
     opacity: 0;
   }
 }
+
+
+
+/* Esto es de los puntos del loading */
+@keyframes bounce-dots {
+  0%, 80%, 100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-dots {
+  animation: bounce-dots 1.4s infinite ease-in-out;
+}

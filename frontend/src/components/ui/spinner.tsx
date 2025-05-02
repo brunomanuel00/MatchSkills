@@ -33,5 +33,22 @@ export const Spinner = ({ isModal = true }: SpinnerProps) => {
         );
     }
 
-    return null;
+    return (
+        <div className="flex justify-center items-center z-51 space-x-1">
+            <span
+                className={`h-3 w-3 rounded-full animate-bounce-dots ${theme === 'light' ? 'bg-white' : 'bg-white'
+                    }`}
+            ></span>
+            <span
+                className={`h-3 w-3 rounded-full animate-bounce-dots ${theme === 'light' ? 'bg-white' : 'bg-white'
+                    }`}
+                style={{ animationDelay: '0.2s' }}
+            ></span>
+            <span
+                className={`h-3 w-3 rounded-full animate-bounce-dots ${theme === 'light' ? 'bg-white' : 'bg-white'
+                    }`}
+                style={{ animationDelay: '0.4s' }}
+            ></span>
+        </div>
+    );
 };
