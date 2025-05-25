@@ -11,6 +11,19 @@ Un sistema que conecta personas con habilidades complementarias para proyectos y
 - **Frontend:** React, Vite,TypeScript, Axios, React Router, Tailwind CSS, Shadcn/ui,i18next,Framer Motion, Lucide
 - **Backend:** Express, MongoDB, Mongoose, JWT, Bcrypt , Cors, Dotenv, Morgan. Lodash, express-async-errors, Nodemon, Supertest
 
+## 🔒 HTTPS local con certificados autofirmados
+
+Este proyecto usa HTTPS local para que cookies `secure` funcionen (Safari lo requiere).
+
+### 🧪 Crear certificados
+
+Usa el script:
+   ```bash
+   ./generate-cert.sh
+
+
+
+
 ## Instalación
 1. Clona el repositorio:
    ```sh
@@ -44,46 +57,74 @@ Un sistema que conecta personas con habilidades complementarias para proyectos y
 
 ## Estructura del Proyecto
     ```sh
-    /frontend
-      ├── public/
-      ├── src/
-      │   ├── assets/
-      │   ├── components/
-      │       ├── ui/
-      │   ├── lib/
-      │   ├── locales/
-      │       ├── en/
-      │       ├── es/
-      │   ├── pages/
-      │       ├── auth/
-      │   ├── routes/
-      │   ├── services/
-      │   ├── styles/
-      │   ├── types/
-      ├── components.json
-      ├── eslint.config.js
-      ├── index.html
-      ├── package.json
-      ├── pnpm-lock.yaml
-      ├── postcss.config.js
-      ├── tailwind.config.js
-      ├── tsconfig.app.json
-      ├── tsconfig.json
-      ├── tsconfig.node.json
-      ├── vite.config.ts
-    /backend
-      ├── src/
-      │   ├── controllers/
-      │   ├── models/
-      │   ├── request/
-      │   ├── utils/
-      ├── .env
-      ├── .eslintrc.js
-      ├── app.js
-      ├── .eslint.config.mjs
-      ├── index.js
-      ├── package-lock.json
-      ├── package.json
+    ## Estructura del Proyecto
+   ├── README.md
+   ├── backend/
+   │   ├── app.js
+   │   ├── cert/
+   │   │   ├── key.pem
+   │   ├── client.js
+   │   ├── controllers/
+   │   │   ├── auth.js
+   │   │   ├── cloudinary.js
+   │   │   ├── groupMessages.js
+   │   │   ├── groups.js
+   │   │   ├── match.js
+   │   │   ├── message.js
+   │   │   ├── user.js
+   │   ├── eslint.config.mjs
+   │   ├── index.js
+   │   ├── models/
+   │   │   ├── Group.js
+   │   │   ├── GroupMessage.js
+   │   │   ├── Match.js
+   │   │   ├── Message.js
+   │   │   ├── Notification.js
+   │   │   ├── User.js
+   │   ├── package-lock.json
+   │   ├── package.json
+   │   ├── request/
+   │   │   ├── Test_patch.rest
+   │   │   ├── create_new_user.rest
+   │   │   ├── login.rest
+   │   │   ├── logout.rest
+   │   ├── service/
+   │   │   ├── geminiAI.js
+   │   ├── temp_uploads/
+   │   ├── test-bcrypt.js
+   │   ├── utils/
+   │   │   ├── cloudinary.js
+   │   │   ├── config.js
+   │   │   ├── logger.js
+   │   │   ├── middleware.js
+   ├── frontend/
+   │   ├── components.json
+   │   ├── eslint.config.js
+   │   ├── index.html
+   │   ├── package.json
+   │   ├── pnpm-lock.yaml
+   │   ├── postcss.config.js
+   │   ├── public/
+   │   ├── src/
+   │   │   ├── assets/
+   │   │   ├── components/
+   │   │   │   ├── ui/
+   │   │   ├── lib/
+   │   │   ├── locales/
+   │   │   │   ├── en/
+   │   │   │   ├── es/
+   │   │   ├── pages/
+   │   │   │   ├── auth/
+   │   │   ├── routes/
+   │   │   ├── services/
+   │   │   ├── styles/
+   │   │   ├── types/
+   │   ├── tailwind.config.js
+   │   ├── tsconfig.app.json
+   │   ├── tsconfig.json
+   │   ├── tsconfig.node.json
+    │   ├── vite.config.ts
+
 
 ## Funcionalidades
 ✅ Registro y autenticación con JWT  

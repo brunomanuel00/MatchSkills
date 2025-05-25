@@ -21,6 +21,31 @@ export interface ContentCardInfo {
     content: CardInfoInterface
 }
 
+type User = {
+    _id: string;
+    name: string;
+    avatar: {
+        public_id: string;
+        url: string;
+    };
+};
+
+export type Message = {
+    _id: string;
+    senderId: User;  // Ahora es un objeto User
+    receiverId: User; // Ahora es un objeto User
+    content: string;
+    timestamp: Date;
+    read: boolean;
+};
+
+export type Chat = {
+    user: User;
+    lastMessage: Message;
+    unreadCount: number;
+};
+
+
 
 export const useBenefits = (): CardInfoInterface[] => {
     const { t } = useTranslation();

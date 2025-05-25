@@ -12,8 +12,14 @@ interface MatchContextType {
 
 const MatchContext = createContext<MatchContextType | undefined>(undefined);
 
+export const useMatch = () => {
+    const context = useContext(MatchContext);
+    if (!context) throw new Error("useMatch be used within an MatchProvider");
+    return context;
+};
+
 export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
-    const [matches, setMatches] = useState<MatchedUser[] | undefined>(undefined);
+    const [matches, setMatches] = useState<MatchedUser[] | undefined>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [hasFetched, setHasFetched] = useState(false);
@@ -26,7 +32,7 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
             const calculate = await matchService.createMatches();
             if (calculate.hasChanged || !hasFetched) {
                 const data = await matchService.getMatches();
-                setMatches(data);
+                setMatches(Array.isArray(data) ? data : []);
                 setHasFetched(true);
             }
             setLoading(false);
@@ -49,8 +55,4 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
-export const useMatch = () => {
-    const context = useContext(MatchContext);
-    if (!context) throw new Error("useMatch be used within an MatchProvider");
-    return context;
-};
+

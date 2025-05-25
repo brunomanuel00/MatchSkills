@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Waypoints, User, LayoutDashboard, Plus, Users, SunMoon, LogOut, Bell } from 'lucide-react';
+import { Menu, X, Home, Waypoints, User, LayoutDashboard, Plus, Users, SunMoon, LogOut, Bell, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LanguageToggle } from './language-toggle';
 import { ThemeToggle } from './theme-toggle';
@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import LogoutButton from './LogoutButton';
 import { useAuth } from './context/AuthContext';
 import { useTheme } from './context/theme-context';
+import { useChat } from './context/ChatContext';
 
 interface NavItem {
     translationKey: string;
@@ -34,6 +35,7 @@ export const Navbar = () => {
     const [hasNotifications, setHasNotifications] = useState<boolean>(false);
     const location = useLocation();
     const { user } = useAuth();
+    const { unReadTotal } = useChat();
     const { toggleTheme } = useTheme();
 
     // Refs para manejar clicks fuera de los menús
@@ -89,6 +91,11 @@ export const Navbar = () => {
                 }
             ]
         },
+        {
+            translationKey: 'logged.messages',
+            path: '/chat',
+            icon: <MessageSquare className="h-5 w-5" />
+        },
     ];
 
     const adminNavItem: NavItem = {
@@ -135,6 +142,7 @@ export const Navbar = () => {
     // Simular notificaciones
     useEffect(() => {
         // setHasNotifications(true);
+
     }, []);
 
     return (
@@ -151,7 +159,7 @@ export const Navbar = () => {
                         <span className="font-bold text-lg md:block">{t('logged.title')}</span>
                     </Link>
 
-                    <nav className="hidden md:flex items-center gap-2">
+                    <nav className="hidden md:flex items-center gap-4"> {/* Aumenté el gap */}
                         {translatedNavItems.map((item) => (
                             <div key={item.path} className="relative" ref={item.dropdown ? teamMenuRef : null}>
                                 {item.dropdown ? (
@@ -162,13 +170,13 @@ export const Navbar = () => {
                                                 setProfileMenuOpen(false);
                                                 setNotificationsOpen(false);
                                             }}
-                                            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname.startsWith(item.path)
+                                            className={`flex flex-col items-center px-3 py-2 rounded-lg transition-colors ${location.pathname.startsWith(item.path)
                                                 ? 'bg-tea_green-200 dark:bg-verdigris-600 text-gray-900 dark:text-white'
                                                 : 'text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
                                                 }`}
                                         >
-                                            {item.icon}
-                                            <span>{item.name}</span>
+                                            <div className="mb-1">{item.icon}</div>
+                                            <span className="text-xs">{item.name}</span>
                                         </button>
 
                                         {teamMenuOpen && (
@@ -195,13 +203,14 @@ export const Navbar = () => {
                                 ) : (
                                     <Link
                                         to={item.path}
-                                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${location.pathname === item.path
+                                        className={`flex flex-col items-center px-3 py-2 rounded-lg transition-colors ${location.pathname === item.path
                                             ? 'bg-tea_green-200 dark:bg-verdigris-600 text-gray-900 dark:text-white'
                                             : 'text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
                                             }`}
                                     >
-                                        {item.icon}
-                                        <span>{item.name}</span>
+
+                                        <div className="mb-1">{item.icon}{item.path === '/chat' && unReadTotal !== 0 && (<div className='absolute z-50 top-1 right-5 h-2 w-2 bg-red-500 rounded-full'></div>)}</div>
+                                        <span className="text-xs">{item.name}</span>
                                     </Link>
                                 )}
                             </div>

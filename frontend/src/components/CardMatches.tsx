@@ -12,11 +12,13 @@ import { useTranslation } from "react-i18next"
 import { useCallback, useState } from "react"
 import { Skill } from "../types/skillTypes"
 import { Modal } from "./Modal"
+import Chat from "./Chat"
 
 
 export default function CardMatches({ user }: UserMatched) {
     const { t } = useTranslation()
     const [isSkillsModalOpen, setSkillsModalOpen] = useState(false);
+    const [isChatModalOpen, setIsChatModalOpen] = useState(false);
     const [skills, setSkills] = useState<Skill[] | undefined>(undefined)
 
     const getTranslatedSkillName = useCallback((skill: Skill) => {
@@ -30,6 +32,9 @@ export default function CardMatches({ user }: UserMatched) {
 
     const closeSkillsModal = () => {
         setSkillsModalOpen(false)
+    }
+    const closeChatModal = () => {
+        setIsChatModalOpen(false)
     }
 
     return (
@@ -66,8 +71,14 @@ export default function CardMatches({ user }: UserMatched) {
                     <Button onClick={() => {
                         setSkills(user.matchingSkills)
                         setSkillsModalOpen(true)
-                    }} className="w-full">
+                    }} className="w-full m-1">
                         {t('matches.view-skills')}
+                    </Button>
+                    <Button onClick={() => {
+                        setSkills(user.matchingSkills)
+                        setIsChatModalOpen(true)
+                    }} className="w-full m-1">
+                        {t('matches.chat')}
                     </Button>
                 </CardFooter>
             </div>
@@ -83,6 +94,16 @@ export default function CardMatches({ user }: UserMatched) {
                         <p key={item.id} className="bg-teal-800 text-white p-3 rounded-lg">{getTranslatedSkillName(item)}</p>
                     ))}
                 </div>
+
+            </Modal>
+            <Modal
+                isOpen={isChatModalOpen}
+                onClose={closeChatModal}
+                title={t('matches.chat')}
+                size="md"
+                large={false}
+            >
+                <Chat receivedUserId={user.id} onClose={closeChatModal} />
 
             </Modal>
         </>

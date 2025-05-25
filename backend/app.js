@@ -28,7 +28,7 @@ mongoose.connect(url)
 
 const allowedOrigins = [
     process.env.FRONTEND_URL,
-    'http://localhost:3001'
+    'https://localhost:3001',
 ];
 
 app.use(cors({

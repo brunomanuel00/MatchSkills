@@ -65,6 +65,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const loadUsers = useCallback(async (newPage?: number, newSize?: number) => {
         try {
             setLoading(true);
+
+            if (user?.rol !== 'admin') return
             const response = await userService.getUsers(
                 newPage || currentPage,
                 newSize || pageSize

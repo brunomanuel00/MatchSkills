@@ -127,7 +127,8 @@
         "teams": "Grupos",
         "create-team": "Crear Grupo",
         "team-requests": "Solicitud de equipo",
-        "view-all": "Ver Todo"
+        "view-all": "Ver Todo",
+        "messages": "Mensajes"
     },
     "footer": {
         "title": "Match de Habilidades",
@@ -151,7 +152,13 @@
     },
     "matches": {
         "skills-found": "Habilidades",
-        "view-skills": "Ver coincidencias"
+        "view-skills": "Ver coincidencias",
+        "chat": "Chat"
+    },
+    "chat": {
+        "typing": "escribiendo...",
+        "select-chat": "Selecciona un chat",
+        "chats": "Conversaciones"
     },
     "benefits": {
         "find": {

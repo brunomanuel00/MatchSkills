@@ -3,14 +3,17 @@ import { AuthProvider } from './components/context/AuthContext';
 import { ThemeProvider } from './components/context/theme-context';
 import { UserProvider } from './components/context/UserContext';
 import router from './routes/router';
+import { ChatProvider } from "./components/context/ChatContext";
 
 function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <UserProvider>
+        {/* <UserProvider> */}
+        <ChatProvider>
           <RouterProvider router={router} />
-        </UserProvider>
+        </ChatProvider>
+        {/* </UserProvider> */}
       </ThemeProvider>
     </AuthProvider>
   );

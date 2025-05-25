@@ -127,7 +127,8 @@
         "teams": "Teams",
         "create-team": "Create Team",
         "team-requests": "Team Request",
-        "view-all": "View All"
+        "view-all": "View All",
+        "messages": "Messages"
     },
     "footer": {
         "title": "Match Skills",
@@ -151,7 +152,13 @@
     },
     "matches": {
         "skills-found": "Skills",
-        "view-skills": "See matches"
+        "view-skills": "See matches",
+        "chat": "Chat"
+    },
+    "chat": {
+        "typing": "typing...",
+        "select-chat": "Select a chat",
+        "chats": "Chats"
     },
     "benefits": {
         "find": {

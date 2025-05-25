@@ -1,0 +1,278 @@
+import { useChat } from './context/ChatContext';
+import { useAuth } from './context/AuthContext';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { format } from 'date-fns';
+import { es, enUS } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
+import { CheckCheck, ChevronDown } from 'lucide-react';
+
+export default function ChatDetail() {
+    const { user } = useAuth();
+    const { messages, sendMessage, activeChat, isTypingFromOther, markAsRead, socket, handleTypingInput, setActiveChat } = useChat();
+    const [input, setInput] = useState('');
+    const { i18n, t } = useTranslation();
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const [unseenMessagesCount, setUnseenMessagesCount] = useState(0);
+    const [showScrollButton, setShowScrollButton] = useState(false);
+    const currentChatRef = useRef<string | null>(null);
+    const isUserAtBottom = useRef(true);
+
+    // Este efecto maneja EXCLUSIVAMENTE el cambio entre chats
+    useEffect(() => {
+        // Detectar cambio de chat activo
+        if (activeChat !== currentChatRef.current) {
+            // Actualizar referencia del chat actual
+            currentChatRef.current = activeChat;
+
+            // Esperar a que el DOM se actualice y luego ir al final del contenedor
+            // Sin animación (behavior: 'auto')
+            setTimeout(() => {
+                const container = messagesContainerRef.current;
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            }, 0);
+        }
+    }, [activeChat]);
+
+    // Este efecto maneja EXCLUSIVAMENTE los nuevos mensajes
+    useEffect(() => {
+        // Solo ejecutar si hay mensajes y no es un cambio de chat
+        if (messages.length && currentChatRef.current === activeChat) {
+            const container = messagesContainerRef.current;
+            if (!container) return;
+
+            // Si el usuario está cerca del final (o está en el fondo), desplazar al final
+            if (isUserAtBottom.current) {
+                setTimeout(() => {
+                    container.scrollTo({
+                        top: container.scrollHeight,
+                        behavior: 'smooth' // Animación suave solo para nuevos mensajes
+                    });
+                }, 50);
+            } else {
+                // Si no está en el fondo, posiblemente incrementar contador de no vistos
+                const lastMessage = messages[messages.length - 1];
+                if (lastMessage && user && lastMessage.receiverId._id === user.id && !lastMessage.read) {
+                    setUnseenMessagesCount(prev => prev + 1);
+                }
+            }
+        }
+    }, [messages, activeChat, user]);
+
+    // Manejar scroll del usuario
+    const handleScroll = useCallback(() => {
+        const container = messagesContainerRef.current;
+        if (!container) return;
+
+        // Actualizar posición del scroll
+        const scrollBottom = container.scrollTop + container.clientHeight;
+        const isAtBottom = container.scrollHeight - scrollBottom <= 50;
+
+        // Actualizar refs y estados
+        isUserAtBottom.current = isAtBottom;
+
+        // Mostrar/ocultar botón de scroll según la posición
+        setShowScrollButton(!isAtBottom);
+
+        // Marcar mensajes como leídos cuando está cerca del final
+        if (isAtBottom) {
+            setUnseenMessagesCount(0);
+        }
+    }, []);
+
+    // Configurar event listeners de scroll
+    useEffect(() => {
+        const container = messagesContainerRef.current;
+        container?.addEventListener('scroll', handleScroll);
+        return () => container?.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
+
+    //Formato para el tiempo que ha transcurrido desde el ultimo mensaje
+    const formatMessageDate = (timestamp: Date) => {
+        const date = new Date(timestamp);
+        const locale = i18n.language === 'es' ? es : enUS;
+
+        return format(date, i18n.language === 'es'
+            ? "d 'de' MMMM yyyy, HH:mm"
+            : "d MMM yyyy, h:mm a", { locale });
+    };
+
+    const handleSubmit = async () => {
+        if (input.trim()) {
+            await sendMessage(input);
+            setInput('');
+        }
+    };
+
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+            setActiveChat(null);
+        }
+    }, [setActiveChat]);
+
+    useEffect(() => {
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [handleKeyDown]);
+
+    // // Efecto para marcar mensajes no leídos como leídos cuando el usuario ve un chat
+    // useEffect(() => {
+    //     if (!user || !activeChat) return;
+
+    //     console.log("ejecutate cojone");
+    //     console.log(messages);
+
+    //     // Filtramos mensajes recibidos por el usuario actual que no han sido leídos
+    //     const unreadReceivedMessages = messages.filter(msg => msg.receiverId._id === user.id &&
+    //         msg.senderId._id === activeChat &&
+    //         !msg.read)
+
+    //     if (unreadReceivedMessages.length > 0) {
+    //         const messageIds = unreadReceivedMessages.map(msg => msg._id)
+
+    //         // Solo procesamos IDs válidos (formato MongoDB ObjectID)
+    //         const validIds = messageIds.filter(id => /^[0-9a-fA-F]{24}$/.test(id));
+
+    //         if (validIds.length > 0) {
+    //             // Notificamos al servidor vía Socket.io que estamos leyendo estos mensajes
+    //             if (socket) {
+    //                 socket.emit('mark_messages_read', {
+    //                     messageIds: validIds,
+    //                     senderId: activeChat
+    //                 })
+    //             }
+    //             markAsRead(validIds)
+    //         }
+
+    //     }
+
+    // }, [activeChat, messages, user, socket, unseenMessagesCount])
+
+    return (
+        <div className="flex flex-col w-full h-full pb-2">
+            <div className='w-full flex justify-start my-auto p-2 h-14 rounded-sm bg-slate-100 dark:bg-cyan-800'>
+                {activeChat &&
+                    <button
+                        onClick={() => setActiveChat(null)}
+                        onKeyDown={() => handleKeyDown}
+                    >
+                        {/* <ArrowLeft className='h-5 w-5 text-black' /> */}
+                    </button>
+                }
+                <div className="flex items-center gap-2 ">
+                    <img
+                        src={
+                            messages.length > 0
+                                ? messages[0].senderId._id === activeChat
+                                    ? messages[0].senderId.avatar?.url
+                                    : messages[0].receiverId.avatar?.url
+                                : 'default-avatar-url'
+                        }
+                        className="w-8 h-8 rounded-full"
+                        alt="Avatar"
+                    />
+                    <div>
+                        <h2 className="font-semibold text-sm">
+                            {
+                                messages.length > 0
+                                    ? messages[0].senderId._id === activeChat
+                                        ? messages[0].senderId.name
+                                        : messages[0].receiverId.name
+                                    : 'default-avatar-url'
+                            }
+                        </h2>
+                        <span>
+                            {isTypingFromOther && (
+                                <div className="text-sm italic text-gray-500 animate-pulse">
+                                    {t('chat.typing')}
+                                </div>
+                            )}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div
+                ref={messagesContainerRef}
+                className="flex-1 overflow-y-auto p-4 space-y-2">
+                {messages.map(message => {
+                    const isOwnMessage = user?.id === message.receiverId?._id;
+                    const timestamp = formatMessageDate(message.timestamp);
+
+                    return (
+                        <div className={`flex ${isOwnMessage ? 'justify-start' : 'justify-end'}`} key={message._id}>
+                            <div className={`${isOwnMessage
+                                ? 'bg-green-200 dark:bg-teal-600'
+                                : 'bg-emerald-400 dark:bg-teal-700'
+                                } rounded-md max-w-[50%] p-3 flex flex-col`}>
+
+                                <p className="text-black dark:text-white break-words">{message.content}</p>
+
+                                <div className="flex justify-between items-center mt-2">
+                                    <span className="text-xs text-gray-600 dark:text-gray-200 ml-auto">
+                                        {timestamp}
+                                    </span>
+                                    {!isOwnMessage &&
+                                        (message.read ? (
+                                            <span className="text-xs mx-2 text-blue-700 dark:text-sky-500">
+                                                <CheckCheck className='h-4 w-4' />
+                                            </span>
+                                        ) : (
+                                            <span className="text-xs mx-2 text-gray-600">
+                                                <CheckCheck className='h-4 w-4' />
+                                            </span>
+                                        ))
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+                {(unseenMessagesCount > 0 || showScrollButton) && (
+                    <button
+                        onClick={() => {
+                            messagesContainerRef.current?.scrollTo({
+                                top: messagesContainerRef.current.scrollHeight,
+                                behavior: 'smooth'
+                            });
+                            setUnseenMessagesCount(0);
+                        }}
+                        className="sticky bottom-4 left-full bg-green-700 dark:bg-teal-500 text-white px-4 py-2 rounded-xl shadow-lg hover:bg-green-600 transition-transform"
+                    >
+                        <div className='flex flex-col'>
+                            <ChevronDown className='h-6 w-6' />
+                            {unseenMessagesCount > 0 && <span className=' font-semibold'> {unseenMessagesCount}</span>}
+                        </div>
+                    </button>
+                )}
+            </div>
+
+            <div className="p-2 flex gap-2">
+                <textarea
+                    className="flex-1 resize-none border rounded px-3 py-2"
+                    value={input}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        handleTypingInput(value);
+                        setInput(value);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSubmit();
+                        }
+                    }}
+                    placeholder="Escribe un mensaje..."
+                    rows={1}
+                />
+                <button
+                    onClick={handleSubmit}
+                    disabled={!input.trim()}
+                    className="bg-teal-600 max-h-10 text-white px-4 py-2 rounded disabled:opacity-50"
+                >
+                    Enviar
+                </button>
+            </div>
+        </div>
+    );
+}

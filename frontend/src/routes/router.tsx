@@ -10,6 +10,8 @@ import ProfilePage from "../pages/ProfilePage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
 import { MatchProvider } from "../components/context/MatchContext";
 import NotFound from "../pages/NotFount";
+import ChatPage from "../pages/ChatPage";
+import { UserProvider } from "../components/context/UserContext";
 
 const router = createBrowserRouter([
     {
@@ -41,13 +43,16 @@ const router = createBrowserRouter([
             },
             {
                 path: '/profile',
-                element: <ProfilePage />
+                element: <UserProvider> <ProfilePage /></UserProvider>
             },
             {
                 path: '/admin-dashboard',
-                element: <AdminDashboardPage />
+                element: <UserProvider><AdminDashboardPage /></UserProvider>
             },
-
+            {
+                path: '/chat',
+                element: <ChatPage />
+            },
         ]
     },
     {

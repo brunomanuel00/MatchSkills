@@ -73,9 +73,9 @@ authRouter.post('/login', async (request, response) => {
 
     response.cookie('token', token, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24,
+        secure: true, // requiere HTTPS
+        sameSite: 'none',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
     })
 
     response.status(200).json({ message: 'login success', user });
@@ -85,7 +85,7 @@ authRouter.post('/logout', (_req, res) => {
     res.clearCookie('token', {
         httpOnly: true,
         secure: true,
-        sameSite: 'strict',
+        sameSite: 'none',
         domain: process.env.COOKIE_DOMAIN || 'localhost'
     });
 

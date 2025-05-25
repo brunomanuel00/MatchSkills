@@ -2,45 +2,71 @@ const matchRouter = require('express').Router();
 const Match = require('../models/Match');
 const User = require('../models/User');
 const { userExtractor } = require('../utils/middleware');
-const { getSkillMatches } = require('../service/geminiAI');
+const { getSkillMatches } = require('../service/aiMatchtes');
 
 // matchRouter.post('/calculate', userExtractor, async (req, res) => {
 //     const userRequesting = req.user;
 
 //     try {
-
-//         // const existingMatch = await Match.findOne({ userId: userRequesting.id });
-
-//         // if (existingMatch) {
-//         //     return res.status(200).json({ message: 'Matches are up to date.' });
-//         // }
-
+//         // Obtener todos los usuarios excepto el solicitante
 //         const otherUsers = await User.find({ _id: { $ne: userRequesting.id } });
 
+//         console.log(`Calculando matches para usuario ${userRequesting.id} contra ${otherUsers.length} usuarios`);
+
+//         // Obtener coincidencias usando IA
 //         const matchesFromAI = await getSkillMatches(userRequesting, otherUsers);
-//         console.log('IA Response:', matchesFromAI);
+
+//         console.log('Respuesta de IA:', matchesFromAI);
 
 //         if (!Array.isArray(matchesFromAI)) {
+//             console.error('La IA no devolvió un array válido');
 //             return res.status(500).json({ error: 'La IA no devolvió una lista válida de coincidencias.' });
 //         }
 
+//         // Formatear las coincidencias para guardar en la base de datos
 //         const formattedMatches = matchesFromAI.map(match => ({
 //             matchedUserId: match.userId,
-//             matchingSkills: Array.isArray(match.matchingSkills)
-//                 ? match.matchingSkills.map(skill => {
-//                     // Si vienen como strings tipo JSON, los parseas
-//                     return typeof skill === 'string' ? JSON.parse(skill) : skill;
-//                 })
-//                 : []
+//             matchingSkills: match.matchingSkills
 //         }));
 
-//         const matchDocument = await Match.findOneAndUpdate(
-//             { userId: userRequesting.id },
-//             { matches: formattedMatches },
-//             { upsert: true, new: true }
-//         );
+//         console.log(`IA encontró ${formattedMatches.length} coincidencias`);
 
-//         res.status(201).json(matchDocument);
+//         // Verificar si ya existe un registro de matches para este usuario
+//         const existingMatch = await Match.findOne({ userId: userRequesting.id });
+
+//         // Detectar cambios comparando con matches existentes
+//         let hasChanged = true;
+
+//         if (existingMatch) {
+//             const currentMatches = JSON.stringify(
+//                 existingMatch.matches.map(m => ({
+//                     matchedUserId: m.matchedUserId.toString(),
+//                     matchingSkills: m.matchingSkills
+//                 }))
+//             );
+
+//             const newMatches = JSON.stringify(formattedMatches);
+//             hasChanged = currentMatches !== newMatches;
+
+//             console.log(`Matches ${hasChanged ? 'han cambiado' : 'no han cambiado'}`);
+//         }
+
+//         // Guardar solo si hay cambios
+//         if (hasChanged) {
+//             await Match.findOneAndUpdate(
+//                 { userId: userRequesting.id },
+//                 { matches: formattedMatches },
+//                 { upsert: true, new: true }
+//             );
+
+//             console.log('Matches guardados en base de datos');
+//         }
+
+//         res.status(201).json({
+//             hasChanged,
+//             matchCount: formattedMatches.length,
+//             message: hasChanged ? 'Matches actualizados' : 'Matches están actualizados'
+//         });
 
 //     } catch (error) {
 //         console.error('Error calculating matches:', error);
@@ -48,6 +74,8 @@ const { getSkillMatches } = require('../service/geminiAI');
 //     }
 // });
 
+
+//Esta ruta es para calculo manual y asi comprobar si la AI esta respondiendo correctamente
 matchRouter.post('/calculate', userExtractor, async (req, res) => {
     const userRequesting = req.user;
 
