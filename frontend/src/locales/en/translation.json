@@ -158,7 +158,9 @@
     "chat": {
         "typing": "typing...",
         "select-chat": "Select a chat",
-        "chats": "Chats"
+        "chats": "Chats",
+        "sent-message": "Sent",
+        "write": "Write a message..."
     },
     "benefits": {
         "find": {

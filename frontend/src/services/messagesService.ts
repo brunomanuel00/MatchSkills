@@ -8,36 +8,19 @@ const getChatList = async (): Promise<Chat[]> => {
         withCredentials: true
     });
     return response.data
-    // .map((chat: any) => ({
-    //     ...chat,
-    //     lastMessage: {
-    //         ...chat.lastMessage,
-    //         timestamp: new Date(chat.lastMessage.timestamp),
-    //         senderId: {
-    //             _id: chat.lastMessage.senderId._id,
-    //             name: chat.lastMessage.senderId.name,
-    //             avatar: chat.lastMessage.senderId.avatar
-    //         },
-    //         receiverId: {
-    //             _id: chat.lastMessage.receiverId._id,
-    //             name: chat.lastMessage.receiverId.name,
-    //             avatar: chat.lastMessage.receiverId.avatar
-    //         }
-    //     }
-    // }));
 };
 
 const getChatMessages = async (userId: string): Promise<Message[]> => {
-    // Validar ObjectId antes de hacer la petición
+
     if (!/^[0-9a-fA-F]{24}$/.test(userId)) {
-        throw new Error('ID de usuario inválido');
+        throw new Error('Invalid user id');
     }
 
     const response = await axios.get(`${baseUrl}/${userId}`, {
         withCredentials: true
     });
 
-    return response.data.map((message: any) => ({
+    return response.data.map((message: Message) => ({
         ...message,
         timestamp: new Date(message.timestamp),
         senderId: {
@@ -84,9 +67,21 @@ const markAsRead = async (messageIds: string[]) => {
     return response.data;
 };
 
+const deleteMessage = async (id: string) => {
+    const response = await axios.delete(`/api/messages/${id}`);
+    return response.data;
+}
+
+const deleteChat = async (otherId: string) => {
+    const response = await axios.delete(`/api/messages/chat/${otherId}`);
+    return response.data;
+}
+
 export default {
     getChatList,
     getChatMessages,
     sendMessage,
-    markAsRead
+    markAsRead,
+    deleteMessage,
+    deleteChat
 };

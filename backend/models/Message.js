@@ -8,6 +8,14 @@ const messageSchema = new mongoose.Schema({
     read: { type: Boolean, default: false }
 });
 
+messageSchema.set("toObject", {
+    transform: (_doc, returnedObject) => {
+        returnedObject.id = returnedObject._id.toString();
+        delete returnedObject._id;
+        delete returnedObject.__v
+    }
+});
+
 messageSchema.index({ senderId: 1, receiverId: 1, timestamp: -1 });
 
 module.exports = mongoose.model('Message', messageSchema);

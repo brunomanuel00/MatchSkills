@@ -3,28 +3,28 @@ const router = express.Router();
 const Message = require('../models/Message');
 const { userExtractor } = require('../utils/middleware');
 const mongoose = require('mongoose');
-// const { io } = require('socket.io-client');
+const DeletedItem = require('../models/DeleteItem');
 
-// Enviar mensaje mejorado
-router.post('/', userExtractor, async (req, res) => {
+// Sent improved message
+router.post('/', userExtractor, async (request, response) => {
     try {
-        const { receiverId, content } = req.body;
-        const senderId = req.user.id;
+        const { receiverId, content } = request.body;
+        const senderId = request.user.id;
 
-        //  Validaciones básicas
+        //  Basic validations
         if (senderId === receiverId) {
-            return res.status(400).json({ error: 'No puedes enviarte mensajes a ti mismo' });
+            return response.status(400).json({ error: "You can't send messages to yourself" });
         }
 
-        // 2. Verificar si el receptor está viendo este chat activamente y emitir el evento via socket
-        const io = req.app.get('io');
-        const connectedUsers = req.app.get('connectedUsers');
-        const activeChats = req.app.get('activeChats' || new Map())
+        // 2) Check if the receiver is actively viewing this chat and broadcast the event via socket
+        const io = request.app.get('io');
+        const connectedUsers = request.app.get('connectedUsers');
+        const activeChats = request.app.get('activeChats' || new Map())
 
-        //Comprobar si el receptor esta en el chat
+        //Check if the receiver is in the chat
         const isReceiverViewingChat = activeChats.get(receiverId) === senderId
 
-        //  Crear y guardar mensaje
+        //  Create and save messages
         const newMessage = new Message({
             senderId,
             receiverId,
@@ -34,50 +34,52 @@ router.post('/', userExtractor, async (req, res) => {
 
         const savedMessage = await newMessage.save();
 
-        //  Buscar sockets conectados
+        //  Find connected sockets
         const receiverSocketId = connectedUsers.get(receiverId);
         const senderSocketId = connectedUsers.get(senderId);
 
-        //  Populate para datos del usuario
+        //  Populate for user data
         const populatedMessage = await Message.populate(savedMessage, [
             { path: 'senderId', select: 'name avatar' },
             { path: 'receiverId', select: 'name avatar' }
         ]);
 
-        //  Preparar payload para Socket.io
+        //  Prepare payload for Socket.io
         const messagePayload = {
             ...populatedMessage.toObject(),
             timestamp: populatedMessage.timestamp.getTime()
         };
 
-        //  Enviar a receptor si está conectado
+        //  Sent to receiver if connected
         if (receiverSocketId) {
             io.to(receiverSocketId).emit('new_message', messagePayload);
         }
 
-        //  Enviar confirmación al emisor
-        if (senderSocketId) {
-            io.to(senderSocketId).emit('message_sent', messagePayload);
-        }
-
-        res.status(201).json(populatedMessage);
+        response.status(201).json(populatedMessage);
     } catch (error) {
-        res.status(500).json({ error: 'Error al enviar mensaje' });
+        response.status(500).json({ error: 'Error sending message' });
     }
 });
 
-// Obtener historial de mensajes con paginación
-router.get('/:userId', userExtractor, async (req, res) => {
+// Get message history with pagination
+router.get('/:userId', userExtractor, async (request, response) => {
     try {
-        const currentUser = req.user.id;
-        const otherUser = req.params.userId;
+        const currentUser = request.user.id;
+        const otherUser = request.params.userId;
 
-        // Validación mejorada de ObjectId
+        // Improved ObjectId Validations
         if (!mongoose.Types.ObjectId.isValid(otherUser)) {
-            return res.status(400).json({ error: 'ID de usuario inválido' });
+            return response.status(400).json({ error: 'Invalid user ID' });
         }
 
-        // 2. Buscar mensajes en ambas direcciones
+        const deleted = await DeletedItem.find({
+            userId: currentUser,
+            itemType: 'message',
+        }).select('itemId').lean()
+
+        const deleteIds = deleted.map(item => item.itemId.toString())
+
+        // 2. Search messages in both directions
         const messages = await Message.find({
             $or: [
                 { senderId: currentUser, receiverId: otherUser },
@@ -88,132 +90,169 @@ router.get('/:userId', userExtractor, async (req, res) => {
             .populate('senderId', 'name avatar')
             .populate('receiverId', 'name avatar');
 
-        // 3. Formatear fechas
-        const formattedMessages = messages.map(msg => ({
+
+        const filteredMessages = messages.filter(msg =>
+            !deleteIds.includes(msg._id.toString())
+        )
+
+        // 3. Format dates
+        const formattedMessages = filteredMessages.map(msg => ({
             ...msg.toObject(),
             timestamp: msg.timestamp.getTime()
         }));
 
-        res.json(formattedMessages);
+        response.json(formattedMessages);
+
+
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener mensajes' });
+        response.status(500).json({ error: 'Error getting messages' });
     }
 });
 
-// Lista de chats optimizada
-router.get('/chats/list', userExtractor, async (req, res) => {
+// Chat list optimized
+router.get('/chats/list', userExtractor, async (request, response) => {
 
     try {
-
-        const userId = req.user._id;
+        const userId = request.user._id;
 
         const chats = await Message.aggregate([
-            {  //Filtrar mensajes por usuarios
+            {  // 1) Filter all messages SENT OR RECEIVED by this user
                 $match: {
                     $or: [
-                        { senderId: userId }, // Mensajes ENVIADOS por el usuario
-                        { receiverId: userId } // Mensajes RECIBIDOS por el usuario
+                        { senderId: userId }, // Messages SENT by the user
+                        { receiverId: userId } // Messages RECEIVED by the user
                     ]
                 }
             },
-            { $sort: { timestamp: -1 } }, //Ordenar por fecha descendente
             {
+                // 2) "Deleted" by this user: lookUp a DeletedItem for itemType:"message"
+                $lookup: {
+                    from: "deleteditems",
+                    let: { mid: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$itemId", "$$mid"] },
+                                        { $eq: ["$userId", new mongoose.Types.ObjectId(userId)] },
+                                        { $eq: ["$itemType", 'message'] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'deletedForUser'
+                }
+            },
+            {
+                // 3) Only keep messages that are not marked as deleted by this user
+                $match: {
+                    $expr: {
+                        $eq: [{ $size: "$deletedForUser" }, 0]
+                    }
+                }
+            },
+            { $sort: { timestamp: -1 } }, // 4) Order by Date Desc
+            {
+                // 5) Group by "the other user" in the conversation and take the most recent message from this group
                 $group: {
                     _id: {
-                        $cond: [// Condicional para determinar el ID del contacto
-                            { $eq: ["$senderId", userId] }, // Si el mensaje fue ENVIADO por el usuario
-                            "$receiverId", // → El contacto es el receptor
-                            "$senderId"  // → El contacto es el remitente
+                        $cond: [ // Conditional to determine the user ID
+                            { $eq: ["$senderId", userId] }, // If the message was SENT by the user
+                            "$receiverId", // → The user is the receiver
+                            "$senderId"  // → The user is the sender
                         ]
                     },
-                    lastMessage: { $first: "$$ROOT" }, // Guarda el primer mensaje del grupo (el más reciente)
+                    lastMessage: { $first: "$$ROOT" }, // Save the first message of the group (the most recent)
                     unreadCount: {
                         $sum: {
-                            $cond: [ // Suma 1 si el mensaje es no leído y recibido por el usuario
+                            $cond: [ // Add 1 if unread and received by the user
                                 {
                                     $and: [
-                                        { $eq: ["$receiverId", userId] }, // Mensaje recibido
-                                        { $eq: ["$read", false] } // No leído
+                                        { $eq: ["$receiverId", userId] }, // Message received
+                                        { $eq: ["$read", false] } // Unread
                                     ]
                                 },
-                                1, // Si cumple, suma 1
-                                0 // Si no, suma 0
+                                1, // If it complies, sum 1
+                                0 // If not, sum 0
                             ]
                         }
                     }
                 }
             },
             {
-                $lookup: {// Obtener datos del usuario contacto
-                    from: "users", // Colección de usuarios
-                    localField: "_id", // Campo local (ID del contacto)
-                    foreignField: "_id", // Campo en la colección "users"
-                    as: "user"  // Guarda el resultado en "user" (array)
+                // 6) Bring data from the "the other user" with a lookup to the user collection
+                $lookup: {// Get user data
+                    from: "users", // User collection
+                    localField: "_id", // Local field (user ID)
+                    foreignField: "_id", // Field in the "user" collection
+                    as: "user"  // Save the result in "user" (array)
                 }
             },
-            { $unwind: "$user" }, //Convertir array en objeto
+            { $unwind: "$user" }, //Convert array to object
             {
-                $project: {//Dar el formato final
-                    _id: 0, // Excluir el campo _id del grupo
-                    user: {
+                $project: {//Give the final format
+                    _id: 0,// Exclude the _id field from the group
+                    user: { // The data we will show about the user
                         _id: "$user._id",
                         name: "$user.name",
                         avatar: {
-                            url: "$user.avatar.url" //Extraer solo la Url del avatar
+                            url: "$user.avatar.url"
                         }
                     },
-                    lastMessage: {
+                    lastMessage: { // The data will show about the message
                         content: "$lastMessage.content",
                         timestamp: "$lastMessage.timestamp",
                         read: "$lastMessage.read"
                     },
-                    unreadCount: 1 // Incluir el conteo de no leídos
+                    unreadCount: 1 // Include unread count
                 }
             }
         ]);
 
-        res.json(chats);
+        response.json(chats);
     } catch (error) {
-        console.error("Error en /chats/list:", error);
-        res.status(500).json({ error: "Error al obtener chats" });
+        console.error("Error in /chats/list:", error);
+        response.status(500).json({ error: "Error getting chats" });
     }
 });
 
-// En tu archivo de rutas de mensajes (paste-3.txt)
-router.patch('/read', userExtractor, async (req, res) => {
+// Mark messages as read
+router.patch('/read', userExtractor, async (request, response) => {
     try {
-        const userId = req.user.id;
-        const { messageIds } = req.body;
+        const userId = request.user.id;
+        const { messageIds } = request.body;
 
-        console.log(`📖 Usuario ${userId} intentando marcar como leídos:`, messageIds);
+        console.log(`📖 User ${userId} trying to mark as read:`, messageIds);
 
-        // Validación mejorada
+        // Improved validations
         if (!messageIds?.length) {
-            return res.status(400).json({ error: 'Se requiere un array de messageIds' });
+            return response.status(400).json({ error: 'An array of messageIds is required' });
         }
 
-        // Convertir a ObjectIds válidos
+        // Convert to valid ObjectIds
         const validObjectIds = messageIds.filter(id => mongoose.Types.ObjectId.isValid(id))
             .map(id => new mongoose.Types.ObjectId(id));
 
-        // 1. PRIMERO: Obtener los mensajes ANTES de actualizarlos para saber quién los envió
+        // 1. First: Get messages before updating them to know who sent them
         const messagesToUpdate = await Message.find({
             _id: { $in: validObjectIds },
             receiverId: userId,
             read: false
         }).lean();
 
-        console.log(`📋 Mensajes encontrados para marcar como leídos:`, messagesToUpdate.length);
+        console.log(`📋 Messages found to mark as read:`, messagesToUpdate.length);
 
         if (messagesToUpdate.length === 0) {
-            return res.json({
+            return response.json({
                 success: true,
                 updatedCount: 0,
-                message: 'No hay mensajes para marcar como leídos'
+                message: 'There are messages to mark as read'
             });
         }
 
-        // 2. Actualizar mensajes como leídos
+        // 2. Update messages as read
         const updateResult = await Message.updateMany(
             {
                 _id: { $in: validObjectIds },
@@ -223,9 +262,9 @@ router.patch('/read', userExtractor, async (req, res) => {
             { $set: { read: true } }
         );
 
-        console.log(`✅ Mensajes actualizados en BD:`, updateResult.modifiedCount);
+        console.log(`✅ Update messages on BD:`, updateResult.modifiedCount);
 
-        // 3. Agrupar mensajes por emisor (senderId)
+        // 3. Group messages by sender (senderId)
         const messagesBySender = messagesToUpdate.reduce((acc, msg) => {
             const sender = msg.senderId.toString();
             if (!acc[sender]) acc[sender] = [];
@@ -233,17 +272,17 @@ router.patch('/read', userExtractor, async (req, res) => {
             return acc;
         }, {});
 
-        console.log(`👥 Mensajes agrupados por emisor:`, messagesBySender);
+        console.log(`👥 Messages grouped by sender:`, messagesBySender);
 
-        // 4. Obtener referencias necesarias
-        const io = req.app.get('io');
-        const connectedUsers = req.app.get('connectedUsers');
+        // 4. Obtain necessary references
+        const io = request.app.get('io');
+        const connectedUsers = request.app.get('connectedUsers');
 
-        // 5. Notificar a cada emisor via Socket.IO
+        // 5. Notify each sender via Socket.IO
         Object.entries(messagesBySender).forEach(([senderId, messageIdsList]) => {
             const senderSocketId = connectedUsers.get(senderId);
 
-            console.log(`🔍 Buscando socket para emisor ${senderId}:`, senderSocketId ? 'ENCONTRADO' : 'NO ENCONTRADO');
+            console.log(`🔍 Looking for a socket for the sender ${senderId}:`, senderSocketId ? 'Found' : 'No found');
 
             if (senderSocketId) {
                 const payload = {
@@ -252,12 +291,12 @@ router.patch('/read', userExtractor, async (req, res) => {
                 };
 
                 io.to(senderSocketId).emit('messages_read', payload);
-                console.log(`📤 Notificación enviada a ${senderId}:`, payload);
+                console.log(`📤 Notification sent to ${senderId}:`, payload);
             }
         });
 
-        // 6. Respuesta exitosa
-        res.json({
+        // 6. Succesfull respinse
+        response.json({
             success: true,
             updatedCount: updateResult.modifiedCount,
             affectedSenders: Object.keys(messagesBySender).length,
@@ -267,14 +306,86 @@ router.patch('/read', userExtractor, async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Error en PATCH /read:', error);
-        res.status(500).json({
-            error: 'Error interno del servidor',
+        console.error('❌ Error in PATCH /read:', error);
+        response.status(500).json({
+            error: 'Internal Server Error',
             details: error.message
         });
     }
 });
 
-// router.delete()
+//Delete a message
+router.delete('/:messageId', userExtractor, async (request, response) => {
+    const userId = request.user.id
+    const messageId = new mongoose.Types.ObjectId(request.params.messageId)
+
+
+    const msg = await Message.find(messageId).lean()
+
+    // 1) Create deletion record for this user
+    await DeletedItem.create({
+        userId,
+        itemType: 'message',
+        itemId: messageId
+    })
+
+    // 2) Check if the other person has already deleted this message
+    const otherUser = msg.senderId === userId ? msg.receiverId : msg.senderId
+    const also = await DeletedItem.findOne({
+        userId: otherUser,
+        itemType: 'message',
+        itemId: messageId
+    })
+
+    if (also) {
+        // 3) Both deleted: delete message and DeletedItem log
+        await Message.findByIdAndDelete(messageId)
+        await DeletedItem.deleteMany({ itemType: 'message', itemId: messageId })
+    }
+
+    response.json({ success: true })
+})
+
+router.delete('/chat/:otherUsedId', userExtractor, async (request, response) => {
+    const userId = request.user.id
+    const otherUserId = request.params.otherUsedId
+
+    // 1)Log of chat deletion by this user
+    await DeletedItem.create({
+        userId,
+        itemType: 'chat',
+        itemId: otherUserId,
+        chatWith: otherUserId
+    })
+
+    // 2)The other user already deleted it
+    const also = await DeletedItem.findOne({
+        userId: otherUserId,
+        itemType: 'chat',
+        itemId: otherUserId
+    })
+
+    if (also) {
+        // 3) Both delete: delete all messages from the conversation
+        await Message.deleteMany({
+            $or: [
+                { senderId: userId, receiverId: otherUserId },
+                { senderId: otherUserId, receiverId: userId }
+            ]
+        })
+
+        // 4) Remove the reference to the chat that has been deleted
+        await DeletedItem.deleteMany({
+            itemType: 'chat',
+            $or: [
+                { userId, itemId: otherUserId },
+                { userId: otherUserId, itemId: userId }
+            ]
+        })
+
+        response.json({ success: true })
+    }
+})
 
 module.exports = router;
+

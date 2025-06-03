@@ -31,8 +31,6 @@ app.set('activeChats', activeChats);
 io.on('connection', (socket) => {
     console.log('🟢 Nuevo cliente conectado:', socket.id);
 
-
-
     // Obtener userId del query handshake
     const userId = socket.handshake.query.userId?.toString();
     if (!userId) {
@@ -68,23 +66,6 @@ io.on('connection', (socket) => {
             // Buscar receptor conectado
             const receiverSocketId = connectedUsers.get(msg.receiverId);
 
-            // Verificar si el receptor tiene este chat activo
-            const isReceiverViewingChat = activeChats.get(msg.receiverId) === msg.senderId;
-
-            // Si el receptor está viendo este chat, marcar como leído automáticamente
-            if (isReceiverViewingChat) {
-                msg.read = true;
-
-                //Se le notifica a quien lo envio que ya fue leido
-                const senderSocketId = connectedUsers.get(msg.senderId)
-                if (senderSocketId) {
-                    io.to(senderSocketId).emit('message_read_instantly', {
-                        messageId: msg._id,
-                        readerId: msg.receiverId
-                    })
-                }
-            }
-
             if (receiverSocketId) {
                 // Enviar mensaje en tiempo real
                 io.to(receiverSocketId).emit('new_message', {
@@ -99,6 +80,29 @@ io.on('connection', (socket) => {
             console.error('Error en private_message:', error);
         }
     });
+
+    // Escuchar evento para marcar mensajes como leídos instantáneamente
+    socket.on('mark_messages_read', async ({ messageIds, senderId }) => {
+        try {
+            if (!messageIds || !Array.isArray(messageIds) || messageIds === 0) return
+
+            // Intentar buscar el socket del remitente para notificarle
+            const senderSocketId = connectedUsers.get(senderId)
+
+            if (senderSocketId) {
+                // Notificar al remitente que sus mensajes fueron leídos
+                io.to(senderSocketId).emit('messages_read', {
+                    messageIds,
+                    readerId: userId
+                })
+
+            }
+
+        } catch (error) {
+            console.error('Error en mark_messages_read:', error);
+
+        }
+    })
 
     // Escucha cuando un usuario está escribiendo en un chat 1 a 1
     // En el evento 'typing' del servidor
@@ -141,28 +145,7 @@ io.on('connection', (socket) => {
     //     }
     // });
 
-    // Escuchar evento para marcar mensajes como leídos instantáneamente
-    socket.on('mark_messages_read', async ({ messageIds, senderId }) => {
-        try {
-            if (!messageIds || !Array.isArray(messageIds) || messageIds === 0) return
 
-            // Intentar buscar el socket del remitente para notificarle
-            const senderSocketId = connectedUsers.get(senderId)
-
-            if (senderSocketId) {
-                // Notificar al remitente que sus mensajes fueron leídos
-                io.to(senderSocketId).emit('messages_read', {
-                    messageIds,
-                    readerId: userId
-                })
-
-            }
-
-        } catch (error) {
-            console.error('Error en mark_messages_read:', error);
-
-        }
-    })
 
     // Desconexión
     socket.on('disconnect', () => {

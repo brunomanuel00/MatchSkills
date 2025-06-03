@@ -53,7 +53,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
             // Si este mensaje fue recibido y el chat está activo, marcarlo como leído automáticamente
             if (message.receiverId._id === user.id && message.senderId._id === activeChat && !message.read) {
                 console.log('🔄 Auto-marcando mensaje como leído');
-                handleMarkAsRead([message._id]);
+                handleMarkAsRead([message.id]);
             }
             loadChats();
         };
@@ -66,8 +66,8 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
             if (readerId !== user.id) {
                 console.log('📝 Actualizando mensajes como leídos en UI');
                 setMessages(prev => prev.map(msg => {
-                    if (messageIds.includes(msg._id) && msg.senderId._id === user.id) {
-                        console.log(`✓ Mensaje ${msg._id} marcado como leído`);
+                    if (messageIds.includes(msg.id) && msg.senderId._id === user.id) {
+                        console.log(`✓ Mensaje ${msg.id} marcado como leído`);
                         return { ...msg, read: true };
                     }
                     return msg;
@@ -87,7 +87,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         };
     }, [user, activeChat]);
 
-    //Efecto pra
+    //Efecto para establecer en el map del socket el chat que este activo o no
     useEffect(() => {
         if (socket && user) {
             socket.emit('set_active_chat', activeChat)
@@ -97,7 +97,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
                 const unreadMessages = messages.filter(msg => !msg.read && msg.receiverId._id === user.id && msg.senderId._id === activeChat)
 
                 if (unreadMessages.length > 0) {
-                    const messagesId = unreadMessages.map(msg => msg._id)
+                    const messagesId = unreadMessages.map(msg => msg.id)
                     handleMarkAsRead(messagesId)
                 }
             }
@@ -149,7 +149,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-
     // Load initial chats
     useEffect(() => {
         loadChats();
@@ -172,7 +171,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
                 console.log(`📨 Mensajes no leídos encontrados:`, unreadMessages.length);
 
                 if (unreadMessages.length > 0) {
-                    const messageIds = unreadMessages.map(msg => msg._id);
+                    const messageIds = unreadMessages.map(msg => msg.id);
 
                     // Verificar IDs válidos
                     const validIds = messageIds.filter(id =>
@@ -196,6 +195,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     }, [activeChat, user]);
 
     const updateChats = useCallback((prevChats: Chat[], message: Message, userId: string) => {
+
         // Determinar si el usuario actual es el remitente
         const isSender = message.senderId._id === userId;
         const otherUser = isSender ? message.receiverId : message.senderId;
@@ -233,7 +233,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         const tempId = `temp-${Date.now()}`;
         // Crear mensaje temporal con estructura completa
         const newMessage: Message = {
-            _id: tempId,
+            id: tempId,
             senderId: {
                 _id: user.id,
                 name: user.name,
@@ -260,7 +260,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
             // Reemplazar mensaje temporal con el real
             setMessages(prev =>
-                prev.map(msg => msg._id === tempId
+                prev.map(msg => msg.id === tempId
                     ? {
                         ...savedMessage,
                         timestamp: new Date(savedMessage.timestamp),
@@ -281,7 +281,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
             );
         } catch (error) {
             // Rollback
-            setMessages(prev => prev.filter(msg => msg._id !== tempId));
+            setMessages(prev => prev.filter(msg => msg.id !== tempId));
             console.error("Error sending message:", error);
         }
     }, [activeChat, user, updateChats]);
@@ -294,7 +294,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         try {
             // 1. Optimistic update en el frontend
             setMessages(prev => prev.map(msg =>
-                messagesIds.includes(msg._id) && msg.receiverId._id === user.id
+                messagesIds.includes(msg.id) && msg.receiverId._id === user.id
                     ? { ...msg, read: true }
                     : msg
             ));
@@ -326,7 +326,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
             // Rollback en caso de error
             setMessages(prev => prev.map(msg =>
-                messagesIds.includes(msg._id)
+                messagesIds.includes(msg.id)
                     ? { ...msg, read: false }
                     : msg
             ));

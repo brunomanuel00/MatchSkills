@@ -31,7 +31,7 @@ type User = {
 };
 
 export type Message = {
-    _id: string;
+    id: string;
     senderId: User;  // Ahora es un objeto User
     receiverId: User; // Ahora es un objeto User
     content: string;

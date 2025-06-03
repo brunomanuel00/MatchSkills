@@ -158,7 +158,9 @@
     "chat": {
         "typing": "escribiendo...",
         "select-chat": "Selecciona un chat",
-        "chats": "Conversaciones"
+        "chats": "Conversaciones",
+        "sent-message": "Enviar",
+        "write": "Escribe un mensaje..."
     },
     "benefits": {
         "find": {

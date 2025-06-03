@@ -53,7 +53,8 @@ export function Login() {
 
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                setErrorType(err.response?.status === 401 ? 'invalidCredentials' : 'genericError');
+                console.log(err.response?.status)
+                setErrorType(err.response?.status === 400 ? 'invalidCredentials' : 'generic-error');
             }
         } finally {
             setIsSubmitting(false)

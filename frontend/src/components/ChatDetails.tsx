@@ -4,11 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
-import { CheckCheck, ChevronDown } from 'lucide-react';
+import { ArrowLeft, CheckCheck, ChevronDown, Send } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function ChatDetail() {
     const { user } = useAuth();
-    const { messages, sendMessage, activeChat, isTypingFromOther, markAsRead, socket, handleTypingInput, setActiveChat } = useChat();
+    const { messages, sendMessage, activeChat, isTypingFromOther, handleTypingInput, setActiveChat } = useChat();
     const [input, setInput] = useState('');
     const { i18n, t } = useTranslation();
     const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -16,6 +17,9 @@ export default function ChatDetail() {
     const [showScrollButton, setShowScrollButton] = useState(false);
     const currentChatRef = useRef<string | null>(null);
     const isUserAtBottom = useRef(true);
+    const [optionMessageOpenId, setOptionMessageOpenId] = useState<string | null>(null)
+    const optionMessage = useRef<HTMLDivElement>(null)
+
 
     // Este efecto maneja EXCLUSIVAMENTE el cambio entre chats
     useEffect(() => {
@@ -116,48 +120,38 @@ export default function ChatDetail() {
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [handleKeyDown]);
 
-    // // Efecto para marcar mensajes no leídos como leídos cuando el usuario ve un chat
-    // useEffect(() => {
-    //     if (!user || !activeChat) return;
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (optionMessage.current && !optionMessage.current.contains(event.target as Node)) {
+                setOptionMessageOpenId(null);
+            }
+        };
 
-    //     console.log("ejecutate cojone");
-    //     console.log(messages);
+        // Usar 'click' en lugar de 'mousedown' para mejor consistencia
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        }
+    }, []);
 
-    //     // Filtramos mensajes recibidos por el usuario actual que no han sido leídos
-    //     const unreadReceivedMessages = messages.filter(msg => msg.receiverId._id === user.id &&
-    //         msg.senderId._id === activeChat &&
-    //         !msg.read)
+    const handleToggleOptions = useCallback((messageId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setOptionMessageOpenId(current =>
+            current === messageId ? null : messageId
+        );
+    }, []);
 
-    //     if (unreadReceivedMessages.length > 0) {
-    //         const messageIds = unreadReceivedMessages.map(msg => msg._id)
-
-    //         // Solo procesamos IDs válidos (formato MongoDB ObjectID)
-    //         const validIds = messageIds.filter(id => /^[0-9a-fA-F]{24}$/.test(id));
-
-    //         if (validIds.length > 0) {
-    //             // Notificamos al servidor vía Socket.io que estamos leyendo estos mensajes
-    //             if (socket) {
-    //                 socket.emit('mark_messages_read', {
-    //                     messageIds: validIds,
-    //                     senderId: activeChat
-    //                 })
-    //             }
-    //             markAsRead(validIds)
-    //         }
-
-    //     }
-
-    // }, [activeChat, messages, user, socket, unseenMessagesCount])
 
     return (
-        <div className="flex flex-col w-full h-full pb-2">
-            <div className='w-full flex justify-start my-auto p-2 h-14 rounded-sm bg-slate-100 dark:bg-cyan-800'>
+        <div className="flex flex-col w-full h-full pb-2 ">
+            <div className='w-full flex justify-start my-auto p-2 h-14 rounded-e-sm bg-slate-100 dark:bg-cyan-800 '>
                 {activeChat &&
                     <button
                         onClick={() => setActiveChat(null)}
                         onKeyDown={() => handleKeyDown}
+                        className='flex justify-center items-center mr-2 rounded-full'
                     >
-                        {/* <ArrowLeft className='h-5 w-5 text-black' /> */}
+                        <ArrowLeft className='h-5 w-5 md:hidden text-black' />
                     </button>
                 }
                 <div className="flex items-center gap-2 ">
@@ -200,16 +194,43 @@ export default function ChatDetail() {
                     const timestamp = formatMessageDate(message.timestamp);
 
                     return (
-                        <div className={`flex ${isOwnMessage ? 'justify-start' : 'justify-end'}`} key={message._id}>
+                        <div className={`flex relative ${isOwnMessage ? 'justify-start' : 'justify-end'} `} key={message.id}>
+
                             <div className={`${isOwnMessage
                                 ? 'bg-green-200 dark:bg-teal-600'
                                 : 'bg-emerald-400 dark:bg-teal-700'
-                                } rounded-md max-w-[50%] p-3 flex flex-col`}>
+                                } rounded-md max-w-[50%] p-3  flex flex-col group/message transition-all duration-200`}>
+
+                                <div className='relative h-1'>
+                                    <span onClick={(e) => handleToggleOptions(message.id, e)} className={`
+                                           absolute hidden group-hover/message:flex
+                                           right-1 -top-3
+                                           items-center justify-center cursor-pointer`}
+                                    >
+                                        ...
+                                    </span>
+
+                                    {optionMessageOpenId === message.id &&
+                                        <div ref={optionMessage}>
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 5 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                className="absolute right-0 mt-2 w-32 text-center hover:bg-slate-300 p-2 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
+                                            >
+                                                Delete
+                                            </motion.div>
+                                        </div>
+
+                                    }
+
+                                </div>
+
 
                                 <p className="text-black dark:text-white break-words">{message.content}</p>
 
                                 <div className="flex justify-between items-center mt-2">
-                                    <span className="text-xs text-gray-600 dark:text-gray-200 ml-auto">
+                                    <span className="text-xs text-gray-600 dark:text-gray-200 ">
                                         {timestamp}
                                     </span>
                                     {!isOwnMessage &&
@@ -249,7 +270,7 @@ export default function ChatDetail() {
 
             <div className="p-2 flex gap-2">
                 <textarea
-                    className="flex-1 resize-none border rounded px-3 py-2"
+                    className="flex-1 resize-none border rounded px-3 py-2 dark:bg-cyan-800 dark:placeholder-gray-300"
                     value={input}
                     onChange={(e) => {
                         const value = e.target.value;
@@ -262,7 +283,7 @@ export default function ChatDetail() {
                             handleSubmit();
                         }
                     }}
-                    placeholder="Escribe un mensaje..."
+                    placeholder={t('chat.write')}
                     rows={1}
                 />
                 <button
@@ -270,7 +291,15 @@ export default function ChatDetail() {
                     disabled={!input.trim()}
                     className="bg-teal-600 max-h-10 text-white px-4 py-2 rounded disabled:opacity-50"
                 >
-                    Enviar
+                    <div className='flex justify-center items-center gap-2'>
+                        <span className='hidden md:flex' >
+                            {t('chat.sent-message')}
+                        </span>
+                        <span className='sr-only'>
+                            {t('chat.sent-message')}
+                        </span>
+                        <Send className='h-5 w-5' />
+                    </div>
                 </button>
             </div>
         </div>

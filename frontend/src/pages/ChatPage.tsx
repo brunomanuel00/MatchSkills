@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { formatDistance } from 'date-fns';
-import { ArrowLeft } from 'lucide-react';
 import ChatDetail from '../components/ChatDetails';
 import { useChat } from '../components/context/ChatContext';
 import { useTranslation } from 'react-i18next';
@@ -10,9 +9,7 @@ import { es, enUS } from 'date-fns/locale';
 
 export default function ChatPage() {
     const { chats, setActiveChat, activeChat, loadChats } = useChat()
-    const [selected] = useState<string | null>(null);
     const { t, i18n } = useTranslation()
-
     useEffect(() => {
         loadChats()
     }, [])
@@ -22,11 +19,11 @@ export default function ChatPage() {
     return (
         <div className=" min-h-screen pt-14 items-center justify-center p-4 bg-gradient-to-br from-tea_green-500 to-light_green-300 dark:from-lapis_lazuli-500 dark:to-verdigris-700">
 
-            <div className="flex min-h-[650px] max-h-[800px] rounded-md mt-10 bg-white dark:bg-cyan-950">
+            <div className="flex relative min-h-[650px] max-h-[650px] rounded-md mt-10 bg-white dark:bg-cyan-950">
 
                 {/* Lista */}
-                <div className={`border-r dark:border-r-teal-800 md:w-1/3 ${selected ? 'hidden md:block' : 'block'} overflow-auto`}>
-                    <h2 className="p-4 text-lg font-bold">{t('chat.chats')}</h2>
+                <div className={`md:border-r md:dark:border-r-teal-800 w-full md:w-1/3 ${activeChat ? 'hidden md:block' : 'block'} overflow-auto`}>
+                    <h2 className="sticky my-1 rounded-s-md h-14 -translate-y-1 z-10 bg-white dark:bg-cyan-800 p-4 text-lg font-bold">{t('chat.chats')}</h2>
                     <ul>
                         {chats.map(c => {
                             let formattedTime = formatDistance(
@@ -46,7 +43,6 @@ export default function ChatPage() {
                             const displayTime = i18n.language === 'es'
                                 ? `hace ${formattedTime}`
                                 : `${formattedTime} ago`;
-
 
                             return (
                                 <li
@@ -79,10 +75,10 @@ export default function ChatPage() {
 
                 </div>
                 {/* Conversación */}
-                <div className={`flex-1 relative ${!selected ? 'hidden md:flex' : 'flex'}`}>
+                <div className={`flex-1 relative flex`}>
                     {activeChat
                         ? <ChatDetail />
-                        : <div className="m-auto text-gray-500">{t('chat.select-chat')}</div>
+                        : <div className="m-auto hidden md:flex text-gray-500">{t('chat.select-chat')}</div>
                     }
                 </div>
             </div>
