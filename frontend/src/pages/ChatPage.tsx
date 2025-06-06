@@ -1,17 +1,48 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatDistance } from 'date-fns';
 import ChatDetail from '../components/ChatDetails';
 import { useChat } from '../components/context/ChatContext';
 import { useTranslation } from 'react-i18next';
 import { es, enUS } from 'date-fns/locale';
+import { motion } from 'framer-motion';
+import { Modal } from '../components/Modal';
 
 
 
 export default function ChatPage() {
-    const { chats, setActiveChat, activeChat, loadChats } = useChat()
+    const { chats, setActiveChat, activeChat, loadChats, handleDeleteChat } = useChat()
     const { t, i18n } = useTranslation()
+    const optionChat = useRef<HTMLDivElement>(null)
+    const [optionChatIdOpen, setOptionChatIdOpen] = useState<string | null>(null)
+    const [isDeleteChatOpen, setIsDeleteChatOpen] = useState<boolean>(false)
+
     useEffect(() => {
         loadChats()
+    }, [])
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (optionChat.current && !optionChat.current.contains(event.target as Node)) {
+                setOptionChatIdOpen(null);
+            }
+        };
+
+        // Usar 'click' en lugar de 'mousedown' para mejor consistencia
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        }
+    }, []);
+
+    const handleToggleOptions = useCallback((chatId: string, event: React.MouseEvent) => {
+        event.stopPropagation();
+        setOptionChatIdOpen(current =>
+            current === chatId ? null : chatId
+        );
+    }, [])
+
+    const handleModalClose = useCallback(() => {
+        setIsDeleteChatOpen(false)
     }, [])
 
     const currentLocale = i18n.language === 'es' ? es : enUS;
@@ -50,7 +81,7 @@ export default function ChatPage() {
                                     onClick={() => {
                                         setActiveChat(c.user?._id);
                                     }}
-                                    className="p-4 hover:bg-gray-100 dark:hover:bg-cyan-800 cursor-pointer flex items-center"
+                                    className="p-4 hover:bg-gray-100 dark:hover:bg-cyan-800 cursor-pointer flex items-center group/chat"
                                 >
                                     {c.user.avatar && (
                                         <img
@@ -64,6 +95,39 @@ export default function ChatPage() {
                                             {c.lastMessage.content}
                                         </p>
                                     </div>
+                                    {/* Delete a chat */}
+                                    <div className='relative h-1'>
+                                        <span
+                                            onClick={(e) => handleToggleOptions(c.user._id, e)}
+                                            className={`
+                                           absolute hidden group-hover/chat:flex
+                                           right-1 -top-3
+                                           items-center justify-center cursor-pointer`}
+                                        >
+                                            ...
+                                        </span>
+
+                                        {optionChatIdOpen === c.user._id &&
+                                            <div ref={optionChat}>
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: -10 }}
+                                                    animate={{ opacity: 1, y: 5 }}
+                                                    exit={{ opacity: 0, y: -10 }}
+                                                    className="absolute right-0 mt-2 w-32 text-center hover:bg-slate-300 p-2 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
+                                                >
+                                                    <button
+                                                        onClick={() => {
+                                                            setIsDeleteChatOpen(true)
+                                                        }}
+                                                    >
+                                                        {t('table.delete')}
+                                                    </button>
+                                                </motion.div>
+                                            </div>
+
+                                        }
+
+                                    </div>
                                     <div className='flex flex-col items-end'>
                                         {c.unreadCount !== 0 && <span className='text-green-500'>{c.unreadCount}</span>}
                                         <span className="text-xs text-gray-400">{displayTime}</span>
@@ -74,7 +138,7 @@ export default function ChatPage() {
                     </ul>
 
                 </div>
-                {/* Conversación */}
+                {/* Chat */}
                 <div className={`flex-1 relative flex`}>
                     {activeChat
                         ? <ChatDetail />
@@ -82,6 +146,33 @@ export default function ChatPage() {
                     }
                 </div>
             </div>
+            <Modal
+                isOpen={isDeleteChatOpen}
+                onClose={handleModalClose}
+                title={t('modal.delete-chat.title')}
+                size='sm'
+            >
+                <h2>{t('modal.delete-chat.subtitle')}</h2>
+                <div className='flex justify-center items-center m-3 gap-4'>
+                    <button
+                        onClick={handleModalClose}
+                        className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black rounded"
+                    >
+                        {t("modal.delete-account.cancel")}
+                    </button>
+                    <button
+                        onClick={() => {
+                            handleDeleteChat(optionChatIdOpen)
+                            handleModalClose()
+
+                        }}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
+                    >
+                        {t("modal.delete-account.accept")}
+                    </button>
+                </div>
+
+            </Modal>
         </div >
     );
 }

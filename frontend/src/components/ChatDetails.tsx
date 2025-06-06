@@ -6,10 +6,11 @@ import { es, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, CheckCheck, ChevronDown, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Modal } from './Modal';
 
 export default function ChatDetail() {
     const { user } = useAuth();
-    const { messages, sendMessage, activeChat, isTypingFromOther, handleTypingInput, setActiveChat } = useChat();
+    const { messages, sendMessage, activeChat, isTypingFromOther, handleTypingInput, setActiveChat, handleDeleteMessage } = useChat();
     const [input, setInput] = useState('');
     const { i18n, t } = useTranslation();
     const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -19,7 +20,7 @@ export default function ChatDetail() {
     const isUserAtBottom = useRef(true);
     const [optionMessageOpenId, setOptionMessageOpenId] = useState<string | null>(null)
     const optionMessage = useRef<HTMLDivElement>(null)
-
+    const [isDeleteMessageModalOpen, setIsDeleteMessageModalOpen] = useState<boolean>(false)
 
     // Este efecto maneja EXCLUSIVAMENTE el cambio entre chats
     useEffect(() => {
@@ -141,6 +142,10 @@ export default function ChatDetail() {
         );
     }, []);
 
+    const closeDeleteMessageModal = useCallback(() => {
+        setIsDeleteMessageModalOpen(false)
+    }, [])
+
 
     return (
         <div className="flex flex-col w-full h-full pb-2 ">
@@ -218,7 +223,11 @@ export default function ChatDetail() {
                                                 exit={{ opacity: 0, y: -10 }}
                                                 className="absolute right-0 mt-2 w-32 text-center hover:bg-slate-300 p-2 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
                                             >
-                                                Delete
+                                                <button onClick={() => {
+                                                    setIsDeleteMessageModalOpen(true)
+                                                }}>
+                                                    {t('table.delete')}
+                                                </button>
                                             </motion.div>
                                         </div>
 
@@ -302,6 +311,33 @@ export default function ChatDetail() {
                     </div>
                 </button>
             </div>
+            <Modal
+                isOpen={isDeleteMessageModalOpen}
+                onClose={closeDeleteMessageModal}
+                title={t('modal.delete-message.title')}
+                size='sm'
+            >
+                <h2>Are you sure do  you want delete this message</h2>
+                <div className='flex justify-center items-center m-3 gap-4'>
+                    <button
+                        onClick={closeDeleteMessageModal}
+                        className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black rounded"
+                    >
+                        {t("modal.delete-account.cancel")}
+                    </button>
+                    <button
+                        onClick={() => {
+                            handleDeleteMessage(optionMessageOpenId)
+                            closeDeleteMessageModal()
+
+                        }}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
+                    >
+                        {t("modal.delete-account.accept")}
+                    </button>
+                </div>
+
+            </Modal>
         </div>
     );
 }

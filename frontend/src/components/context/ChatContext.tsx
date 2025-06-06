@@ -16,6 +16,8 @@ type ChatContextType = {
     isTypingFromOther: boolean;
     loadChats: () => void
     handleTypingInput: (input: string) => void;
+    handleDeleteMessage: (messageId: string | null) => void;
+    handleDeleteChat: (otherUserId: string | null) => void;
 };
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -357,6 +359,22 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [socket, activeChat, user, typingTimeout]);
 
+    const handleDeleteMessage = useCallback(async (messageId: string | null) => {
+        if (messageId) {
+            const messageDelete = await messagesService.deleteMessage(messageId)
+            console.warn("Result of delete message: ", messageDelete)
+
+        }
+
+    }, [])
+
+    const handleDeleteChat = useCallback(async (otherUserId: string | null) => {
+        if (otherUserId) {
+            const chatDelete = await messagesService.deleteChat(otherUserId)
+            console.warn("Result of delete message: ", chatDelete)
+        }
+    }, [])
+
     return (
         <ChatContext.Provider
             value={{
@@ -370,7 +388,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
                 sendMessage: handleSend,
                 markAsRead: handleMarkAsRead,
                 isTypingFromOther,
-                handleTypingInput
+                handleTypingInput,
+                handleDeleteMessage,
+                handleDeleteChat
             }}
         >
             {children}

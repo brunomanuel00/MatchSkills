@@ -64,6 +64,14 @@
             "description": "¿Seguro que quieres eliminar esta cuenta? Esta acción no se puede deshacer.",
             "cancel": "Cancelar",
             "accept": "Sí, Eliminar"
+        },
+        "delete-message": {
+            "title": "Eliminar Menjaje",
+            "subtitle": "¿Estás seguro que deseas eliminar este mensaje?"
+        },
+        "delete-chat": {
+            "title": "Eliminar Chat",
+            "subtitle": "¿Estás seguro que deseas eliminar este chat?"
         }
     },
     "table": {

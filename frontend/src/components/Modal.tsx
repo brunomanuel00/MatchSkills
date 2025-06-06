@@ -31,7 +31,7 @@ export const Modal = ({ isOpen, onClose, children, title, size = "md", large = f
                         exit={{ scale: 0.95, opacity: 0 }}
                         transition={{ duration: 0.2 }}
                     >
-                        <div className="flex justify-between items-center p-4">
+                        <div className="flex justify-between items-center p-y-4">
                             <h3 className="font-bold text-lg">{title}</h3>
                             <button onClick={onClose} className="text-gray-500 dark:text-gray-300 hover:text-gray-700 hover:dark:text-white">
                                 <X className="h-5 w-5" />
