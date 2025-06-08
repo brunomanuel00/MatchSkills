@@ -58,6 +58,9 @@ const errorHandler = (error, request, response, next) => {
     if (error.name === 'MongoServerError' && error.message.includes('E11000 duplicate key error')) {
         return response.status(400).json({ error: 'expected `username` to be unique' })
     }
+    if (error.name === 'AuthorizationError') {
+        return response.status(403).json({ error: "Requires admin privileges" });
+    }
     if (error.name === 'UnauthorizedError') {
         return response.status(403).json({ error: error.message });
     }

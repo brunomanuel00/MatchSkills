@@ -132,9 +132,6 @@
         "dashboard": "Panel",
         "title": "Match de Habilidades",
         "notifications": "Notificaciones",
-        "teams": "Grupos",
-        "create-team": "Crear Grupo",
-        "team-requests": "Solicitud de equipo",
         "view-all": "Ver Todo",
         "messages": "Mensajes"
     },

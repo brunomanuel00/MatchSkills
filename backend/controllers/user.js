@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const { userExtractor } = require('../utils/middleware')
 const { upload, handleMulterError, handleAvatarUpload } = require('./cloudinary')
 const Match = require('../models/Match')
+const { handleUserMessageDeletion } = require('../utils/utils')
 
 userRouter.get('/', userExtractor, async (req, res) => {
     try {
@@ -13,7 +14,7 @@ userRouter.get('/', userExtractor, async (req, res) => {
 
         // Añadir validación numérica
         if (isNaN(page) || isNaN(limit)) {
-            return res.status(400).json({ error: 'Parámetros inválidos' });
+            return res.status(400).json({ error: 'Invalid params' });
         }
 
         const [users, total] = await Promise.all([
@@ -24,9 +25,6 @@ userRouter.get('/', userExtractor, async (req, res) => {
         // Forzar tipo numérico
         const numericTotal = Number(total);
         const totalPages = Math.ceil(numericTotal / limit);
-        // console.log("Estos son los users", await User.find({}))
-        // const usersTotal = await User.find({})
-        // res.json(usersTotal)
 
         res.json({
             users: users.map(user => ({
@@ -126,8 +124,9 @@ userRouter.get('/:id', userExtractor, async (request, response) => {
 
 userRouter.delete('/array_users', userExtractor, async (request, response) => {
     try {
-        // 1. Verificar usuario autenticado
+        // 1. Verify authenticated user
         const userRequesting = request.user;
+
         if (!userRequesting) {
             return response.status(401).json({ error: 'token missing or invalid' });
         }
@@ -145,7 +144,7 @@ userRouter.delete('/array_users', userExtractor, async (request, response) => {
 
         if (!Array.isArray(ids)) {
             return response.status(400).json({
-                error: 'Invalid request format: expected array of user IDs'
+                error: 'Invalid request format: expected non-empty array of user IDs'
             });
         }
 
@@ -155,7 +154,7 @@ userRouter.delete('/array_users', userExtractor, async (request, response) => {
             });
         }
 
-        // 4. Prevenir auto-eliminación
+        // 4. Prevent auto-deleted
         if (ids.includes(userRequesting.id)) {
             return response.status(403).json({
                 error: 'Admin users cannot delete themselves'
@@ -200,9 +199,19 @@ userRouter.delete('/:id', userExtractor, async (request, response) => {
     if (userRequesting.id !== userIdToDelete && userRequesting.rol !== 'admin') {
         const error = new Error("You don't have permission for change user");
         error.name = 'UnauthorizedError';
-        throw error;
+        return response.status(403).json({ error: error.message });
     }
 
+    const userToDelete = await User.findById(userIdToDelete)
+
+    if (!userToDelete) {
+        return response.status(404).json({ error: "User not found" })
+    }
+
+    // Handle messages before deleting the user
+    await handleUserMessageDeletion(userIdToDelete)
+
+    // Delete the user
     await User.findByIdAndDelete(userIdToDelete);
 
     await Match.updateMany(
@@ -306,10 +315,10 @@ userRouter.patch("/:id", userExtractor, upload.single('avatar'), handleMulterErr
 
     response.json(userResponse);
     if (updateData.lookingFor !== undefined) {
-        fetch('http://localhost:3001/api/matches/calculate', { // Ajusta la URL de tu servidor si es diferente
+        fetch('http://localhost:3001/api/matches/calculate', {
             method: 'POST',
             headers: {
-                'Cookie': `token=${request.cookies.token}` // Envía la cookie para la autenticación
+                'Cookie': `token=${request.cookies.token}`
             }
         });
     }

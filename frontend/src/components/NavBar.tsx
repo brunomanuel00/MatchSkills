@@ -75,23 +75,6 @@ export const Navbar = () => {
             icon: <Waypoints className="h-5 w-5" />
         },
         {
-            translationKey: 'logged.teams',
-            path: '/teams',
-            icon: <Users className="h-5 w-5" />,
-            dropdown: [
-                {
-                    translationKey: 'logged.create-team',
-                    path: '/create-team',
-                    icon: <Plus className="h-4 w-4" />
-                },
-                {
-                    translationKey: 'logged.team-requests',
-                    path: '/team-requests',
-                    icon: <Users className="h-4 w-4" />
-                }
-            ]
-        },
-        {
             translationKey: 'logged.messages',
             path: '/chat',
             icon: <MessageSquare className="h-5 w-5" />

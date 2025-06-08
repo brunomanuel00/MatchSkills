@@ -132,9 +132,6 @@
         "dashboard": "Dashboard",
         "title": "Match Skills",
         "notifications": "Notifications",
-        "teams": "Teams",
-        "create-team": "Create Team",
-        "team-requests": "Team Request",
         "view-all": "View All",
         "messages": "Messages"
     },

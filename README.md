@@ -1,142 +1,155 @@
-# Match de Habilidades
+# Skills Match
 
-Un sistema que conecta personas con habilidades complementarias para proyectos y colaboraciones.
+A system that connects people with complementary skills for projects and collaborations.
 
-## Capturas de Pantalla
-![Vista Principal](./screenshots/principal.png)
+## Screenshots
+
+![Main View](./screenshots/principal.png)
 ![Login](./screenshots/login.png)
-![Registro](./screenshots/register.png)
+![Register](./screenshots/register.png)
 
-## Tecnologías Utilizadas
-- **Frontend:** React, Vite,TypeScript, Axios, React Router, Tailwind CSS, Shadcn/ui,i18next,Framer Motion, Lucide
-- **Backend:** Express, MongoDB, Mongoose, JWT, Bcrypt , Cors, Dotenv, Morgan. Lodash, express-async-errors, Nodemon, Supertest
+## Technologies Used
 
-## 🔒 HTTPS local con certificados autofirmados
+* **Frontend:** React, Vite, TypeScript, Axios, React Router, Tailwind CSS, Shadcn/ui, i18next, Framer Motion, Lucide
+* **Backend:** Express, MongoDB, Mongoose, JWT, Bcrypt, Cors, Dotenv, Morgan, Lodash, express-async-errors, Nodemon, Supertest
 
-Este proyecto usa HTTPS local para que cookies `secure` funcionen (Safari lo requiere).
+## 🔒 Local HTTPS with Self-Signed Certificates
 
-### 🧪 Crear certificados
+This project uses local HTTPS so that `Secure` cookies work correctly (required by Safari).
 
-Usa el script:
-   ```bash
-   ./generate-cert.sh
+### 🧪 Generate Certificates
 
+Use the following script:
 
+```sh
+./generate-cert.sh
+```
 
+## Installation
 
-## Instalación
-1. Clona el repositorio:
+1. Clone the repository:
+
    ```sh
    git clone https://github.com/brunomanuel00/MatchSkills.git
    cd MatchSkills
    rm -rf .git
+   ```
 
-2. Instalar dependencias
+2. Install dependencies:
+
    ```sh
    cd frontend && pnpm install
    cd ../backend && npm install
+   ```
 
-3. Configurar env
+3. Configure environment variables in `backend/.env`:
 
-   backend/.env
    ```sh
-   MONGODB_URI=mongodb+srv://TUCUENTAMONGODB@cluster0.54z7f.mongodb.net/NombreRegistro?retryWrites=true&w=majority&appName=Cluster0
+   MONGODB_URI=<Your MongoDB connection string>
    PORT=3001
 
-   TEST_MONGODB_URI=mongodb+srv://TUCUENTAMONGODB@cluster0.54z7f.mongodb.net/TestNombreRegistro?retryWrites=true&w=majority
+   TEST_MONGODB_URI=<Your Test MongoDB connection string>
 
-   SECRET = para el jwt;
+   SECRET=<Your JWT secret>
+   ```
 
-4. Inicia el servidor
+4. Start the backend server:
+
    ```sh
-   cd backend && npm dev
+   cd backend && npm run dev
+   ```
 
-5. Inicia el frontend
+5. Start the frontend development server:
+
    ```sh
    cd ../frontend && pnpm dev
+   ```
 
-## Estructura del Proyecto
-    ```sh
-    ## Estructura del Proyecto
-   ├── README.md
-   ├── backend/
-   │   ├── app.js
-   │   ├── cert/
-   │   │   ├── key.pem
-   │   ├── client.js
-   │   ├── controllers/
-   │   │   ├── auth.js
-   │   │   ├── cloudinary.js
-   │   │   ├── groupMessages.js
-   │   │   ├── groups.js
-   │   │   ├── match.js
-   │   │   ├── message.js
-   │   │   ├── user.js
-   │   ├── eslint.config.mjs
-   │   ├── index.js
-   │   ├── models/
-   │   │   ├── Group.js
-   │   │   ├── GroupMessage.js
-   │   │   ├── Match.js
-   │   │   ├── Message.js
-   │   │   ├── Notification.js
-   │   │   ├── User.js
-   │   ├── package-lock.json
-   │   ├── package.json
-   │   ├── request/
-   │   │   ├── Test_patch.rest
-   │   │   ├── create_new_user.rest
-   │   │   ├── login.rest
-   │   │   ├── logout.rest
-   │   ├── service/
-   │   │   ├── geminiAI.js
-   │   ├── temp_uploads/
-   │   ├── test-bcrypt.js
-   │   ├── utils/
-   │   │   ├── cloudinary.js
-   │   │   ├── config.js
-   │   │   ├── logger.js
-   │   │   ├── middleware.js
-   ├── frontend/
-   │   ├── components.json
-   │   ├── eslint.config.js
-   │   ├── index.html
-   │   ├── package.json
-   │   ├── pnpm-lock.yaml
-   │   ├── postcss.config.js
-   │   ├── public/
-   │   ├── src/
-   │   │   ├── assets/
-   │   │   ├── components/
-   │   │   │   ├── ui/
-   │   │   ├── lib/
-   │   │   ├── locales/
-   │   │   │   ├── en/
-   │   │   │   ├── es/
-   │   │   ├── pages/
-   │   │   │   ├── auth/
-   │   │   ├── routes/
-   │   │   ├── services/
-   │   │   ├── styles/
-   │   │   ├── types/
-   │   ├── tailwind.config.js
-   │   ├── tsconfig.app.json
-   │   ├── tsconfig.json
-   │   ├── tsconfig.node.json
-    │   ├── vite.config.ts
+## Project Structure
 
+```sh
+├── README.md
+├── backend/
+│   ├── app.js
+│   ├── cert/
+│   │   └── key.pem
+│   ├── client.js
+│   ├── controllers/
+│   │   ├── auth.js
+│   │   ├── cloudinary.js
+│   │   ├── groupMessages.js
+│   │   ├── groups.js
+│   │   ├── match.js
+│   │   ├── message.js
+│   │   └── user.js
+│   ├── eslint.config.mjs
+│   ├── index.js
+│   ├── models/
+│   │   ├── Group.js
+│   │   ├── GroupMessage.js
+│   │   ├── Match.js
+│   │   ├── Message.js
+│   │   ├── Notification.js
+│   │   └── User.js
+│   ├── package.json
+│   ├── request/
+│   │   ├── Test_patch.rest
+│   │   ├── create_new_user.rest
+│   │   ├── login.rest
+│   │   └── logout.rest
+│   ├── service/
+│   │   └── geminiAI.js
+│   ├── temp_uploads/
+│   ├── test-bcrypt.js
+│   └── utils/
+│       ├── cloudinary.js
+│       ├── config.js
+│       ├── logger.js
+│       └── middleware.js
+└── frontend/
+    ├── components.json
+    ├── eslint.config.js
+    ├── index.html
+    ├── package.json
+    ├── pnpm-lock.yaml
+    ├── postcss.config.js
+    ├── public/
+    ├── src/
+    │   ├── assets/
+    │   ├── components/
+    │   │   └── ui/
+    │   ├── lib/
+    │   ├── locales/
+    │   │   ├── en/
+    │   │   └── es/
+    │   ├── pages/
+    │   │   └── auth/
+    │   ├── routes/
+    │   ├── services/
+    │   ├── styles/
+    │   └── types/
+    ├── tailwind.config.js
+    ├── tsconfig.app.json
+    ├── tsconfig.json
+    ├── tsconfig.node.json
+    └── vite.config.ts
+```
 
-## Funcionalidades
-✅ Registro y autenticación con JWT  
-✅ Búsqueda de habilidades  
-✅ Sistema de match basado en compatibilidad  
-✅ Chat en tiempo real (próximamente)
+## Features
 
-## Contribuir
-¡Las contribuciones son bienvenidas!  
-1. Haz un fork del proyecto  
-2. Crea una rama: `git checkout -b mi-nueva-funcionalidad`  
-3. Haz tus cambios y crea un PR  
+* ✅ User registration and authentication with JWT
+* ✅ Skill search
+* ✅ Matching system based on compatibility
+* ✅ Real-time chat (coming soon)
 
-## Licencia
-Este proyecto está bajo la licencia MIT.
+## Contributing
+
+Contributions are welcome!
+
+1. Fork the repository.
+2. Create a new branch: `git checkout -b my-new-feature`.
+3. Make your changes and open a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
