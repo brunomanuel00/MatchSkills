@@ -77,16 +77,12 @@ Use the following script:
 │   ├── controllers/
 │   │   ├── auth.js
 │   │   ├── cloudinary.js
-│   │   ├── groupMessages.js
-│   │   ├── groups.js
 │   │   ├── match.js
 │   │   ├── message.js
 │   │   └── user.js
 │   ├── eslint.config.mjs
 │   ├── index.js
 │   ├── models/
-│   │   ├── Group.js
-│   │   ├── GroupMessage.js
 │   │   ├── Match.js
 │   │   ├── Message.js
 │   │   ├── Notification.js
@@ -98,7 +94,7 @@ Use the following script:
 │   │   ├── login.rest
 │   │   └── logout.rest
 │   ├── service/
-│   │   └── geminiAI.js
+│   │   └── aiMatches.js
 │   ├── temp_uploads/
 │   ├── test-bcrypt.js
 │   └── utils/
@@ -106,6 +102,7 @@ Use the following script:
 │       ├── config.js
 │       ├── logger.js
 │       └── middleware.js
+|       └──utils.js
 └── frontend/
     ├── components.json
     ├── eslint.config.js
