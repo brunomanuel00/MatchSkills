@@ -1,155 +1,222 @@
 # Skills Match
 
-A system that connects people with complementary skills for projects and collaborations.
+_A system that connects people with complementary skills for projects and collaborations._
 
-## Screenshots
+---
 
-![Main View](./screenshots/principal.png)
-![Login](./screenshots/login.png)
-![Register](./screenshots/register.png)
+## Table of Contents
 
-## Technologies Used
+1. [Features](#features)
+2. [Tech Stack](#tech-stack)
+3. [Project Structure](#project-structure)
+4. [Installation](#installation)
+   - [Prerequisites](#prerequisites)
+   - [Backend Setup](#backend-setup)
+   - [Frontend Setup](#frontend-setup)
+5. [Environment Variables](#environment-variables)
+6. [Usage](#usage)
+   - [Running Backend](#running-backend)
+   - [Running Frontend](#running-frontend)
+7. [API Endpoints](#api-endpoints)
+8. [Screenshots](#screenshots)
+9. [Contributing](#contributing)
+10. [License](#license)
 
-* **Frontend:** React, Vite, TypeScript, Axios, React Router, Tailwind CSS, Shadcn/ui, i18next, Framer Motion, Lucide
-* **Backend:** Express, MongoDB, Mongoose, JWT, Bcrypt, Cors, Dotenv, Morgan, Lodash, express-async-errors, Nodemon, Supertest
-
-## 🔒 Local HTTPS with Self-Signed Certificates
-
-This project uses local HTTPS so that `Secure` cookies work correctly (required by Safari).
-
-### 🧪 Generate Certificates
-
-Use the following script:
-
-```sh
-./generate-cert.sh
-```
-
-## Installation
-
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/brunomanuel00/MatchSkills.git
-   cd MatchSkills
-   rm -rf .git
-   ```
-
-2. Install dependencies:
-
-   ```sh
-   cd frontend && pnpm install
-   cd ../backend && npm install
-   ```
-
-3. Configure environment variables in `backend/.env`:
-
-   ```sh
-   MONGODB_URI=<Your MongoDB connection string>
-   PORT=3001
-
-   TEST_MONGODB_URI=<Your Test MongoDB connection string>
-
-   SECRET=<Your JWT secret>
-   ```
-
-4. Start the backend server:
-
-   ```sh
-   cd backend && npm run dev
-   ```
-
-5. Start the frontend development server:
-
-   ```sh
-   cd ../frontend && pnpm dev
-   ```
-
-## Project Structure
-
-```sh
-├── README.md
-├── backend/
-│   ├── app.js
-│   ├── cert/
-│   │   └── key.pem
-│   ├── client.js
-│   ├── controllers/
-│   │   ├── auth.js
-│   │   ├── cloudinary.js
-│   │   ├── groupMessages.js
-│   │   ├── groups.js
-│   │   ├── match.js
-│   │   ├── message.js
-│   │   └── user.js
-│   ├── eslint.config.mjs
-│   ├── index.js
-│   ├── models/
-│   │   ├── Group.js
-│   │   ├── GroupMessage.js
-│   │   ├── Match.js
-│   │   ├── Message.js
-│   │   ├── Notification.js
-│   │   └── User.js
-│   ├── package.json
-│   ├── request/
-│   │   ├── Test_patch.rest
-│   │   ├── create_new_user.rest
-│   │   ├── login.rest
-│   │   └── logout.rest
-│   ├── service/
-│   │   └── geminiAI.js
-│   ├── temp_uploads/
-│   ├── test-bcrypt.js
-│   └── utils/
-│       ├── cloudinary.js
-│       ├── config.js
-│       ├── logger.js
-│       └── middleware.js
-└── frontend/
-    ├── components.json
-    ├── eslint.config.js
-    ├── index.html
-    ├── package.json
-    ├── pnpm-lock.yaml
-    ├── postcss.config.js
-    ├── public/
-    ├── src/
-    │   ├── assets/
-    │   ├── components/
-    │   │   └── ui/
-    │   ├── lib/
-    │   ├── locales/
-    │   │   ├── en/
-    │   │   └── es/
-    │   ├── pages/
-    │   │   └── auth/
-    │   ├── routes/
-    │   ├── services/
-    │   ├── styles/
-    │   └── types/
-    ├── tailwind.config.js
-    ├── tsconfig.app.json
-    ├── tsconfig.json
-    ├── tsconfig.node.json
-    └── vite.config.ts
-```
+---
 
 ## Features
 
-* ✅ User registration and authentication with JWT
-* ✅ Skill search
-* ✅ Matching system based on compatibility
-* ✅ Real-time chat (coming soon)
+- 🔍 **User Authentication** with JWT and session management
+- 🤝 **Skill Matching**: Match users by complementary skills
+- 💬 **Real-time Chat** (via Socket.io)
+- 🛠️ **User & Notification Management**
+- 🏗️ **Admin Dashboard** to manage users and matches
+- 🔔 **Notifications** for new matches and messages
+- 🌐 **i18n Support** (English & Spanish)
+- 🎨 **Light/Dark Mode**
+
+---
+
+## Tech Stack
+
+- **Frontend**: React, Vite, TypeScript, Axios, React Router, Tailwind CSS, Shadcn/ui, i18next, Framer Motion, Lucide
+- **Backend**: Node.js, Express, MongoDB, Mongoose, JWT, Bcrypt, Cors, Dotenv, Morgan, Lodash, express-async-errors, Nodemon
+- **Testing**: Jest, Supertest
+
+---
+
+## Project Structure
+
+```
+match-habilidades/
+├── backend/                 # Express API
+│   ├── controllers/         # Route handlers
+│   ├── middleware/          # Auth, error handling, etc.
+│   ├── models/              # Mongoose schemas
+│   ├── services/            # Business logic (user, match, notification)
+│   ├── tests/               # Jest & Supertest tests
+│   ├── app.js               # Express app setup
+│   └── server.js            # Server entrypoint
+├── frontend/                # React application
+│   ├── src/
+│   │   ├── components/      # UI components and toast setup
+│   │   ├── hooks/           # Custom hooks (useAuth, useNotifications)
+│   │   ├── pages/           # Route pages (Login, Dashboard, Profile)
+│   │   ├── services/        # Axios API wrappers
+│   │   ├── stores/          # Zustand or Context stores
+│   │   ├── locales/         # i18n translation files
+│   │   ├── types/           # TypeScript type definitions
+│   │   ├── utils/           # Utility functions
+│   │   ├── App.tsx          # Root component
+│   │   └── main.tsx         # Entry point
+│   └── vite.config.ts       # Vite configuration
+├── certificate/             # Self-signed SSL certs for local HTTPS
+├── screenshots/             # UI screenshots
+├── .env.example             # Example environment variables
+├── .gitignore
+└── README.md                # This file
+```
+
+---
+
+## Installation
+
+### Prerequisites
+
+- Node.js v16+
+- npm or yarn
+- MongoDB (local or Atlas)
+
+### Backend Setup
+
+1. **Install dependencies**
+   ```bash
+   cd backend
+   npm install
+   # or yarn
+   ```
+2. **Configure environment**
+   - Copy `.env.example` to `.env` and fill in values (see [Environment Variables](#environment-variables)).
+3. **Run the server**
+   ```bash
+   npm run dev
+   # or yarn dev
+   ```
+
+### Frontend Setup
+
+1. **Install dependencies**
+   ```bash
+   cd frontend
+   npm install
+   # or yarn
+   ```
+2. **Configure environment**
+   - Copy `.env.example` to `.env` and set `VITE_API_URL` to your backend URL (e.g., `https://localhost:3000`).
+3. **Run the app**
+   ```bash
+   npm run dev
+   # or yarn dev
+   ```
+
+---
+
+## Environment Variables
+
+Copy the `.env.example` files in both `backend/` and `frontend/` and fill the following:
+
+```bash
+# backend/.env
+PORT=3000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+# ...other keys (SSL paths, etc.)
+
+# frontend/.env
+VITE_API_URL=https://localhost:3000
+# ...other VITE_ keys
+```
+
+---
+
+## Usage
+
+### Running Backend
+
+```bash
+cd backend
+npm run dev
+```
+
+The API runs on `https://localhost:3000` (or the `PORT` you set).
+
+### Running Frontend
+
+```bash
+cd frontend
+npm run dev
+```
+
+The React app runs on `http://localhost:5173` by default.
+
+---
+
+## API Endpoints
+
+### Auth
+
+- `POST /api/auth/register` – Register new user
+- `POST /api/auth/login` – Login and get JWT
+- `POST /api/auth/logout` – Invalidate session
+
+### Users
+
+- `GET /api/users` – List users (admin)
+- `GET /api/users/:id` – Get user profile
+- `PATCH /api/users/:id` – Update user
+- `DELETE /api/users/:id` – Delete user
+
+### Matches
+
+- `GET /api/matches` – Get your matches
+- `POST /api/matches` – Create/update matches manually
+
+### Notifications
+
+- `GET /api/notifications` – List notifications
+- `PATCH /api/notifications/:id` – Mark as read
+- `DELETE /api/notifications/:id` – Delete one
+- `DELETE /api/notifications/bulk` – Bulk delete
+
+### Chat
+
+- WebSocket `/socket.io` – Real-time messaging endpoints
+
+---
+
+## Screenshots
+
+![Main Dashboard](./screenshots/principal.png)
+![Login Page](./screenshots/login.png)
+![Register Page](./screenshots/register.png)
+
+---
 
 ## Contributing
 
-Contributions are welcome!
+Contributions are welcome! Follow these steps:
 
-1. Fork the repository.
-2. Create a new branch: `git checkout -b my-new-feature`.
-3. Make your changes and open a Pull Request.
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature/my-feature`
+5. Open a Pull Request
+
+Please read `CONTRIBUTING.md` (if present) for contribution guidelines.
+
+---
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+
