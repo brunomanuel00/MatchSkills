@@ -141,7 +141,7 @@ router.patch('/mark-read', userExtractor, async (request, response) => {
     }
 })
 
-router.delete('/:id', userExtractor, async (request, response) => {
+router.delete('/:id/eliminated', userExtractor, async (request, response) => {
     try {
         const notification = await Notification.findOneAndDelete({
             _id: request.params.id,
@@ -174,16 +174,21 @@ router.delete('/', userExtractor, async (request, response) => {
 });
 
 router.delete('/bulk', userExtractor, async (request, response) => {
+    console.log('Esto es el array de not a eliminar')
     try {
+        const userId = request.user.id
         const { notificationIds } = request.body;
+
 
         if (!Array.isArray(notificationIds) || notificationIds.length === 0) {
             return response.status(400).json({ error: 'Invalid notification IDs provided.' });
         }
 
+        console.log('Y aqui pasamos lo de la comprobacion de array');
+
         const result = await Notification.deleteMany({
             _id: { $in: notificationIds },
-            user: request.user.id
+            user: userId
         });
 
         response.json({

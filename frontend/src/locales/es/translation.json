@@ -187,7 +187,7 @@
             "title": "No tienes notificaciones",
             "description": "Cuando recibas nuevas notificaciones, aparecerán aquí."
         },
-        "selected": "{{count}} seleccionada ",
+        "selected": "{{count}} seleccionado",
         "actions": {
             "selectAll": "Seleccionar todo",
             "deselectAll": "Deseleccionar todo",
@@ -199,12 +199,13 @@
             "new_match": "Nuevo match",
             "new_message": "Nuevo mensaje"
         },
-        "matchDetails": "{{count}} nuevo{{count === 1 ? '' : 's'}} match{{count === 1 ? '' : 'es'}}",
+        "matchDetails": "{{count}} nuevo/s",
+        "new_match": "¡Tienes {{count}} nuevo/s match/es!",
         "delete": {
             "confirm": {
                 "title": "Confirmar eliminación",
                 "messageAll": "¿Estás seguro de que quieres eliminar todas las notificaciones? Esta acción no se puede deshacer.",
-                "messageSelected": "¿Estás seguro de que quieres eliminar {{count}} notificación{{count === 1 ? '' : 'es'}}? Esta acción no se puede deshacer."
+                "messageSelected": "¿Estás seguro de que quieres eliminar {{count}} notificación/es? Esta acción no se puede deshacer."
             }
         },
         "errors": {

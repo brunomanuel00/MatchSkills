@@ -73,12 +73,6 @@ const updateUser = async (id: string, updateData: {
         }
     }
 
-    // Debug: Mostrar contenido del FormData
-    console.log('Contenido de FormData:');
-    for (const [key, value] of formData.entries()) {
-        console.log(key, value);
-    }
-
     try {
         const response = await apiClient.patch(`/${id}`, formData, {
             headers: {
@@ -88,7 +82,6 @@ const updateUser = async (id: string, updateData: {
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
-            console.error('Error detallado:', error.response?.data);
             const errorData = error.response?.data;
             throw new Error(errorData?.message || errorData?.error || 'Error al actualizar usuario');
         }

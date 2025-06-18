@@ -23,11 +23,17 @@ i18n
         resources,
         lng: savedLanguage || "en",
         fallbackLng: "en",
+        load: "languageOnly",          // ← importante
+        supportedLngs: ["en", "es"],   // ← limita sólo a estos
+        interpolation: {
+            escapeValue: false,
+        },
         detection: {
             order: ["localStorage", "navigator"],
             caches: ["localStorage"],
-        },
-    })
+        },                 // ← activa mensajes en consola
+    });
+
 
 export default i18n
 

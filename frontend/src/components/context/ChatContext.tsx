@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import messagesService from '../../services/messagesService';
 import { Chat, Message } from '../../types/utils';
+import { toastEasy } from '../hooks/toastEasy';
 
 type ChatContextType = {
     socket: Socket | null;
@@ -48,28 +49,26 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         });
 
         const handleNewMessage = (message: Message) => {
-            console.log('📨 Nuevo mensaje recibido:', message);
             setMessages(prev => [...prev, message]);
             setChats(prev => updateChats(prev, message, user.id));
 
             // Si este mensaje fue recibido y el chat está activo, marcarlo como leído automáticamente
             if (message.receiverId._id === user.id && message.senderId._id === activeChat && !message.read) {
-                console.log('🔄 Auto-marcando mensaje como leído');
+
                 handleMarkAsRead([message.id]);
             }
             loadChats();
         };
 
         const handleMessagesRead = ({ messageIds, readerId }: { messageIds: string[], readerId: string }) => {
-            console.log('✅ Evento messages_read recibido:', { messageIds, readerId, currentUserId: user.id });
 
             // Solo actualizar si NOSOTROS somos el emisor de esos mensajes
             // (readerId es quien leyó nuestros mensajes)
             if (readerId !== user.id) {
-                console.log('📝 Actualizando mensajes como leídos en UI');
+
                 setMessages(prev => prev.map(msg => {
                     if (messageIds.includes(msg.id) && msg.senderId._id === user.id) {
-                        console.log(`✓ Mensaje ${msg.id} marcado como leído`);
+
                         return { ...msg, read: true };
                     }
                     return msg;
@@ -146,7 +145,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
                 setChats(Array.isArray(data) ? data : []);
             } catch (error) {
-                console.error("Error loading chats:", error);
+                toastEasy('error')
             }
         }
     };
@@ -170,7 +169,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
                     msg.senderId._id === activeChat // Este debe ser el chat activo
                 );
 
-                console.log(`📨 Mensajes no leídos encontrados:`, unreadMessages.length);
 
                 if (unreadMessages.length > 0) {
                     const messageIds = unreadMessages.map(msg => msg.id);
@@ -181,13 +179,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
                     );
 
                     if (validIds.length > 0) {
-                        console.log(`📤 Marcando como leídos:`, validIds);
                         await handleMarkAsRead(validIds);
                     }
                 }
 
             } catch (error) {
-                console.error("❌ Error loading messages:", error);
+                toastEasy('error')
             }
         }
     }, [activeChat, user]);
@@ -284,14 +281,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         } catch (error) {
             // Rollback
             setMessages(prev => prev.filter(msg => msg.id !== tempId));
-            console.error("Error sending message:", error);
+            toastEasy('error')
         }
     }, [activeChat, user, updateChats]);
 
     const handleMarkAsRead = useCallback(async (messagesIds: string[]) => {
         if (!user) return;
-
-        console.log(`📖 Marcando como leídos ${messagesIds.length} mensajes para usuario ${user.id}`);
 
         try {
             // 1. Optimistic update en el frontend
@@ -318,13 +313,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
             });
 
             // 2. Llamar al servicio API - AQUÍ es donde se envía la notificación
-            const response = await messagesService.markAsRead(messagesIds);
-            console.log(`✅ Respuesta del servidor:`, response);
+            await messagesService.markAsRead(messagesIds);
 
-            // 3. NO necesitas emitir evento socket aquí, el backend ya lo hace
+
 
         } catch (error) {
-            console.error('❌ Error al marcar mensajes como leídos:', error);
+            toastEasy('error')
 
             // Rollback en caso de error
             setMessages(prev => prev.map(msg =>
@@ -363,9 +357,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         if (!messageId) return
 
         try {
-            const messageDelete = await messagesService.deleteMessage(messageId)
-            console.warn("Result of delete message: ", messageDelete)
-
+            await messagesService.deleteMessage(messageId)
 
             const messsageslenght = messages.length
 
@@ -377,7 +369,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
             }
 
         } catch (error) {
-            console.error("❌ Error deleting message:", error);
+            toastEasy('error')
 
             // Rollback: reload messages if an error occurs
             if (activeChat) {
@@ -393,8 +385,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
         try {
 
-            const chatDelete = await messagesService.deleteChat(otherUserId)
-            console.warn("Result of delete message: ", chatDelete)
+            await messagesService.deleteChat(otherUserId)
 
             setChats(prev => {
                 const updatedChats = prev.filter(c => c.user._id !== otherUserId)
@@ -411,11 +402,10 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
         } catch (error) {
 
-            console.error("❌ Error deleting chat:", error);
+            toastEasy('error')
 
             // Rollback: reload chat if there is an error 
             await loadChats();
-
         }
 
 

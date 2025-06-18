@@ -3,6 +3,7 @@ import { Notification } from '../../types/notificationsTypes'
 import notificationService from '../../services/notificationService';
 import { toastEasy } from './toastEasy';
 import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 
 interface UseNotificationsReturn {
     //Sates
@@ -22,7 +23,7 @@ interface UseNotificationsReturn {
     markNotificationsAsRead: () => Promise<void>;
     deleteNotification: (notificationId: string) => Promise<void>;
     deleteAllNotifications: () => Promise<void>;
-    deleteNotifications: (notificationIds: string[]) => Promise<void>;
+    deleteNotifications: () => Promise<void>;
     refresh: () => Promise<void>;
     handleSelectedToggle: (notId: string) => void;
     handleSelectAllNot: () => void
@@ -60,8 +61,6 @@ export function useNotifications(): UseNotificationsReturn {
             const data = await notificationService.getAllNotifications();
             setNotifications(data)
 
-            console.log(`📬 Notifications loaded: ${data.length}`);
-
         } catch (error: any) {
 
             setError(error.response?.data?.error || t('notifications.errors.loading'))
@@ -81,7 +80,7 @@ export function useNotifications(): UseNotificationsReturn {
             const data = await notificationService.getRecentNotifications();
             setRecentNotifications(data)
 
-            console.log(`📬 Recent notifications: ${data.length}`);
+
         } catch (error: any) {
             setError(error.response?.data?.error || t('notifications.errors.loading-recent'))
             toastEasy('error', t('notifications.errors.loading-recent'))
@@ -97,7 +96,6 @@ export function useNotifications(): UseNotificationsReturn {
             const data = await notificationService.getUnreadCount()
             setUnreadCount(data.unreadCount)
 
-            console.log(`🔔 Unread notifications: ${data.unreadCount}`);
         } catch (error: any) {
             console.error('Error fetching unread count:', error);
             setError(error.response?.data?.error || 'Error loading notification count')
@@ -115,13 +113,12 @@ export function useNotifications(): UseNotificationsReturn {
         setSelectedNotifications(prev =>
             prev.length === notifications.length ? [] : notifications.map(not => not.id)
         )
-        console.log("Esto son los ids de los seleccionados: ", selectedNotifications)
     }, [selectedNotifications])
 
     const markAsRead = useCallback(async (notificationId: string) => {
         try {
 
-            const data = await notificationService.markAsRead(notificationId)
+            await notificationService.markAsRead(notificationId)
 
             setNotifications(prev => prev.map(not =>
                 not.id === notificationId ? { ...not, read: true } : not
@@ -131,9 +128,10 @@ export function useNotifications(): UseNotificationsReturn {
                 not.id === notificationId ? { ...not, read: true } : not
             ))
 
-            console.log('This is the notification read', data)
+            toastEasy('success')
 
         } catch (error: any) {
+            toastEasy('error')
             console.error('Error marking notification as read:', error);
             setError(error.response?.data?.error || 'Error marking notification as read');
         }
@@ -142,13 +140,14 @@ export function useNotifications(): UseNotificationsReturn {
     const markAllAsRead = useCallback(async () => {
         try {
 
-            const result = await notificationService.markAllAsRead()
+            await notificationService.markAllAsRead()
             setNotifications(prev => prev.map(not => ({ ...not, read: true })))
             setRecentNotifications(prev => prev.map(not => ({ ...not, read: true })))
             setUnreadCount(0)
 
-            console.log(`✅ ${result.modifiedCount} notifications marked as read`);
+            toastEasy('success')
         } catch (error: any) {
+            toastEasy('error')
 
             console.error('Error marking all notifications as read:', error);
             setError(error.response?.data?.error || 'Error marking all notifications as read');
@@ -159,7 +158,7 @@ export function useNotifications(): UseNotificationsReturn {
     const markNotificationsAsRead = useCallback(async () => {
         try {
 
-            const result = await notificationService.markNotificationsAsRead(selectedNotifications)
+            await notificationService.markNotificationsAsRead(selectedNotifications)
 
             setNotifications(prev => prev.map(not =>
                 selectedNotifications.includes(not.id) ? { ...not, read: true } : not
@@ -172,10 +171,11 @@ export function useNotifications(): UseNotificationsReturn {
 
             await fetchUnreadCount();
 
-            console.log(`✅ ${result.modifiedCount} notificaciones marcadas como leídas`);
+            toastEasy('success')
 
         } catch (error: any) {
 
+            toastEasy('error')
             console.error('Error marking all notifications as read:', error);
             setError(error.response?.data?.error || 'Error marking all notifications as read');
 
@@ -185,7 +185,7 @@ export function useNotifications(): UseNotificationsReturn {
     const deleteNotification = useCallback(async (notificationId: string) => {
         try {
 
-            const result = await notificationService.deleteNotification(notificationId)
+            await notificationService.deleteNotification(notificationId)
 
             setNotifications(prev => prev.filter(not => not.id !== notificationId))
 
@@ -193,9 +193,10 @@ export function useNotifications(): UseNotificationsReturn {
 
             await fetchUnreadCount();
 
-            console.log('🗑️ ', result.message);
+            toastEasy('success')
 
         } catch (error: any) {
+            toastEasy('error')
             console.error('Error deleting notification:', error);
             setError(error.response?.data?.error || 'Error al eliminar notificación');
         }
@@ -204,36 +205,39 @@ export function useNotifications(): UseNotificationsReturn {
     const deleteAllNotifications = useCallback(async () => {
         try {
 
-            const result = await notificationService.deleteAllNotifications()
+            await notificationService.deleteAllNotifications()
             setNotifications([])
             setRecentNotifications([])
             setUnreadCount(0)
 
-            console.log(`🗑️ ${result.deletedCount} notificaciones eliminadas`);
+            toastEasy('success')
 
         } catch (error: any) {
+
+            toastEasy('error')
 
             console.error('Error deleting all notifications:', error);
             setError(error.response?.data?.error || 'Error al eliminar todas las notificaciones');
         }
     }, [])
 
-    const deleteNotifications = useCallback(async (notificationIds: string[]) => {
+    const deleteNotifications = useCallback(async () => {
         try {
 
-            const result = await notificationService.deleteNotifications(notificationIds);
+            await notificationService.deleteNotifications(selectedNotifications);
 
-            setNotifications(prev => prev.filter(n => !notificationIds.includes(n.id)))
+            setNotifications(prev => prev.filter(n => !selectedNotifications.includes(n.id)))
 
-            setRecentNotifications(prev => prev.filter(n => !notificationIds.includes(n.id)))
+            setRecentNotifications(prev => prev.filter(n => !selectedNotifications.includes(n.id)))
             await fetchUnreadCount();
 
-            console.log(`🗑️ ${result.deletedCount} notificaciones eliminadas`);
+            toastEasy('success')
         } catch (error: any) {
+            toastEasy('error')
             console.error('Error deleting notifications:', error);
             setError(error.response?.data?.error || 'Error al eliminar notificaciones');
         }
-    }, [fetchUnreadCount]);
+    }, [fetchUnreadCount, selectedNotifications]);
 
     const refresh = useCallback(async () => {
         setLoading(true);
@@ -244,9 +248,6 @@ export function useNotifications(): UseNotificationsReturn {
         ]);
         setLoading(false);
     }, [fetchNotifications, fetchRecentNotifications, fetchUnreadCount])
-
-
-
 
     useEffect(() => {
         refresh();
@@ -268,10 +269,13 @@ export function useNotifications(): UseNotificationsReturn {
 
     // Utilidades
     const hasUnreadNotifications = unreadCount > 0;
+
     const formatMessage = useCallback((notification: Notification) =>
-        notificationService.formatNotificationMessage(notification), []);
+        notificationService.formatNotificationMessage(notification, t),
+        [t]);
+
     const getRelativeTime = useCallback((createdAt: string) =>
-        notificationService.getRelativeTime(createdAt), []);
+        notificationService.getRelativeTime(createdAt, i18n), [i18n]);
 
     return {
         notifications,

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Notification } from "../types/notificationsTypes";
+import { i18n, TFunction } from "i18next";
 
 const baseUrl = "/api/notifications";
 
@@ -46,7 +47,7 @@ const markNotificationsAsRead = async (notificationIds: string[]): Promise<{ mes
 
 // Delete a specific notification
 const deleteNotification = async (notificationId: string): Promise<{ message: string }> => {
-    const response = await apiClient.delete(`/${notificationId}`);
+    const response = await apiClient.delete(`/${notificationId}/eliminated`);
     return response.data;
 }
 
@@ -63,36 +64,57 @@ const deleteNotifications = async (notificationIds: string[]): Promise<{ message
 }
 
 // Format notification message according to type
-const formatNotificationMessage = (notification: Notification): string => {
+const formatNotificationMessage = (
+    notification: Notification,
+    t: TFunction
+): string => {
     switch (notification.type) {
-        case 'new_match':
-            return notification.data.message ||
-                `¡Tienes ${notification.data.newMatchesCount || 1} nuevo${(notification.data.newMatchesCount || 1) > 1 ? 's' : ''} match${(notification.data.newMatchesCount || 1) > 1 ? 'es' : ''}!`;
+        case 'new_match': {
+            const count = notification.data.newMatchesCount || 1;
+
+            return t('notifications.new_match', { count });
+        }
         case 'new_message':
-            return notification.data.message || '¡Tienes un nuevo mensaje!';
+            return t('notifications.new_message');
         default:
-            return 'Nueva notificación';
+            return t('notifications.default');
     }
-}
+};
 
 // Get relative time since creation
-const getRelativeTime = (createdAt: string): string => {
-    const now = new Date();
-    const notificationTime = new Date(createdAt);
-    const diffInMinutes = Math.floor((now.getTime() - notificationTime.getTime()) / (1000 * 60));
+const getRelativeTime = (createdAt: string, i18n: i18n): string => {
+    const now = Date.now();
+    const then = new Date(createdAt).getTime();
+    const diffMs = then - now;
 
-    if (diffInMinutes < 1) return 'Ahora mismo';
-    if (diffInMinutes < 60) return `Hace ${diffInMinutes} minuto${diffInMinutes > 1 ? 's' : ''}`;
+    // Crea un formateador para el idioma activo
+    const rtf = new Intl.RelativeTimeFormat(i18n.language, {
+        numeric: "auto"  // "hace 1 minuto" vs. "hace un minuto"
+    });
 
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `Hace ${diffInHours} hora${diffInHours > 1 ? 's' : ''}`;
+    const minute = 1000 * 60;
+    const hour = minute * 60;
+    const day = hour * 24;
+    const week = day * 7;
 
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `Hace ${diffInDays} día${diffInDays > 1 ? 's' : ''}`;
-
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    return `Hace ${diffInWeeks} semana${diffInWeeks > 1 ? 's' : ''}`;
-}
+    if (Math.abs(diffMs) < minute) {
+        return rtf.format(0, "minute");        // “ahora” o “just now”
+    }
+    if (Math.abs(diffMs) < hour) {
+        const minutes = Math.round(diffMs / minute);
+        return rtf.format(minutes, "minute");  // e.g. “hace 5 minutos” / “5 minutes ago”
+    }
+    if (Math.abs(diffMs) < day) {
+        const hours = Math.round(diffMs / hour);
+        return rtf.format(hours, "hour");      // e.g. “hace 2 horas” / “2 hours ago”
+    }
+    if (Math.abs(diffMs) < week) {
+        const days = Math.round(diffMs / day);
+        return rtf.format(days, "day");        // ...
+    }
+    const weeks = Math.round(diffMs / week);
+    return rtf.format(weeks, "week");
+};
 
 export default {
     getAllNotifications,

@@ -13,6 +13,7 @@ import { useCallback, useState } from "react"
 import { Skill } from "../types/skillTypes"
 import { Modal } from "./Modal"
 import Chat from "./Chat"
+import { toastEasy } from "./hooks/toastEasy"
 
 
 export default function CardMatches({ user }: UserMatched) {
@@ -25,7 +26,7 @@ export default function CardMatches({ user }: UserMatched) {
         try {
             return t(`skills.${skill.category}.${skill.id}`);
         } catch (error) {
-            console.error(`Translation not found for skill: ${skill.category}.${skill.id}`);
+            toastEasy('error')
             return skill.id;
         }
     }, [t]);

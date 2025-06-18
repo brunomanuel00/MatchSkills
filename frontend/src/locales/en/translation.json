@@ -199,12 +199,13 @@
             "new_match": "New match",
             "new_message": "New message"
         },
-        "matchDetails": "{{count}} new match{{count === 1 ? '' : 'es'}}",
+        "matchDetails": "{{count}} new/es",
+        "new_match": "You have {{count}} new match/es!",
         "delete": {
             "confirm": {
                 "title": "Confirm deletion",
                 "messageAll": "Are you sure you want to delete all notifications? This action cannot be undone.",
-                "messageSelected": "Are you sure you want to delete {{count}} notification{{count === 1 ? '' : 's'}}? This action cannot be undone."
+                "messageSelected": "Are you sure you want to delete {{count}} notification/s? This action cannot be undone."
             }
         },
         "errors": {

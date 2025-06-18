@@ -82,7 +82,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setTotalPages(Number(response.pagination.totalPages));
 
         } catch (error) {
-            console.error('Error loading users:', error);
+            toastEasy('error')
             toastEasy("error", t("errorMessages.loadingUsers"));
             setTotalUsers(0); // Resetear a 0 en caso de error
         } finally {
@@ -131,7 +131,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (axios.isAxiosError(error)) {
                 errorMessage = error.response?.data?.error || errorMessage;
             }
-            console.error('Delete error:', error);
             toastEasy("error", `${errorMessage}`);
         } finally {
             setLoading(false);
@@ -148,7 +147,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUserToEdit(userData);
 
         } catch (error) {
-            console.error(error)
             toastEasy("error", t("errorMessages.fetchingUser"));
         } finally {
             setLoadingUser(false);

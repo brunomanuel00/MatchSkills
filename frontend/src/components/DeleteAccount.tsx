@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import userService from "../services/userService";
 import { useNavigate } from "react-router-dom";
 import { useUsers } from "./context/UserContext";
+import { toastEasy } from "./hooks/toastEasy";
 interface DeleteAccount {
     t: TFunction<"translation", undefined>;
     id: string
@@ -23,7 +24,7 @@ export default function DeleteAccount({ t, id, showText }: DeleteAccount) {
             refreshUsers()
             navigate(0)
         } catch (error) {
-            console.error("Failed to delete account", error);
+            toastEasy('error')
         }
     }, [])
 

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { MatchedUser } from "../../types/matchTypes";
 import matchService from "../../services/matchService";
+import { useNotifications } from "../hooks/useNotifications";
 
 interface MatchContextType {
     matches: MatchedUser[] | undefined;
@@ -23,6 +24,7 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [bestMatches, setBestMatches] = useState<MatchedUser[] | undefined>(undefined);
+    const { refresh } = useNotifications()
 
     // Referencias para control de estado
     const lastServerUpdateRef = useRef<string | null>(null);
@@ -33,7 +35,6 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchMatches = useCallback(async (force: boolean = false) => {
         // Prevenir múltiples ejecuciones simultáneas
         if (isCalculatingRef.current && !force) {
-            console.log('🔄 Ya hay un cálculo en progreso, saltando...');
             return;
         }
 
@@ -45,14 +46,6 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
             const serverLastUpdate = updateInfo.lastUpdated;
             const serverMatchCount = updateInfo.matchCount || 0;
 
-            console.log('📊 Estado actual:', {
-                serverLastUpdate,
-                serverMatchCount,
-                lastServerUpdate: lastServerUpdateRef.current,
-                lastMatchCount: lastMatchCountRef.current,
-                isInitialLoad: isInitialLoadRef.current
-            });
-
             // Condiciones para actualizar
             const needsUpdate = force ||
                 isInitialLoadRef.current ||
@@ -62,20 +55,11 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
                 serverMatchCount !== lastMatchCountRef.current;
 
             if (needsUpdate) {
-                console.log('📡 Actualizando matches - Razón:', {
-                    force,
-                    isInitialLoad: isInitialLoadRef.current,
-                    noMatches: !updateInfo.hasMatches,
-                    noServerUpdate: !serverLastUpdate,
-                    differentUpdate: serverLastUpdate !== lastServerUpdateRef.current,
-                    differentCount: serverMatchCount !== lastMatchCountRef.current
-                });
 
                 isCalculatingRef.current = true;
 
                 // 2. Calcular matches
                 const calculateResult = await matchService.createMatches();
-                console.log('🎯 Resultado del cálculo:', calculateResult);
 
                 // 3. Obtener matches actualizados
                 const data = await matchService.getMatches();
@@ -89,16 +73,12 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
                 lastMatchCountRef.current = matchesArray.length;
                 isInitialLoadRef.current = false;
 
-                console.log(`✅ Matches cargados: ${matchesArray.length} (${calculateResult.newMatchesCount || 0} nuevos)`);
-
                 // 5. Mostrar notificación si hay nuevos matches
                 if (calculateResult.hasNewNotifications) {
-                    console.log(`🔔 ${calculateResult.newMatchesCount} nuevos matches encontrados`);
-                    // Aquí puedes agregar lógica adicional para mostrar notificaciones en UI
+                    refresh()
                 }
 
             } else {
-                console.log('✅ Datos actualizados - usando cache');
 
                 // Solo obtener matches si no los tenemos
                 if (!matches || matches.length === 0) {
@@ -110,7 +90,6 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
             }
 
         } catch (err: any) {
-            console.error('Error in fetchMatches:', err);
             setError(err.response?.data?.error || "Error al cargar los matches");
         } finally {
             setLoading(false);
@@ -120,7 +99,6 @@ export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Función manual de refetch
     const manualRefetch = useCallback(() => {
-        console.log('🔄 Refetch manual iniciado');
         setLoading(true);
         fetchMatches(true); // Forzar actualización
     }, [fetchMatches]);

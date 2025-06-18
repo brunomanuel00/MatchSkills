@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useNotifications } from "../components/hooks/useNotifications"
 import { Spinner } from "../components/ui/spinner"
 import { Checkbox } from "../components/ui/checkbox"
-import { Bell, CheckSquare, Square, Trash2 } from "lucide-react"
+import { Bell, CheckSquare, Clock, Square, Trash2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export default function NotificationsPage() {
@@ -12,8 +12,11 @@ export default function NotificationsPage() {
         selectedNotifications,
         markNotificationsAsRead,
         deleteAllNotifications,
+        deleteNotifications,
         handleSelectedToggle,
-        handleSelectAllNot
+        handleSelectAllNot,
+        getRelativeTime,
+        formatMessage
     } = useNotifications()
     const { t } = useTranslation()
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -24,6 +27,17 @@ export default function NotificationsPage() {
         setShowDeleteConfirm(true)
     }
 
+    const executeDelete = async () => {
+
+        if (deleteType === 'all') {
+            await deleteAllNotifications()
+            setShowDeleteConfirm(false)
+        } else {
+            await deleteNotifications()
+            setShowDeleteConfirm(false)
+        }
+
+    }
 
     if (loading) {
         return (
@@ -90,39 +104,80 @@ export default function NotificationsPage() {
                                     </>
                                 )}
                             </div>
-                            <button
-                                onClick={() => confirmDelete('all')}
-                                className="flex items-center gap-2 px-3 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
-                            >
-                                <Trash2 className="h-4 w-4" />
-                                {t('notifications.actions.deleteAll')}
-                            </button>
-                        </div>
-                        <div>
+                            <div className="flex gap-2">
+                                {selectedNotifications.length > 0 && (
+                                    <button
+                                        onClick={() => confirmDelete('selected')}
+                                        className="flex items-center gap-2 px-3 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                        {t('notifications.actions.deleteSelected')}
+                                    </button>
+                                )}
 
+                                <button
+                                    onClick={() => confirmDelete('all')}
+                                    className="flex items-center gap-2 px-3 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                    {t('notifications.actions.deleteAll')}
+                                </button>
+
+                            </div>
                         </div>
+
 
                     </div>
-                    <div className=" bg-white dark:bg-gray-800 rounded-b-lg shadow-lg">
-                        <ul className="divide-y divide-gray-200 dark:divide-gray-700" >
-                            {notifications.map(not => (
-                                <li key={not.id} className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${!not.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                                    }`}>
-                                    <div className="flex mx-1 items-center justify-start h-full">
+                    <div className="bg-white pb-2 dark:bg-gray-800 rounded-b-lg shadow-lg">
+                        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+                            {notifications.map((notification) => (
+                                <li
+                                    key={notification.id}
+                                    className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${!notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                                        }`}
+                                >
+                                    <div className="flex items-start gap-4">
                                         <Checkbox
-                                            checked={selectedNotifications.includes(not.id)}
-                                            onCheckedChange={() => handleSelectedToggle(not.id)}
-                                            className="mx-4"
+                                            checked={selectedNotifications.includes(notification.id)}
+                                            onCheckedChange={() => handleSelectedToggle(notification.id)}
+                                            className="mt-1"
                                         />
-                                        <span className="text-lg">{not.data.message}</span>
-                                    </div>
-                                    <div className=" ml-4 mt-2">
-                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${not.type === 'new_match'
-                                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                                            }`}>
-                                            {t(`notifications.types.${not.type}`)}
-                                        </span>
+
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <p className={`text-sm ${!notification.read ? 'font-semibold' : ''} text-gray-900 dark:text-white`}>
+                                                        {formatMessage(notification)}
+                                                    </p>
+
+                                                    {notification.type === 'new_match' && notification.data.newMatchesCount && (
+                                                        <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                                            {t('notifications.matchDetails', {
+                                                                count: notification.data.newMatchesCount
+                                                            })}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 ml-4">
+                                                    <Clock className="h-3 w-3" />
+                                                    <span>{getRelativeTime(notification.createdAt)}</span>
+                                                    {!notification.read && (
+                                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Tipo de notificación */}
+                                            <div className="mt-2">
+                                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${notification.type === 'new_match'
+                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                                                    }`}>
+                                                    {t(`notifications.types.${notification.type}`)}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </li>
                             ))}
@@ -151,7 +206,7 @@ export default function NotificationsPage() {
                                         {t('common.cancel')}
                                     </button>
                                     <button
-                                        // onClick={executeDelete}
+                                        onClick={executeDelete}
                                         className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
                                     >
                                         {t('common.delete')}

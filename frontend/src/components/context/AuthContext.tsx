@@ -79,34 +79,3 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         </AuthContext.Provider>
     );
 };
-
-
-// console.log(userData)
-// setUser({
-//     avatar: {
-//         public_id: "default_avatar",
-//         url: "https://res.cloudinary.com/decnbbgn8/image/upload/v1743115286/default_avatars.svg_lszftj.png"
-//     },
-//     email: "fer@gmail.com",
-//     id: "67ef57d15c81926e025f9e26",
-//     lookingFor: [
-//         { id: 'yoga', category: 'others' },
-//         { id: 'medicine', category: 'sciences' },
-//         { id: 'go', category: 'technology' }
-//     ],
-//     name: "Fernando Padilla",
-//     rol: "admin",
-//     skills
-//         : [
-//             { id: 'ts', category: 'technology' },
-//             { id: 'py', category: 'technology' },
-//             { id: 'java', category: 'technology' },
-//             { id: 'csharp', category: 'technology' },
-//             { id: 'meditation', category: 'others' },
-//             { id: 'swift', category: 'technology' },
-//             { id: 'biology', category: 'sciences' },
-//             { id: 'php', category: 'technology' },
-//             { id: 'react', category: 'technology' },
-//             { id: 'angular', category: 'technology' },
-//             { id: 'ruby', category: 'technology' }]
-// })
