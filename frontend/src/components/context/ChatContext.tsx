@@ -360,19 +360,65 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     }, [socket, activeChat, user, typingTimeout]);
 
     const handleDeleteMessage = useCallback(async (messageId: string | null) => {
-        if (messageId) {
+        if (!messageId) return
+
+        try {
             const messageDelete = await messagesService.deleteMessage(messageId)
             console.warn("Result of delete message: ", messageDelete)
 
+
+            const messsageslenght = messages.length
+
+            setMessages(prev => prev.filter(msg => msg.id !== messageId))
+
+            if (messsageslenght === 1) {
+                await loadChats()
+                setActiveChat(null)
+            }
+
+        } catch (error) {
+            console.error("❌ Error deleting message:", error);
+
+            // Rollback: reload messages if an error occurs
+            if (activeChat) {
+                loadMessages();
+            }
+
         }
 
-    }, [])
+    }, [loadChats, activeChat, loadMessages])
 
     const handleDeleteChat = useCallback(async (otherUserId: string | null) => {
-        if (otherUserId) {
+        if (!otherUserId) return
+
+        try {
+
             const chatDelete = await messagesService.deleteChat(otherUserId)
             console.warn("Result of delete message: ", chatDelete)
+
+            setChats(prev => {
+                const updatedChats = prev.filter(c => c.user._id !== otherUserId)
+                const countUnread = updatedChats.reduce((acc, curr) => acc + curr.unreadCount, 0);
+                setUnReadTotal(countUnread);
+
+                return updatedChats;
+            })
+
+            if (activeChat === otherUserId) {
+                setActiveChat(null);
+                setMessages([]);
+            }
+
+        } catch (error) {
+
+            console.error("❌ Error deleting chat:", error);
+
+            // Rollback: reload chat if there is an error 
+            await loadChats();
+
         }
+
+
     }, [])
 
     return (

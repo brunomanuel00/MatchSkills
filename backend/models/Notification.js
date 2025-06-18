@@ -8,4 +8,27 @@ const notificationSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+// 1) Virtual para "id"
+notificationSchema.virtual('id').get(function () {
+    return this._id.toHexString();
+});
+
+// 2) Configurar transformación
+notificationSchema.set('toJSON', {
+    virtuals: true,           // Incluir el campo virtual "id"
+    versionKey: false,        // Quitar "__v"
+    transform: (doc, ret) => {
+        // ret es el objeto que se va a serializar
+        // Reemplazamos ret.user por solo nombre y email:
+        if (ret.user && typeof ret.user === 'object') {
+            ret.user = {
+                name: ret.user.name,
+                email: ret.user.email
+            };
+        }
+        // Eliminamos _id
+        delete ret._id;
+    }
+});
+
 module.exports = mongoose.model('Notification', notificationSchema);

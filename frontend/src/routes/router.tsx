@@ -12,6 +12,7 @@ import { MatchProvider } from "../components/context/MatchContext";
 import NotFound from "../pages/NotFount";
 import ChatPage from "../pages/ChatPage";
 import { UserProvider } from "../components/context/UserContext";
+import NotificationsPage from "../pages/NotificationsPage";
 
 const router = createBrowserRouter([
     {
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
             {
                 path: '/chat',
                 element: <ChatPage />
+            },
+            {
+                path: '/notifications',
+                element: <NotificationsPage />
             },
         ]
     },

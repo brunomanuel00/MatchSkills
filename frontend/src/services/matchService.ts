@@ -10,8 +10,13 @@ const getMatches = async () => {
     const response = await axios.get(baseUrl, { withCredentials: true })
     return response.data
 }
+const getLastUpdate = async () => {
+    const response = await axios.get(`${baseUrl}/last-update`, { withCredentials: true })
+    return response.data
+}
 
 export default {
     createMatches,
-    getMatches
+    getMatches,
+    getLastUpdate
 }

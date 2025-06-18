@@ -113,10 +113,12 @@ export default function ChatPage() {
                                                     initial={{ opacity: 0, y: -10 }}
                                                     animate={{ opacity: 1, y: 5 }}
                                                     exit={{ opacity: 0, y: -10 }}
-                                                    className="absolute right-0 mt-2 w-32 text-center hover:bg-slate-300 p-2 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
+                                                    className="absolute right-5 -top-6 mt-2 w-32 text-center hover:bg-slate-300 p-2 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
                                                 >
                                                     <button
-                                                        onClick={() => {
+                                                        className='w-full h-full'
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
                                                             setIsDeleteChatOpen(true)
                                                         }}
                                                     >

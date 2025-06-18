@@ -10,7 +10,8 @@ const matchSchema = new mongoose.Schema({
                 category: { type: String, required: true }
             }]
         }
-    ]
+    ],
+    lastUpdated: { type: Date, default: Date.now }
 });
 
 matchSchema.set('toJSON', {

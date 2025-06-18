@@ -6,6 +6,7 @@ const authRoutes = require('./controllers/auth')
 const userRoutes = require('./controllers/user')
 const matchRoutes = require('./controllers/match')
 const messageRoutes = require('./controllers/message');
+const notificationsRoutes = require('./controllers/notification')
 const cookieParser = require('cookie-parser');
 const middleware = require('./utils/middleware')
 const config = require('./utils/config')
@@ -16,7 +17,7 @@ mongoose.set('strictQuery', false)
 
 const url = config.MONGODB_URI
 
-logger.info(url)
+logger.info("🚥 Connecting to MongoDB")
 
 mongoose.connect(url)
     .then(_result => {
@@ -49,8 +50,8 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser());
 app.use(middleware.morganMiddleware)
-// app.use(middleware.userExtractor)
 app.use('/api/auth', authRoutes)
+app.use('/api/notifications', notificationsRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/matches', matchRoutes)
 app.use('/api/messages', messageRoutes);

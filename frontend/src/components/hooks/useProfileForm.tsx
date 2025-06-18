@@ -24,6 +24,7 @@ export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions 
     // 1. Estados iniciales memoizados
     const initialUserState = useMemo(() => ({
         ...baseUser,
+        id: baseUser.id,
         avatar: baseUser.avatar || DEFAULT_AVATAR,
         skills: baseUser.skills ? [...baseUser.skills] : [],
         lookingFor: baseUser.lookingFor ? [...baseUser.lookingFor] : []
@@ -93,11 +94,17 @@ export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions 
     // 4. Handlers
 
     const handleSkillsChange = useCallback((newSkills: SelectedSkills) => {
-        setUserEdit(prev => ({
-            ...prev!,
-            skills: newSkills.mySkills,
-            lookingFor: newSkills.desiredSkills
-        }));
+        setUserEdit(prev => {
+            if (!prev) {
+                console.error('Previous user state is null/undefined');
+                return prev;
+            }
+            return {
+                ...prev,
+                skills: newSkills.mySkills,
+                lookingFor: newSkills.desiredSkills
+            };
+        });
         setSkills(newSkills);
     }, []);
 
@@ -127,6 +134,13 @@ export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions 
 
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!userEdit || !userEdit.id) {
+            console.error('User edit state is invalid:', userEdit);
+            toastEasy("error", "Error: Usuario no válido");
+            return;
+        }
+
         if (passwords.newPassword && passwords.newPassword.length < 8) {
             return toastEasy("error", t("validation.passwordLength"));
         }
@@ -162,6 +176,7 @@ export function useProfileForm({ externalUser, onClose }: UseProfileFormOptions 
             // reset
             const newInitialState = {
                 ...updated,
+                id: updated.id || userEdit.id,
                 avatar: updated.avatar || DEFAULT_AVATAR,
                 skills: updated.skills ? [...updated.skills] : [],
                 lookingFor: updated.lookingFor ? [...updated.lookingFor] : [],

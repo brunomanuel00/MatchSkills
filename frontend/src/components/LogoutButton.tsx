@@ -1,30 +1,21 @@
 import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
-import { useAuth } from "./context/AuthContext";
 import { useTranslation } from "react-i18next"
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useLogOut } from "./hooks/useLogOut";
+
 
 export default function LogoutButton() {
-    const { logout } = useAuth();
-    const { t } = useTranslation()
-    const navigate = useNavigate()
 
-    const handleLogout = async () => {
-        try {
-            await logout();
-            navigate('/')
-        } catch (error) {
-            console.error("Error al cerrar sesión:", error);
-        }
-    };
+    const { t } = useTranslation()
+    const handleLogOut = useLogOut()
 
     return (
         <Button
             title={t('session.close')}
             variant="ghost"
-            onClick={handleLogout}
-            className="flex items-center gap-2 hover:bg-white dark:hover:bg-neutral-800"
+            onClick={handleLogOut}
+            className="flex items-center gap-2 hover:bg-white-200 dark:hover:bg-neutral-800"
         >
             <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}

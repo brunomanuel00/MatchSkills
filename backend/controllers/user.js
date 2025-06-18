@@ -5,6 +5,7 @@ const { userExtractor } = require('../utils/middleware')
 const { upload, handleMulterError, handleAvatarUpload } = require('./cloudinary')
 const Match = require('../models/Match')
 const { handleUserMessageDeletion } = require('../utils/utils')
+const fetch = require('node-fetch')
 
 userRouter.get('/', userExtractor, async (req, res) => {
     try {
@@ -315,7 +316,7 @@ userRouter.patch("/:id", userExtractor, upload.single('avatar'), handleMulterErr
 
     response.json(userResponse);
     if (updateData.lookingFor !== undefined) {
-        fetch('http://localhost:3001/api/matches/calculate', {
+        fetch('https://localhost:3001/api/matches/calculate', {
             method: 'POST',
             headers: {
                 'Cookie': `token=${request.cookies.token}`

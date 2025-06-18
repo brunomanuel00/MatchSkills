@@ -223,9 +223,11 @@ export default function ChatDetail() {
                                                 exit={{ opacity: 0, y: -10 }}
                                                 className="absolute right-0 mt-2 w-32 text-center hover:bg-slate-300 p-2 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
                                             >
-                                                <button onClick={() => {
-                                                    setIsDeleteMessageModalOpen(true)
-                                                }}>
+                                                <button
+                                                    className='w-full h-full'
+                                                    onClick={() => {
+                                                        setIsDeleteMessageModalOpen(true)
+                                                    }}>
                                                     {t('table.delete')}
                                                 </button>
                                             </motion.div>

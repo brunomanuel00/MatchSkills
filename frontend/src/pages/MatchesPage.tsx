@@ -1,14 +1,10 @@
-import { useEffect } from "react";
 import { useMatch } from "../components/context/MatchContext"
 import { Spinner } from "../components/ui/spinner"
 import CardMatches from "../components/CardMatches";
 
 export default function MatchesPage() {
-    const { loading, refetch, matches } = useMatch()
+    const { loading, matches } = useMatch()
 
-    useEffect(() => {
-        refetch();
-    }, []);
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-tea_green-500 to-light_green-300 dark:from-lapis_lazuli-500 dark:to-verdigris-700">

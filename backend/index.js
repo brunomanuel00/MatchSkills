@@ -17,12 +17,11 @@ const server = https.createServer({ key, cert }, app)
 
 const io = new Server(server, {
     cors: {
-        origin: ['https://localhost:5173'], // usa https en local también
+        origin: ['https://localhost:5173'],
         methods: ['GET', 'POST'],
         credentials: true,
     },
 })
-
 
 app.set('io', io);
 app.set('connectedUsers', connectedUsers);
@@ -123,28 +122,6 @@ io.on('connection', (socket) => {
     socket.on("stopTyping", ({ to }) => {
         socket.to(to).emit("stopTyping", { from: socket.userId });
     });
-
-
-
-    // Mensaje grupal
-    // socket.on('group_message', ({ groupId, message }) => {
-    //     io.to(groupId).emit('group_message', message);
-    // });
-
-    // // Unirse a grupo
-    // socket.on('join_group', (groupId) => {
-    //     socket.join(groupId);
-    //     console.log(`📢 Socket ${socket.id} unido al grupo ${groupId}`);
-    // });
-
-    // // Notificación individual
-    // socket.on('notify', ({ userId, notification }) => {
-    //     const socketId = connectedUsers.get(userId);
-    //     if (socketId) {
-    //         io.to(socketId).emit('notify', notification);
-    //     }
-    // });
-
 
 
     // Desconexión

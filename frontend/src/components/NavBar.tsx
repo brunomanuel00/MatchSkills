@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Waypoints, User, LayoutDashboard, Plus, Users, SunMoon, LogOut, Bell, MessageSquare } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Menu, X, Home, Waypoints, User, LayoutDashboard, Bell, MessageSquare } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { LanguageToggle } from './language-toggle';
 import { ThemeToggle } from './theme-toggle';
 import logo from '../assets/match de habilidades.jpg';
@@ -10,6 +10,8 @@ import LogoutButton from './LogoutButton';
 import { useAuth } from './context/AuthContext';
 import { useTheme } from './context/theme-context';
 import { useChat } from './context/ChatContext';
+import { useLogOut } from './hooks/useLogOut';
+import { useNotifications } from './hooks/useNotifications';
 
 interface NavItem {
     translationKey: string;
@@ -37,6 +39,8 @@ export const Navbar = () => {
     const { user } = useAuth();
     const { unReadTotal } = useChat();
     const { toggleTheme } = useTheme();
+    const handleLogOut = useLogOut()
+    const { recentNotifications, hasUnreadNotifications } = useNotifications();
 
     // Refs para manejar clicks fuera de los menús
     const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -124,9 +128,9 @@ export const Navbar = () => {
 
     // Simular notificaciones
     useEffect(() => {
-        // setHasNotifications(true);
+        (hasUnreadNotifications) ? setHasNotifications(true) : setHasNotifications(false)
 
-    }, []);
+    }, [hasUnreadNotifications]);
 
     return (
         <>
@@ -212,10 +216,28 @@ export const Navbar = () => {
                                     }}
                                     className="p-2 rounded-lg text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 relative"
                                 >
-                                    <Bell className="h-5 w-5" />
-                                    {hasNotifications && (
-                                        <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
-                                    )}
+                                    <motion.div
+                                        animate={hasNotifications ? {
+                                            rotate: [0, -15, 15, -15, 15, 0],
+                                            transition: {
+                                                duration: 0.5,
+                                                repeat: 2
+                                            }
+                                        } : {}}
+                                    >
+                                        <Bell className="h-5 w-5" />
+                                    </motion.div>
+                                    <AnimatePresence>
+                                        {hasNotifications && (
+                                            <motion.span
+                                                className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                exit={{ scale: 0 }}
+                                                transition={{ type: "spring", stiffness: 500 }}
+                                            />
+                                        )}
+                                    </AnimatePresence>
                                 </button>
 
                                 {notificationsOpen && (
@@ -225,29 +247,39 @@ export const Navbar = () => {
                                         exit={{ opacity: 0, y: -10 }}
                                         className="absolute right-0 mt-2 w-72 bg-white dark:bg-lapis_lazuli-500 rounded-md shadow-lg py-1 z-50"
                                     >
-                                        <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-600">
+                                        <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-400">
                                             <h3 className="font-medium text-gray-900 dark:text-white">{t('logged.notifications')}</h3>
                                         </div>
-                                        <div className="max-h-60 overflow-y-auto">
-                                            <div className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer">
-                                                <div className="flex items-start">
-                                                    <div className="ml-3 flex-1">
-                                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                                            {t('logged.new_team_request')}
-                                                        </p>
-                                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                            {t('logged.user_wants_to_join')}
-                                                        </p>
-                                                        <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
-                                                            {t('logged.hours_ago', { count: 2 })}
-                                                        </p>
+                                        {recentNotifications.length === 0 ?
+                                            <div className='flex flex-col p-3 items-center justify-center'>
+                                                <h3 className='font-semibold'>{t('notifications.empty.title')}</h3>
+                                            </div>
+                                            : recentNotifications.map(item => (
+                                                <div>
+                                                    <div className="max-h-60 overflow-y-auto">
+                                                        <div className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-lapis_lazuli-300 cursor-pointer">
+                                                            <div className="flex items-start">
+                                                                <div className="ml-3 flex-1">
+                                                                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                                        {item?.data?.message}
+                                                                    </p>
+                                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                                        {t('logged.user_wants_to_join')}
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
+                                                                        {t('logged.hours_ago', { count: 2 })}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
+
+                                            ))}
+
                                         <Link
                                             to="/notifications"
-                                            className="block px-4 py-2 text-sm text-center text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 border-t border-gray-200 dark:border-gray-600"
+                                            className="block px-4 py-2 text-sm text-center text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-lapis_lazuli-300 border-t border-gray-200 dark:border-gray-400"
                                             onClick={() => setNotificationsOpen(false)}
                                         >
                                             {t('logged.view-all')}
@@ -291,7 +323,7 @@ export const Navbar = () => {
                                                 <ThemeToggle />
                                             </div>
                                         </div>
-                                        <div className="px-4 py-2 flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer">
+                                        <div onClick={handleLogOut} className="px-4 py-2 flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer">
                                             <span>{t('session.close')}</span>
                                             <div className="ml-auto">
                                                 <LogoutButton />
@@ -307,6 +339,17 @@ export const Navbar = () => {
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         >
                             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                            <AnimatePresence>
+                                {hasNotifications && !mobileMenuOpen && (
+                                    <motion.span
+                                        className="absolute top-4 right-4 h-2 w-2 rounded-full bg-red-500"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        exit={{ scale: 0 }}
+                                        transition={{ type: "spring", stiffness: 500 }}
+                                    />
+                                )}
+                            </AnimatePresence>
                         </button>
                     </div>
                 </div>
@@ -363,10 +406,22 @@ export const Navbar = () => {
                                 <Link
                                     to="/notifications"
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    className=" relative flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                 >
                                     <Bell className="h-5 w-5" />
                                     <span>{t('logged.view-all')}</span>
+                                    <AnimatePresence>
+                                        {hasNotifications && (
+                                            <motion.span
+                                                className="absolute top-1 left-28 h-2 w-2 rounded-full bg-red-500"
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                exit={{ scale: 0 }}
+                                                transition={{ type: "spring", stiffness: 500 }}
+                                            />
+                                        )}
+                                    </AnimatePresence>
+
                                 </Link>
                             </div>
 

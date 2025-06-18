@@ -181,6 +181,41 @@
             "description": "Trabaja en conjunto para desarrollar ideas y llevar tus proyectos al siguiente nivel."
         }
     },
+    "notifications": {
+        "title": "Notificaciones",
+        "empty": {
+            "title": "No tienes notificaciones",
+            "description": "Cuando recibas nuevas notificaciones, aparecerán aquí."
+        },
+        "selected": "{{count}} seleccionada ",
+        "actions": {
+            "selectAll": "Seleccionar todo",
+            "deselectAll": "Deseleccionar todo",
+            "markSelectedAsRead": "Marcar como leídas",
+            "deleteSelected": "Eliminar seleccionadas",
+            "deleteAll": "Eliminar todas"
+        },
+        "types": {
+            "new_match": "Nuevo match",
+            "new_message": "Nuevo mensaje"
+        },
+        "matchDetails": "{{count}} nuevo{{count === 1 ? '' : 's'}} match{{count === 1 ? '' : 'es'}}",
+        "delete": {
+            "confirm": {
+                "title": "Confirmar eliminación",
+                "messageAll": "¿Estás seguro de que quieres eliminar todas las notificaciones? Esta acción no se puede deshacer.",
+                "messageSelected": "¿Estás seguro de que quieres eliminar {{count}} notificación{{count === 1 ? '' : 'es'}}? Esta acción no se puede deshacer."
+            }
+        },
+        "errors": {
+            "loading": "Error al cargar las notificaciones",
+            "loading-recent": "Error al cargar notificaciones recientes"
+        }
+    },
+    "common": {
+        "cancel": "Cancelar",
+        "delete": "Eliminar"
+    },
     "skills": {
         "categories": {
             "technology": "Tecnología",
