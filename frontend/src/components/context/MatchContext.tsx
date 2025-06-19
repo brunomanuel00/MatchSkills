@@ -20,7 +20,7 @@ export const useMatch = () => {
 };
 
 export const MatchProvider = ({ children }: { children: React.ReactNode }) => {
-    const [matches, setMatches] = useState<MatchedUser[] | undefined>([]);
+    const [matches, setMatches] = useState<MatchedUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [bestMatches, setBestMatches] = useState<MatchedUser[] | undefined>(undefined);

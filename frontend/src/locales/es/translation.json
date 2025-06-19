@@ -158,7 +158,12 @@
     "matches": {
         "skills-found": "Habilidades",
         "view-skills": "Ver coincidencias",
-        "chat": "Chat"
+        "chat": "Chat",
+        "title": "Tus matches",
+        "empty": {
+            "title": "No tienes coincidencias",
+            "description": "Cuando tengas coincidencias, aparecerán aquí."
+        }
     },
     "chat": {
         "typing": "escribiendo...",

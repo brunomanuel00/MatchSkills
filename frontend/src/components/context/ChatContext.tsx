@@ -18,7 +18,7 @@ type ChatContextType = {
     loadChats: () => void
     handleTypingInput: (input: string) => void;
     handleDeleteMessage: (messageId: string | null) => void;
-    handleDeleteChat: (otherUserId: string | null) => void;
+    handleDeleteChat: (otherUserId: string) => void;
 };
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -380,12 +380,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
     }, [loadChats, activeChat, loadMessages])
 
-    const handleDeleteChat = useCallback(async (otherUserId: string | null) => {
+    const handleDeleteChat = useCallback(async (otherUserId: string) => {
         if (!otherUserId) return
 
         try {
-
-            await messagesService.deleteChat(otherUserId)
+            const data = await messagesService.deleteChat(otherUserId)
+            console.log(data)
 
             setChats(prev => {
                 const updatedChats = prev.filter(c => c.user._id !== otherUserId)
@@ -399,6 +399,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
                 setActiveChat(null);
                 setMessages([]);
             }
+            await loadChats()
 
         } catch (error) {
 

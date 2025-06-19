@@ -158,7 +158,12 @@
     "matches": {
         "skills-found": "Skills",
         "view-skills": "See matches",
-        "chat": "Chat"
+        "chat": "Chat",
+        "title": "Your matches",
+        "empty": {
+            "title": "You have no matches",
+            "description": "When you have matches, they will appear here."
+        }
     },
     "chat": {
         "typing": "typing...",

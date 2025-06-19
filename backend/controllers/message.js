@@ -115,6 +115,15 @@ router.get('/chats/list', userExtractor, async (request, response) => {
     try {
         const userId = request.user._id;
 
+        const deletedChat = await DeletedItem.find({
+            userId,
+            itemType: 'chat'
+        }).select('itemId chatWith').lean()
+
+        const deletedChatUserIds = deletedChat.map(item =>
+            item.chatWith ? new mongoose.Types.ObjectId(item.chatWith) : new mongoose.Types.ObjectId(item.itemId)
+        );
+
         const chats = await Message.aggregate([
             {  // 1) Filter all messages SENT OR RECEIVED by this user
                 $match: {
@@ -179,6 +188,11 @@ router.get('/chats/list', userExtractor, async (request, response) => {
                             ]
                         }
                     }
+                }
+            },
+            {
+                $match: {
+                    _id: { $nin: deletedChatUserIds }
                 }
             },
             {
@@ -320,7 +334,18 @@ router.delete('/:messageId', userExtractor, async (request, response) => {
     const messageId = new mongoose.Types.ObjectId(request.params.messageId)
 
 
-    const msg = await Message.find(messageId).lean()
+    if (!mongoose.Types.ObjectId.isValid(messageId)) {
+        return response.status(400).json({ error: 'Invalid message ID' });
+    }
+
+    const messageObjectId = new mongoose.Types.ObjectId(messageId);
+
+    // Find the message first
+    const msg = await Message.findById(messageObjectId).lean();
+
+    if (!msg) {
+        return response.status(404).json({ error: 'Message not found' });
+    }
 
     // 1) Create deletion record for this user
     await DeletedItem.create({
@@ -346,44 +371,70 @@ router.delete('/:messageId', userExtractor, async (request, response) => {
     response.json({ success: true })
 })
 
-router.delete('/chat/:otherUsedId', userExtractor, async (request, response) => {
-    const userId = request.user.id
-    const otherUserId = request.params.otherUsedId
+router.delete('/chat/:otherUserId', userExtractor, async (request, response) => {
+    try {
+        const userId = request.user.id
+        const otherUserId = request.params.otherUserId // ✅ Corregido el nombre
 
-    // 1)Log of chat deletion by this user
-    await DeletedItem.create({
-        userId,
-        itemType: 'chat',
-        itemId: otherUserId,
-        chatWith: otherUserId
-    })
+        // Validar que el otherUserId sea válido
+        if (!mongoose.Types.ObjectId.isValid(otherUserId)) {
+            return response.status(400).json({ error: 'Invalid user ID' });
+        }
 
-    // 2)The other user already deleted it
-    const also = await DeletedItem.findOne({
-        userId: otherUserId,
-        itemType: 'chat',
-        itemId: otherUserId
-    })
+        // Verificar que no sea el mismo usuario
+        if (userId === otherUserId) {
+            return response.status(400).json({ error: "Cannot delete chat with yourself" });
+        }
 
-    if (also) {
-        // 3) Both delete: delete all messages from the conversation
-        await Message.deleteMany({
-            $or: [
-                { senderId: userId, receiverId: otherUserId },
-                { senderId: otherUserId, receiverId: userId }
-            ]
-        })
+        console.log(`🗑️ User ${userId} deleting chat with ${otherUserId}`);
 
-        // 4) Remove the reference to the chat that has been deleted
-        await DeletedItem.deleteMany({
+        // 1) Log of chat deletion by this user
+        await DeletedItem.create({
+            userId,
             itemType: 'chat',
-            $or: [
-                { userId, itemId: otherUserId },
-                { userId: otherUserId, itemId: userId }
-            ]
+            itemId: userId, // ✅ Corregido: usar userId como itemId
+            chatWith: otherUserId
         })
+
+        // 2) Check if the other user already deleted it
+        const also = await DeletedItem.findOne({
+            userId: otherUserId,
+            itemType: 'chat',
+            itemId: otherUserId, // ✅ Corregido: usar otherUserId como itemId
+            chatWith: userId
+        })
+
+        console.log(`🔍 Other user deletion record:`, also ? 'Found' : 'Not found');
+
+        if (also) {
+            console.log(`💥 Both users deleted - removing all messages and records`);
+
+            // 3) Both deleted: delete all messages from the conversation
+            const deleteResult = await Message.deleteMany({
+                $or: [
+                    { senderId: userId, receiverId: otherUserId },
+                    { senderId: otherUserId, receiverId: userId }
+                ]
+            })
+
+            console.log(`📧 Deleted ${deleteResult.deletedCount} messages`);
+
+            // 4) Remove the chat deletion records
+            const deletedItems = await DeletedItem.deleteMany({
+                itemType: 'chat',
+                $or: [
+                    { userId, chatWith: otherUserId },
+                    { userId: otherUserId, chatWith: userId }
+                ]
+            })
+
+            console.log(`🗂️ Deleted ${deletedItems.deletedCount} deletion records`);
+        }
 
         response.json({ success: true })
+    } catch (error) {
+        console.error('❌ Error deleting chat:', error);
+        response.status(500).json({ error: 'Error deleting chat' });
     }
 })
 
