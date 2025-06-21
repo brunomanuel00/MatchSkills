@@ -136,14 +136,9 @@ export const Navbar = () => {
         <>
             <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-3xl">
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-                    <Link to="/home" className="flex items-center gap-2">
-                        <motion.img
-                            src={logo}
-                            alt="Match de Habilidades"
-                            className="h-10 w-10 rounded-full"
-                            whileHover={{ scale: 1.05 }}
-                        />
-                        <span className="font-bold text-lg md:block">{t('logged.title')}</span>
+                    <Link to="/home" className="flex items-center space-x-3">
+                        <img className="rounded-lg w-10 h-10 object-cover" src={logo || "/placeholder.svg"} alt={t("welcomePage.header.logoAlt")} />
+                        <span className="font-bold text-xl text-slate-800 dark:text-slate-200">{t("welcomePage.header.logoText")}</span>
                     </Link>
 
                     <nav className="hidden md:flex items-center gap-4"> {/* Aumenté el gap */}

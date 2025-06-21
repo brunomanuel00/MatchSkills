@@ -199,6 +199,17 @@ The React app runs on `http://localhost:5173` by default.
 ![Main Dashboard](./screenshots/principal.png)
 ![Login Page](./screenshots/login.png)
 ![Register Page](./screenshots/register.png)
+![Home Page1](./screenshots/home1.png)
+![Home Page2](./screenshots/home2.png)
+![Home Page3](./screenshots/home3.png)
+![Match Page1](./screenshots/matches1.png)
+![Match Page2](./screenshots/matches2.png)
+![Match Page3](./screenshots/matches3.png)
+![Profile Page1](./screenshots/profile1.png)
+![Profile Page2](./screenshots/profile2.png)
+![DashBoard Page](./screenshots/dashboard.png)
+![Chat Page](./screenshots/chat.png)
+![Notification Page](./screenshots/notification.png)
 
 ---
 

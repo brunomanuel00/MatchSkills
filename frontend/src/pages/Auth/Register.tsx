@@ -99,7 +99,12 @@ export function Register() {
             variants={containerVariants}
         >
             <div className="top-4 right-4 flex justify-evenly space-x-2 ">
-                <div className="absolute top-4 left-5"><Link to='/'><img className=" rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" src={logo} alt="match de habilidades" /></Link> </div>
+                <div className="absolute top-4 left-5">
+                    <Link to="/" className="flex items-center space-x-3">
+                        <img className="rounded-lg w-10 h-10 object-cover" src={logo || "/placeholder.svg"} alt={t("welcomePage.header.logoAlt")} />
+                        <span className="font-bold text-xl text-slate-800 dark:text-slate-200">{t("welcomePage.header.logoText")}</span>
+                    </Link>
+                </div>
                 <div className=" absolute  top-4 right-4">
                     <LanguageToggle />
                     <ThemeToggle />
@@ -252,7 +257,7 @@ export function Register() {
                     </div>
                 </div>
             </motion.div>
-        </motion.div>
+        </motion.div >
     )
 }
 
