@@ -127,14 +127,22 @@ Copy the `.env.example` files in both `backend/` and `frontend/` and fill the fo
 
 ```bash
 # backend/.env
-PORT=3000
+PORT=3001
 MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-# ...other keys (SSL paths, etc.)
+TEST_MONGODB_URI=your_mongodb_connection_string
 
-# frontend/.env
-VITE_API_URL=https://localhost:3000
-# ...other VITE_ keys
+SECRET = for you jwt put a string here
+
+FRONTEND_URL=https://localhost:5173
+BACKEND_URL=https://localhost:3001
+COOKIE_DOMAIN=localhost 
+
+#Save photos
+CLOUDINARY_CLOUD_NAME= your cloudinary name
+CLOUDINARY_API_KEY=your cloudinary api_key
+CLOUDINARY_API_SECRET=your cloudinary api_key
+DEFAULT_AVATAR_URL= this is for a default picture for user
+
 ```
 
 ---
