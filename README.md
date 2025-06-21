@@ -72,7 +72,6 @@ match-habilidades/
 │   └── vite.config.ts       # Vite configuration
 ├── certificate/             # Self-signed SSL certs for local HTTPS
 ├── screenshots/             # UI screenshots
-├── .env.example             # Example environment variables
 ├── .gitignore
 └── README.md                # This file
 ```
