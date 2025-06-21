@@ -1,4 +1,61 @@
 {
+    "welcomePage": {
+        "header": {
+            "logoAlt": "Skills Match",
+            "logoText": "Skills Match"
+        },
+        "hero": {
+            "tagline": "Plataforma Profesional de Colaboración",
+            "titlePart1": "Conecta con",
+            "titlePart2": "Profesionales",
+            "titlePart3": "que Complementen tus Habilidades",
+            "description": "Únete a la red profesional líder para formar equipos multidisciplinarios. Conecta con expertos verificados y lleva tus proyectos al siguiente nivel.",
+            "team": "Equipo Multidisciplinario",
+            "stats": [
+                {
+                    "number": "500+",
+                    "label": "Profesionales Activos"
+                },
+                {
+                    "number": "150+",
+                    "label": "Proyectos Completados"
+                },
+                {
+                    "number": "95%",
+                    "label": "Tasa de Éxito"
+                }
+            ],
+            "teamRoles": "Developer • Diseñador UX • Project Manager",
+            "buttons": {
+                "register": "Comenzar Ahora",
+                "login": "Iniciar Sesión"
+            }
+        },
+        "features": {
+            "title": "¿Por qué elegir Skills Match?",
+            "description": "Nuestra plataforma está diseñada para profesionales que buscan colaboraciones estratégicas y proyectos de alto impacto.",
+            "items": [
+                {
+                    "title": "Matching Preciso",
+                    "description": "Algoritmo avanzado que conecta profesionales con habilidades complementarias para maximizar el éxito del proyecto."
+                },
+                {
+                    "title": "Red Profesional",
+                    "description": "Accede a una red curada de profesionales verificados en tecnología, diseño, marketing y gestión de proyectos."
+                },
+                {
+                    "title": "Crecimiento Profesional",
+                    "description": "Desarrolla nuevas competencias colaborando con expertos en diferentes áreas y construye tu portafolio profesional."
+                }
+            ]
+        },
+        "cta": {
+            "title": "Comienza tu próximo proyecto hoy",
+            "description": "Únete a cientos de profesionales que ya están colaborando en proyectos innovadores.",
+            "button": "Crear Cuenta Profesional",
+            "footer": "Registro gratuito • Sin compromisos"
+        }
+    },
     "welcome": {
         "title": "Bienvenido a Match de Habilidades",
         "subtitle": "Conéctate con personas que complementan tus habilidades",

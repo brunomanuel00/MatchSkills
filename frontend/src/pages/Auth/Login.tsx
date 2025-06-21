@@ -12,7 +12,7 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { ThemeToggle } from "../../components/theme-toggle"
 import { LanguageToggle } from "../../components/language-toggle"
-import logo from '../../assets/Match de habilidades.jpg'
+import logo from '../../assets/logo.webp';
 import { useAuth } from '../../components/context/AuthContext';
 import { AuthCredentials } from "../../types/authTypes"
 

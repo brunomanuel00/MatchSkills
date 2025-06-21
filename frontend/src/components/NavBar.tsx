@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Waypoints, User, LayoutDashboard, Bell, MessageSquare } from 'lucide-react';
+import { Menu, X, Home, Waypoints, User, LayoutDashboard, Bell, MessageSquare, Clock } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { LanguageToggle } from './language-toggle';
 import { ThemeToggle } from './theme-toggle';
-import logo from '../assets/match de habilidades.jpg';
+import logo from '../assets/logo.webp';
 import { useTranslation } from "react-i18next";
 import LogoutButton from './LogoutButton';
 import { useAuth } from './context/AuthContext';
@@ -40,7 +40,7 @@ export const Navbar = () => {
     const { unReadTotal } = useChat();
     const { toggleTheme } = useTheme();
     const handleLogOut = useLogOut()
-    const { recentNotifications, hasUnreadNotifications } = useNotifications();
+    const { recentNotifications, hasUnreadNotifications, getRelativeTime, formatMessage } = useNotifications();
 
     // Refs para manejar clicks fuera de los menús
     const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -261,14 +261,15 @@ export const Navbar = () => {
                                                             <div className="flex items-start">
                                                                 <div className="ml-3 flex-1">
                                                                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                                                        {item?.data?.message}
+                                                                        {formatMessage(item)}
                                                                     </p>
-                                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                                        {t('logged.user_wants_to_join')}
-                                                                    </p>
-                                                                    <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
-                                                                        {t('logged.hours_ago', { count: 2 })}
-                                                                    </p>
+                                                                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                        <Clock className="h-3 w-3" />
+                                                                        <span>{getRelativeTime(item.createdAt)}</span>
+                                                                        {!item.read && (
+                                                                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>

@@ -1,6 +1,63 @@
 {
+    "welcomePage": {
+        "header": {
+            "logoAlt": "Skills Match",
+            "logoText": "Skills Match"
+        },
+        "hero": {
+            "tagline": "Professional Collaboration Platform",
+            "titlePart1": "Connect with",
+            "titlePart2": "Professionals",
+            "titlePart3": " that Complement Your Skills",
+            "description": "Join the leading professional network to form multidisciplinary teams. Connect with verified experts and take your projects to the next level.",
+            "team": "Multidisciplinary Team",
+            "stats": [
+                {
+                    "number": "500+",
+                    "label": "Active Professionals"
+                },
+                {
+                    "number": "150+",
+                    "label": "Completed Projects"
+                },
+                {
+                    "number": "95%",
+                    "label": "Success Rate"
+                }
+            ],
+            "teamRoles": "Developer • UX Designer • Project Manager",
+            "buttons": {
+                "register": "Get Started Now",
+                "login": "Log In"
+            }
+        },
+        "features": {
+            "title": "Why Choose Skills Match?",
+            "description": "Our platform is designed for professionals looking for strategic collaborations and high-impact projects.",
+            "items": [
+                {
+                    "title": "Precise Matching",
+                    "description": "Advanced algorithm that connects professionals with complementary skills to maximize project success."
+                },
+                {
+                    "title": "Professional Network",
+                    "description": "Access a curated network of verified professionals in technology, design, marketing, and project management."
+                },
+                {
+                    "title": "Professional Growth",
+                    "description": "Develop new competencies by collaborating with experts in different areas and build your professional portfolio."
+                }
+            ]
+        },
+        "cta": {
+            "title": "Start Your Next Project Today",
+            "description": "Join hundreds of professionals already collaborating on innovative projects.",
+            "button": "Create Professional Account",
+            "footer": "Free registration • No commitments"
+        }
+    },
     "welcome": {
-        "title": "Welcome to Match Skills",
+        "title": "Welcome to Skills Match",
         "subtitle": "Connect with people who complement your skills",
         "description": "Choose an option to continue",
         "login": "Login",
@@ -130,13 +187,13 @@
         "matches": "Matches",
         "profile": "Profile",
         "dashboard": "Dashboard",
-        "title": "Match Skills",
+        "title": "Skills Match",
         "notifications": "Notifications",
         "view-all": "View All",
         "messages": "Messages"
     },
     "footer": {
-        "title": "Match Skills",
+        "title": "Skills Match",
         "description": "Connecting talents and opportunities to create incredible projects together.",
         "quickLinks": "Quick Links",
         "connect": "Connect with us",
@@ -144,7 +201,7 @@
         "matches": "Matches",
         "profile": "Profile",
         "dashboard": "Dashboard",
-        "copyright": "Match Skills. All rights reserved.",
+        "copyright": "Skills Match. All rights reserved.",
         "loggedInAs": "Logged in as"
     },
     "home": {
